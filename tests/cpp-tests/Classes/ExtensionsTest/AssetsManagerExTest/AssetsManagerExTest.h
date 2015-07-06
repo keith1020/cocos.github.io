@@ -2,34 +2,52 @@
 #define __AssetsManagerEx_Test_H__
 
 #include "extensions/cocos-ext.h"
+#include "../../testBasic.h"
 #include "../../BaseTest.h"
 
-DEFINE_TEST_SUITE(AssetsManagerExTests);
+USING_NS_CC;
+USING_NS_CC_EXT;
 
-class AssetsManagerExLoaderScene : public TestCase
+class AssetsManagerExTestLayer : public BaseTest
 {
 public:
-    static AssetsManagerExLoaderScene* create(int testIndex);
-
-    AssetsManagerExLoaderScene(int testIndex);
+    AssetsManagerExTestLayer(const std::string& spritePath);
+    ~AssetsManagerExTestLayer(void);
     
-    void startDownloadCallback(cocos2d::Ref* sender);
-
     virtual std::string title() const;
-
-    virtual bool init() override;
-    virtual void onExit() override;
+    void onEnter();
+    
+    virtual void restartCallback(Ref* sender);
+    virtual void nextCallback(Ref* sender);
+    virtual void backCallback(Ref* sender);
     
 private:
-    int _testIndex;
-    cocos2d::Layer* _loadLayer;
-    cocos2d::Menu* _downloadMenu;
+    Sprite *_background;
+    std::string _spritePath;
+};
 
-    cocos2d::extension::AssetsManagerEx* _am;
-    cocos2d::Label* _progress;
-    cocos2d::extension::EventListenerAssetsManagerEx* _amListener;
+class AssetsManagerExTestScene : public TestScene
+{
+public:
+    AssetsManagerExTestScene(std::string background);
+    virtual void runThisTest() override;
+};
 
-    void onLoadEnd();
+class AssetsManagerExLoaderScene : public TestScene
+{
+public:
+    AssetsManagerExLoaderScene();
+    
+    virtual void runThisTest() override;
+    
+    virtual void onExit() override;
+    
+    static int currentScene;
+    
+private:
+    AssetsManagerEx *_am;
+    Label *_progress;
+    EventListenerAssetsManagerEx* _amListener;
 };
 
 #endif /* defined(__AssetsManagerEx_Test_H__) */

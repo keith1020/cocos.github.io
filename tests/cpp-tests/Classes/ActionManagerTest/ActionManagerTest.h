@@ -1,30 +1,30 @@
 #ifndef _ACTION_MANAGER_TEST_H_
 #define _ACTION_MANAGER_TEST_H_
 
+#include "../testBasic.h"
 #include "../BaseTest.h"
 
-DEFINE_TEST_SUITE(ActionManagerTests);
-
-class ActionManagerTest : public TestCase
+class ActionManagerTest: public BaseTest
 {
 protected:
-    cocos2d::TextureAtlas* _atlas;
+    TextureAtlas* _atlas;
 
     std::string    _title;
 
 public:
-    ActionManagerTest();
-    ~ActionManagerTest();
+    ActionManagerTest(void);
+    ~ActionManagerTest(void);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
+    void restartCallback(Ref* sender);
+    void nextCallback(Ref* sender);
+    void backCallback(Ref* sender);
 };
 
 class CrashTest : public ActionManagerTest
 {
 public:
-    CREATE_FUNC(CrashTest);
-
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
     void removeThis();
@@ -33,8 +33,6 @@ public:
 class LogicTest : public ActionManagerTest
 {
 public:
-    CREATE_FUNC(LogicTest);
-
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
     void bugMe(Node* node);
@@ -43,8 +41,6 @@ public:
 class PauseTest : public ActionManagerTest
 {
 public:
-    CREATE_FUNC(PauseTest);
-
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
     void unpause(float dt);
@@ -53,8 +49,6 @@ public:
 class StopActionTest : public ActionManagerTest
 {
 public:
-    CREATE_FUNC(StopActionTest);
-
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
     void stopAction();
@@ -63,8 +57,6 @@ public:
 class StopAllActionsTest : public ActionManagerTest
 {
 public:
-    CREATE_FUNC(StopAllActionsTest);
-
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
     void stopAction(float time);
@@ -73,11 +65,15 @@ public:
 class ResumeTest : public ActionManagerTest
 {
 public:
-    CREATE_FUNC(ResumeTest);
-
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
     void resumeGrossini(float time);
+};
+
+class ActionManagerTestScene : public TestScene
+{
+public:
+    virtual void runThisTest();
 };
 
 #endif

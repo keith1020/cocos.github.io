@@ -64,11 +64,6 @@ namespace cocostudio
         return instanceLayoutReader;
     }
     
-    void LayoutReader::destroyInstance()
-    {
-        CC_SAFE_DELETE(instanceLayoutReader);
-    }
-    
     void LayoutReader::setPropsFromBinary(cocos2d::ui::Widget *widget, CocoLoader *cocoLoader, stExpCocoNode *cocoNode)
     {
         WidgetReader::setPropsFromBinary(widget, cocoLoader, cocoNode);
@@ -190,21 +185,12 @@ namespace cocostudio
         
         /* adapt screen gui */
         float w = 0, h = 0;
-        bool adaptScrennExsit = DICTOOL->checkObjectExist_json(options, P_AdaptScreen);
-        if (adaptScrennExsit)
+        bool adaptScrenn = DICTOOL->getBooleanValue_json(options, P_AdaptScreen);
+        if (adaptScrenn)
         {
-            bool adaptScrenn = DICTOOL->getBooleanValue_json(options, P_AdaptScreen);
-            if (adaptScrenn)
-            {
-                Size screenSize = Director::getInstance()->getWinSize();
-                w = screenSize.width;
-                h = screenSize.height;
-            }
-            else
-            {
-                w = DICTOOL->getFloatValue_json(options, P_Width);
-                h = DICTOOL->getFloatValue_json(options, P_Height);
-            }
+            Size screenSize = CCDirector::getInstance()->getWinSize();
+            w = screenSize.width;
+            h = screenSize.height;
         }
         else
         {
@@ -309,11 +295,7 @@ namespace cocostudio
             panel->setBackGroundImageCapInsets(Rect(cx, cy, cw, ch));
         }
         
-        bool layoutTypeExsit = DICTOOL->checkObjectExist_json(options, P_LayoutType);
-        if (layoutTypeExsit)
-        {
-            panel->setLayoutType((Layout::Type)DICTOOL->getIntValue_json(options, P_LayoutType));
-        }
+        panel->setLayoutType((Layout::Type)DICTOOL->getIntValue_json(options, P_LayoutType));
         
         int bgimgcr = DICTOOL->getIntValue_json(options, P_ColorR,255);
         int bgimgcg = DICTOOL->getIntValue_json(options, P_ColorG,255);
@@ -675,12 +657,12 @@ namespace cocostudio
             {
                 panel->setBackGroundImage(imageFileName, (Widget::TextureResType)imageFileNameType);
             }
-            //else
-            //{
-            //    auto label = Label::create();
-            //    label->setString(__String::createWithFormat("%s missed", errorFilePath.c_str())->getCString());
-            //    panel->addChild(label);
-            //}
+            else
+            {
+                auto label = Label::create();
+                label->setString(__String::createWithFormat("%s missed", errorFilePath.c_str())->getCString());
+                panel->addChild(label);
+            }
         }
         
         auto widgetOptions = options->widgetOptions();

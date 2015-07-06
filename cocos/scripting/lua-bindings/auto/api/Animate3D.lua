@@ -11,34 +11,10 @@
 -- @return float#float ret (return value: float)
         
 --------------------------------
--- set animate quality
--- @function [parent=#Animate3D] setQuality 
--- @param self
--- @param #int quality
--- @return Animate3D#Animate3D self (return value: cc.Animate3D)
-        
---------------------------------
 -- 
 -- @function [parent=#Animate3D] setWeight 
 -- @param self
 -- @param #float weight
--- @return Animate3D#Animate3D self (return value: cc.Animate3D)
-        
---------------------------------
--- 
--- @function [parent=#Animate3D] removeFromMap 
--- @param self
--- @return Animate3D#Animate3D self (return value: cc.Animate3D)
-        
---------------------------------
--- 
--- @function [parent=#Animate3D] initWithFrames 
--- @param self
--- @param #cc.Animation3D animation
--- @param #int startFrame
--- @param #int endFrame
--- @param #float frameRate
--- @return bool#bool ret (return value: bool)
         
 --------------------------------
 -- 
@@ -51,36 +27,18 @@
 -- @function [parent=#Animate3D] setSpeed 
 -- @param self
 -- @param #float speed
--- @return Animate3D#Animate3D self (return value: cc.Animate3D)
         
---------------------------------
--- @overload self, cc.Animation3D, float, float         
--- @overload self, cc.Animation3D         
--- @function [parent=#Animate3D] init
--- @param self
--- @param #cc.Animation3D animation
--- @param #float fromTime
--- @param #float duration
--- @return bool#bool ret (return value: bool)
-
 --------------------------------
 -- get & set origin interval
 -- @function [parent=#Animate3D] setOriginInterval 
 -- @param self
 -- @param #float interval
--- @return Animate3D#Animate3D self (return value: cc.Animate3D)
         
 --------------------------------
 -- get & set blend weight, weight must positive
 -- @function [parent=#Animate3D] getWeight 
 -- @param self
 -- @return float#float ret (return value: float)
-        
---------------------------------
--- get animate quality
--- @function [parent=#Animate3D] getQuality 
--- @param self
--- @return int#int ret (return value: int)
         
 --------------------------------
 -- @overload self, cc.Animation3D, float, float         
@@ -93,7 +51,7 @@
 -- @return Animate3D#Animate3D ret (return value: cc.Animate3D)
 
 --------------------------------
---  get animate transition time between 3d animations 
+--  animate transition time 
 -- @function [parent=#Animate3D] getTransitionTime 
 -- @param self
 -- @return float#float ret (return value: float)
@@ -114,18 +72,10 @@
 -- @return Animate3D#Animate3D ret (return value: cc.Animate3D)
         
 --------------------------------
---  set animate transition time between 3d animations 
--- @function [parent=#Animate3D] setTransitionTime 
--- @param self
--- @param #float transTime
--- @return Animate3D#Animate3D self (return value: cc.Animate3D)
-        
---------------------------------
 -- 
 -- @function [parent=#Animate3D] startWithTarget 
 -- @param self
 -- @param #cc.Node target
--- @return Animate3D#Animate3D self (return value: cc.Animate3D)
         
 --------------------------------
 -- 
@@ -143,26 +93,17 @@
 -- 
 -- @function [parent=#Animate3D] stop 
 -- @param self
--- @return Animate3D#Animate3D self (return value: cc.Animate3D)
         
 --------------------------------
 -- 
 -- @function [parent=#Animate3D] update 
 -- @param self
 -- @param #float t
--- @return Animate3D#Animate3D self (return value: cc.Animate3D)
         
 --------------------------------
 -- 
 -- @function [parent=#Animate3D] step 
 -- @param self
 -- @param #float dt
--- @return Animate3D#Animate3D self (return value: cc.Animate3D)
-        
---------------------------------
--- 
--- @function [parent=#Animate3D] Animate3D 
--- @param self
--- @return Animate3D#Animate3D self (return value: cc.Animate3D)
         
 return nil

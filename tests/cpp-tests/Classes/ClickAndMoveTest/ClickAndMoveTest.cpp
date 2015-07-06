@@ -1,23 +1,25 @@
 #include "ClickAndMoveTest.h"
 #include "../testResource.h"
 
-USING_NS_CC;
-
 enum
 {
     kTagSprite = 1,
 };
 
-ClickAndMoveTest::ClickAndMoveTest()
+void ClickAndMoveTestScene::runThisTest()
 {
-    ADD_TEST_CASE(ClickAndMoveTestCase);
+    auto layer = new (std::nothrow) MainLayer();
+    layer->autorelease();
+
+    addChild(layer);
+    Director::getInstance()->replaceScene(this);
 }
 
-ClickAndMoveTestCase::ClickAndMoveTestCase()
+MainLayer::MainLayer()
 {
     auto listener = EventListenerTouchOneByOne::create();
-    listener->onTouchBegan = CC_CALLBACK_2(ClickAndMoveTestCase::onTouchBegan, this);
-    listener->onTouchEnded = CC_CALLBACK_2(ClickAndMoveTestCase::onTouchEnded, this);
+    listener->onTouchBegan = CC_CALLBACK_2(MainLayer::onTouchBegan, this);
+    listener->onTouchEnded = CC_CALLBACK_2(MainLayer::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
     
     auto sprite = Sprite::create(s_pathGrossini);
@@ -38,12 +40,12 @@ ClickAndMoveTestCase::ClickAndMoveTestCase()
                       )); 
 }
 
-bool ClickAndMoveTestCase::onTouchBegan(Touch* touch, Event  *event)
+bool MainLayer::onTouchBegan(Touch* touch, Event  *event)
 {
     return true;
 }
 
-void ClickAndMoveTestCase::onTouchEnded(Touch* touch, Event  *event)
+void MainLayer::onTouchEnded(Touch* touch, Event  *event)
 {
     auto location = touch->getLocation();
 

@@ -243,8 +243,164 @@ ssize_t ZipUtils::inflateMemoryWithHint(unsigned char *in, ssize_t inLength, uns
 
 ssize_t ZipUtils::inflateMemory(unsigned char *in, ssize_t inLength, unsigned char **out)
 {
-    // 256k for hint
     return inflateMemoryWithHint(in, inLength, out, 256 * 1024);
+
+	/*#define CHUNK 16384
+	int ret, flush;
+    unsigned have;
+    z_stream strm;
+    unsigned char in[CHUNK];
+    unsigned char out[CHUNK];
+
+    / * allocate deflate state * /
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    ret = deflateInit(&strm, level);
+    if (ret != Z_OK)
+        return ret;
+
+    / * compress until end of file * /
+    do {
+//         strm.avail_in = fread(in, 1, CHUNK, source);
+//         if (ferror(source)) {
+//             (void)deflateEnd(&strm);
+//             return Z_ERRNO;
+//         }
+//        flush = feof(source) ? Z_FINISH : Z_NO_FLUSH;
+		flush = Z_FINISH;
+        strm.next_in = in;
+		strm.avail_in = static_cast<unsigned int>(inLength);;
+
+        / * run deflate() on input until output buffer not full, finish
+           compression if all of source has been read in * /
+        do {
+            strm.avail_out = CHUNK;
+            strm.next_out = out;
+            ret = deflate(&strm, flush);    / * no bad return value * /
+            assert(ret != Z_STREAM_ERROR);  / * state not clobbered * /
+            have = CHUNK - strm.avail_out;
+            if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
+                (void)deflateEnd(&strm);
+                return Z_ERRNO;
+            }
+        } while (strm.avail_out == 0);
+        assert(strm.avail_in == 0);     / * all input will be used * /
+
+        / * done when last data in file processed * /
+    } while (flush != Z_FINISH);
+    assert(ret == Z_STREAM_END);        / * stream will be complete * /
+
+    / * clean up and return * /
+    (void)deflateEnd(&strm);
+    return Z_OK;
+*/
+}
+
+// Lynn deflate
+int ZipUtils::deflateMemoryWithHint(unsigned char *in, ssize_t inLength, unsigned char **out, ssize_t *outLength, ssize_t outLenghtHint)
+{
+	/* ret value */
+	int err = Z_OK;
+
+	ssize_t bufferSize = outLenghtHint;
+	*out = (unsigned char*)malloc(bufferSize);
+
+	z_stream d_stream; /* compression stream */
+	d_stream.zalloc = (alloc_func)0;
+	d_stream.zfree = (free_func)0;
+	d_stream.opaque = (voidpf)0;
+
+	d_stream.next_in  = in;
+	d_stream.avail_in = static_cast<unsigned int>(inLength);
+	d_stream.next_out = *out;
+	d_stream.avail_out = static_cast<unsigned int>(bufferSize);
+
+	/* window size to hold 256k */
+	if( (err = deflateInit(&d_stream, Z_DEFAULT_COMPRESSION)) != Z_OK )
+		return err;
+
+	for (;;)
+	{
+		err = deflate(&d_stream, Z_FINISH);
+
+		if (err == Z_STREAM_END)
+		{
+			break;
+		}
+
+		switch (err)
+		{
+		case Z_NEED_DICT:
+			err = Z_DATA_ERROR;
+		case Z_DATA_ERROR:
+		case Z_MEM_ERROR:
+		case Z_BUF_ERROR:
+		case Z_STREAM_ERROR:
+			deflateEnd(&d_stream);
+			return err;
+		}
+
+		// not enough memory ?
+		if (err != Z_STREAM_END)
+		{
+			*out = (unsigned char*)realloc(*out, bufferSize * BUFFER_INC_FACTOR);
+
+			/* not enough memory, ouch */
+			if (! *out )
+			{
+				CCLOG("cocos2d: ZipUtils: realloc failed");
+				deflateEnd(&d_stream);
+				return Z_MEM_ERROR;
+			}
+
+			d_stream.next_out = *out + bufferSize;
+			d_stream.avail_out = static_cast<unsigned int>(bufferSize);
+			bufferSize *= BUFFER_INC_FACTOR;
+		}
+	}
+
+	*outLength = bufferSize - d_stream.avail_out;
+	err = deflateEnd(&d_stream);
+	return err;
+}
+ssize_t ZipUtils::deflateMemoryWithHint(unsigned char *in, ssize_t inLength, unsigned char **out, ssize_t outLengthHint)
+{
+	ssize_t outLength = 0;
+	int err = deflateMemoryWithHint(in, inLength, out, &outLength, outLengthHint);
+
+	if (err != Z_OK || *out == nullptr)
+	{
+		if (err == Z_MEM_ERROR)
+		{
+			CCLOG("cocos2d: ZipUtils: Out of memory while compressing map data!");
+		}
+		else if (err == Z_VERSION_ERROR)
+		{
+			CCLOG("cocos2d: ZipUtils: Incompatible zlib version!");
+		}
+		else if (err == Z_DATA_ERROR)
+		{
+			CCLOG("cocos2d: ZipUtils: Incorrect zlib decompressed data!");
+		}
+		else
+		{
+			CCLOG("cocos2d: ZipUtils: Unknown error while compressing map data!");
+		}
+
+		if(*out)
+		{
+			free(*out);
+			*out = nullptr;
+		}
+		outLength = 0;
+	}
+	return outLength;
+}
+ssize_t ZipUtils::deflateMemory(unsigned char *in, ssize_t inLength, unsigned char **out)
+{
+	// 256k for hint
+	return deflateMemoryWithHint(in, inLength, out, 256 * 1024);
 }
 
 int ZipUtils::inflateGZipFile(const char *path, unsigned char **out)

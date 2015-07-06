@@ -26,7 +26,8 @@ THE SOFTWARE.
 #define __COCOS2DX_LUA_LOADER_H__
 
 #include "cocos2d.h"
-
+#include "luaconf.h"
+#include "crypto/CCCrypto.h"
 extern "C"
 {
 #include "lua.h"

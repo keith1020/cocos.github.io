@@ -99,7 +99,7 @@ def main():
 
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     cocos_root = os.path.abspath(os.path.join(project_root, ''))
-    cxx_generator_root = os.path.abspath(os.path.join(project_root, 'tools/bindings-generator'))
+    cxx_generator_root = os.path.abspath(os.path.join(project_root, '../tools/tolua/bindings-generator'))
 
     # save config to file
     config = ConfigParser.ConfigParser()
@@ -132,6 +132,7 @@ def main():
 
         tolua_root = '%s/tools/tolua' % project_root
         output_dir = '%s/cocos/scripting/lua-bindings/auto' % project_root
+        moonton_dir = '%s/../Classes' % project_root
 
         cmd_args = {'cocos2dx.ini' : ('cocos2d-x', 'lua_cocos2dx_auto'), \
                     'cocos2dx_extension.ini' : ('cocos2dx_extension', 'lua_cocos2dx_extension_auto'), \
@@ -147,10 +148,10 @@ def main():
                     'cocos2dx_3d.ini': ('cocos2dx_3d', 'lua_cocos2dx_3d_auto'), \
                     'cocos2dx_audioengine.ini': ('cocos2dx_audioengine', 'lua_cocos2dx_audioengine_auto'), \
                     'cocos2dx_csloader.ini' : ('cocos2dx_csloader', 'lua_cocos2dx_csloader_auto'), \
-                    'cocos2dx_experimental_webview.ini' : ('cocos2dx_experimental_webview', 'lua_cocos2dx_experimental_webview_auto'), \
-                    'cocos2dx_physics3d.ini' : ('cocos2dx_physics3d', 'lua_cocos2dx_physics3d_auto'), \
-                    'cocos2dx_navmesh.ini' : ('cocos2dx_navmesh', 'lua_cocos2dx_navmesh_auto'), \
+                    '../../../tools/tolua/moonton.ini' : ('moonton', 'lua_moonton_auto'), \
                     }
+
+        #cmd_args = {'../../../tools/tolua/moonton.ini' : ('moonton', 'lua_moonton_auto'), }
         target = 'lua'
         generator_py = '%s/generator.py' % cxx_generator_root
         for key in cmd_args.keys():
@@ -158,7 +159,12 @@ def main():
             cfg = '%s/%s' % (tolua_root, key)
             print 'Generating bindings for %s...' % (key[:-4])
             command = '%s %s %s -s %s -t %s -o %s -n %s' % (python_bin, generator_py, cfg, args[0], target, output_dir, args[1])
+            #print command
             _run_cmd(command)
+
+        if platform == 'win32':
+            with _pushd(output_dir):
+                _run_cmd('dos2unix *')
 
         print '---------------------------------'
         print 'Generating lua bindings succeeds.'

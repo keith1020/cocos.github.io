@@ -55,7 +55,7 @@ public class Cocos2dxEditText extends EditText {
     public Cocos2dxEditText(final Context context, final AttributeSet attrs, final int defStyle) {
         super(context, attrs, defStyle);
     }
-
+ 
     // ===========================================================
     // Getter & Setter
     // ===========================================================
@@ -78,6 +78,14 @@ public class Cocos2dxEditText extends EditText {
         }
 
         return true;
+    }
+    @Override
+    public boolean onKeyPreIme(int keyCode, KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            //dispatchKeyEvent(event);
+            return false;
+        }
+        return super.onKeyPreIme(keyCode, event);
     }
 
     // ===========================================================

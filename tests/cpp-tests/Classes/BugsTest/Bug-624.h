@@ -3,24 +3,24 @@
 
 #include "BugsTest.h"
 
-class Bug624Layer : public BugsTestBase
+class Bug624Layer : public BugsTestBaseLayer
 {
 public:
     virtual ~Bug624Layer();
-    virtual bool init() override;
+    virtual bool init();
     void switchLayer(float dt);
-    virtual void onAcceleration(cocos2d::Acceleration* acc, cocos2d::Event* event);
+    virtual void onAcceleration(Acceleration* acc, Event* event);
 
     CREATE_FUNC(Bug624Layer);
 };
 
-class Bug624Layer2 : public BugsTestBase
+class Bug624Layer2 : public BugsTestBaseLayer
 {
 public:
     virtual ~Bug624Layer2();
-    virtual bool init() override;
+    virtual bool init();
     void switchLayer(float dt);
-    virtual void onAcceleration(cocos2d::Acceleration* acc, cocos2d::Event* event);
+    virtual void onAcceleration(Acceleration* acc, Event* event);
 
     CREATE_FUNC(Bug624Layer2);
 };

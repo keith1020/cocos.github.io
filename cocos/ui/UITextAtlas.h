@@ -30,17 +30,13 @@ THE SOFTWARE.
 
 NS_CC_BEGIN
 
-/**
- * @addtogroup ui
- * @{
- */
-
 class Label;
 
 namespace ui {
     
 /**
- * @brief UI TextAtlas widget.
+ *   @js NA
+ *   @lua NA
  */
 class CC_GUI_DLL TextAtlas : public Widget
 {
@@ -49,35 +45,22 @@ class CC_GUI_DLL TextAtlas : public Widget
     
 public:
     /**
-     * Default constructor.
-     *
-     * @lua new
+     * Default constructor
      */
     TextAtlas();
     
     /**
-     * Default destructor.
-     *
-     * @lua NA
+     * Default destructor
      */
     virtual ~TextAtlas();
     
     /**
-     * Create a TexAtlas object.
-     *
-     * @return An autoreleased TextAtlas object.
+     * Allocates and initializes.
      */
     static TextAtlas* create();
     
     /**
-     * Create a LabelAtlas from a char map file.
-     *
-     * @param stringValue A given string needs to be displayed.
-     * @param charMapFile A given char map file name.
-     * @param itemWidth The element width.
-     * @param itemHeight The element height.
-     * @param startCharMap The starting char of the atlas.
-     * @return An autoreleased TextAtlas object.
+     * create a LabelAtlas from a char map file
      */
     static TextAtlas* create(const std::string& stringValue,
                              const std::string& charMapFile,
@@ -85,32 +68,18 @@ public:
                              int itemHeight,
                              const std::string& startCharMap);
     
-    /** Initializes the LabelAtlas with a string, a char map file(the atlas), the width and height of each element and the starting char of the atlas.
-     *
-     * @param stringValue A given string needs to be displayed.
-     * @param charMapFile A given char map file name.
-     * @param itemWidth The element width.
-     * @param itemHeight The element height.
-     * @param startCharMap The starting char of the atlas.
-     */
-    
+    /** initializes the LabelAtlas with a string, a char map file(the atlas), the width and height of each element and the starting char of the atlas */
     void setProperty(const std::string& stringValue,
                      const std::string& charMapFile,
                      int itemWidth,
                      int itemHeight,
                      const std::string& startCharMap);
     
-    /**Set string value for labelatlas.
-     *
-     * @param value A given string needs to be displayed.
-     */
+    //set string value for labelatlas.
     CC_DEPRECATED_ATTRIBUTE void setStringValue(const std::string& value){this->setString(value);}
     void setString(const std::string& value);
     
-    /**Get string value for labelatlas.
-     *
-     * @return The string value of TextAtlas.
-     */
+    //get string value for labelatlas.
     CC_DEPRECATED_ATTRIBUTE const std::string& getStringValue() const{return this->getString();}
     const std::string& getString() const;
     
@@ -132,12 +101,11 @@ public:
     /**
      * Returns the "class name" of widget.
      */
-    virtual std::string getDescription() const override;
+    virtual std::string getDescription() const;
     
-    /**
-     * @js NA
-     */
     virtual void adaptRenderers() override;
+
+	Label* getAtlasRenderer(){ return _labelAtlasRenderer; };
 protected:
     virtual void initRenderer() override;
     virtual void onSizeChanged() override;
@@ -156,10 +124,6 @@ protected:
 };
 
 }
-
-// end of ui group
-/// @}
-
 NS_CC_END
 
 #endif /* defined(__CocoGUI__LabelAtlas__) */

@@ -5,130 +5,110 @@
 -- @parent_module ccui
 
 --------------------------------
--- brief Query the custom scroll threshold of the PageView.<br>
--- return Custom scroll threshold in float.
+-- brief Return user defined scroll page threshold
 -- @function [parent=#PageView] getCustomScrollThreshold 
 -- @param self
 -- @return float#float ret (return value: float)
         
 --------------------------------
--- Gets current displayed page index.<br>
+-- Gets current page index.<br>
 -- return current page index.
 -- @function [parent=#PageView] getCurPageIndex 
 -- @param self
--- @return long#long ret (return value: long)
+-- @return int#int ret (return value: int)
         
 --------------------------------
--- Add a widget as a page of PageView in a given index.<br>
--- param widget    Widget to be added to pageview.<br>
--- param pageIdx   A given index.<br>
--- param forceCreate   If `forceCreate` is true and `widget` isn't exists, pageview would create a default page and add it.
+-- Add a widget to a page of pageview.<br>
+-- param widget    widget to be added to pageview.<br>
+-- param pageIdx   index of page.<br>
+-- param forceCreate   if force create and there is no page exsit, pageview would create a default page for adding widget.
 -- @function [parent=#PageView] addWidgetToPage 
 -- @param self
 -- @param #ccui.Widget widget
--- @param #long pageIdx
+-- @param #int pageIdx
 -- @param #bool forceCreate
--- @return PageView#PageView self (return value: ccui.PageView)
         
 --------------------------------
--- brief Query whether use user defined scroll page threshold or not.<br>
--- return True if using custom scroll threshold, false otherwise.
+-- brief Query whether we are using user defined scroll page threshold or not
 -- @function [parent=#PageView] isUsingCustomScrollThreshold 
 -- @param self
 -- @return bool#bool ret (return value: bool)
         
 --------------------------------
--- brief Get a page at a given index<br>
--- param index A given index.<br>
--- return A layout pointer in PageView container.
+-- 
 -- @function [parent=#PageView] getPage 
 -- @param self
--- @param #long index
+-- @param #int index
 -- @return Layout#Layout ret (return value: ccui.Layout)
         
 --------------------------------
--- Remove a page of PageView.<br>
--- param page  Page to be removed.
+-- Remove a page of pageview.<br>
+-- param page    page which will be removed.
 -- @function [parent=#PageView] removePage 
 -- @param self
 -- @param #ccui.Layout page
--- @return PageView#PageView self (return value: ccui.PageView)
         
 --------------------------------
--- brief Add a page turn callback to PageView, then when one page is turning, the callback will be called.<br>
--- param callback A page turning callback.
+-- 
 -- @function [parent=#PageView] addEventListener 
 -- @param self
 -- @param #function callback
--- @return PageView#PageView self (return value: ccui.PageView)
         
 --------------------------------
--- brief Set using user defined scroll page threshold or not.<br>
--- If you set it to false, then the default scroll threshold is pageView.width / 2<br>
--- param flag True if using custom scroll threshold, false otherwise.
+-- brief Set using user defined scroll page threshold or not<br>
+-- If you set it to false, then the default scroll threshold is pageView.width / 2
 -- @function [parent=#PageView] setUsingCustomScrollThreshold 
 -- @param self
 -- @param #bool flag
--- @return PageView#PageView self (return value: ccui.PageView)
         
 --------------------------------
--- brief If you don't specify the value, the pageView will turn page when scrolling at the half width of a page.<br>
--- param threshold  A threshold in float.
+-- brief If you don't specify the value, the pageView will scroll when half pageview width reached
 -- @function [parent=#PageView] setCustomScrollThreshold 
 -- @param self
 -- @param #float threshold
--- @return PageView#PageView self (return value: ccui.PageView)
         
 --------------------------------
--- Insert a page into PageView at a given index.<br>
--- param page  Page to be inserted.<br>
--- param idx   A given index.
+-- Insert a page to pageview.<br>
+-- param page    page to be added to pageview.
 -- @function [parent=#PageView] insertPage 
 -- @param self
 -- @param #ccui.Layout page
 -- @param #int idx
--- @return PageView#PageView self (return value: ccui.PageView)
         
 --------------------------------
--- Scroll to a page with a given index.<br>
--- param idx   A given index in the PageView.
+-- scroll pageview to index.<br>
+-- param idx    index of page.
 -- @function [parent=#PageView] scrollToPage 
 -- @param self
--- @param #long idx
--- @return PageView#PageView self (return value: ccui.PageView)
+-- @param #int idx
         
 --------------------------------
--- Remove a page at a given index of PageView.<br>
--- param index  A given index.
+-- Remove a page at index of pageview.<br>
+-- param index    index of page.
 -- @function [parent=#PageView] removePageAtIndex 
 -- @param self
--- @param #long index
--- @return PageView#PageView self (return value: ccui.PageView)
+-- @param #int index
         
 --------------------------------
--- brief Get all the pages in the PageView.<br>
--- return A vector of Layout pionters.
+-- 
 -- @function [parent=#PageView] getPages 
 -- @param self
 -- @return array_table#array_table ret (return value: array_table)
         
 --------------------------------
--- brief Remove all pages of the PageView.
+-- 
 -- @function [parent=#PageView] removeAllPages 
 -- @param self
--- @return PageView#PageView self (return value: ccui.PageView)
         
 --------------------------------
--- Insert a page into the end of PageView.<br>
--- param page Page to be inserted.
+-- Push back a page to pageview.<br>
+-- param page    page to be added to pageview.
 -- @function [parent=#PageView] addPage 
 -- @param self
 -- @param #ccui.Layout page
--- @return PageView#PageView self (return value: ccui.PageView)
         
 --------------------------------
--- Create an empty PageView.<br>
--- return A PageView instance.
+-- Allocates and initializes.
 -- @function [parent=#PageView] create 
 -- @param self
 -- @return PageView#PageView ret (return value: ccui.PageView)
@@ -140,13 +120,15 @@
 -- @return Ref#Ref ret (return value: cc.Ref)
         
 --------------------------------
--- 
+-- Gets LayoutType.<br>
+-- see LayoutType<br>
+-- return LayoutType
 -- @function [parent=#PageView] getLayoutType 
 -- @param self
 -- @return int#int ret (return value: int)
         
 --------------------------------
--- 
+-- Returns the "class name" of widget.
 -- @function [parent=#PageView] getDescription 
 -- @param self
 -- @return string#string ret (return value: string)
@@ -156,27 +138,18 @@
 -- @function [parent=#PageView] update 
 -- @param self
 -- @param #float dt
--- @return PageView#PageView self (return value: ccui.PageView)
         
 --------------------------------
--- 
--- @function [parent=#PageView] init 
--- @param self
--- @return bool#bool ret (return value: bool)
-        
---------------------------------
--- 
+-- Sets LayoutType.<br>
+-- see LayoutType<br>
+-- param type LayoutType
 -- @function [parent=#PageView] setLayoutType 
 -- @param self
 -- @param #int type
--- @return PageView#PageView self (return value: ccui.PageView)
         
 --------------------------------
--- Default constructor<br>
--- js ctor<br>
--- lua new
+-- Default constructor
 -- @function [parent=#PageView] PageView 
 -- @param self
--- @return PageView#PageView self (return value: ccui.PageView)
         
 return nil

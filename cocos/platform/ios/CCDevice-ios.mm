@@ -33,15 +33,12 @@
 #include "base/CCEventAcceleration.h"
 #include "base/CCDirector.h"
 #import <UIKit/UIKit.h>
-
+#include "AdSupport/ASIdentifierManager.h"
+#include <GameKit/GameKit.h>
+#include "base/CCUserDefault.h"
 // Accelerometer
 #import<CoreMotion/CoreMotion.h>
 #import<CoreFoundation/CoreFoundation.h>
-
-// Vibrate
-#import <AudioToolbox/AudioToolbox.h>
-
-#define SENSOR_DELAY_GAME 0.02
 
 @interface CCAccelerometerDispatcher : NSObject<UIAccelerometerDelegate>
 {
@@ -74,7 +71,6 @@ static CCAccelerometerDispatcher* s_pAccelerometerDispatcher;
     if( (self = [super init]) ) {
         _acceleration = new cocos2d::Acceleration();
         _motionManager = [[CMMotionManager alloc] init];
-        _motionManager.accelerometerUpdateInterval = SENSOR_DELAY_GAME;
     }
     return self;
 }
@@ -171,10 +167,6 @@ int Device::getDPI()
     }
     return dpi;
 }
-
-
-
-
 void Device::setAccelerometerEnabled(bool isEnabled)
 {
     [[CCAccelerometerDispatcher sharedAccelerometerDispather] setAccelerometerEnabled:isEnabled];
@@ -232,7 +224,7 @@ static CGSize _calculateStringSize(NSString *str, id font, CGSize *constrainSize
     CGSize dim;
     if(s_isIOS7OrHigher){
         NSDictionary *attibutes = @{NSFontAttributeName:font};
-        dim = [str boundingRectWithSize:textRect options:(NSStringDrawingOptions)(NSStringDrawingUsesLineFragmentOrigin) attributes:attibutes context:nil].size;
+        dim = [str boundingRectWithSize:textRect options:(NSStringDrawingOptions)(NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading) attributes:attibutes context:nil].size;
     }
     else {
         dim = [str sizeWithFont:font constrainedToSize:textRect];
@@ -474,7 +466,7 @@ Data Device::getTextureDataForText(const char * text, const FontDefinition& text
         info.strokeColorR           = textDefinition._stroke._strokeColor.r / 255.0f;
         info.strokeColorG           = textDefinition._stroke._strokeColor.g / 255.0f;
         info.strokeColorB           = textDefinition._stroke._strokeColor.b / 255.0f;
-        info.strokeColorA           = textDefinition._stroke._strokeAlpha / 255.0f;
+        info.strokeColorB           = textDefinition._stroke._strokeAlpha / 255.0f;
         info.strokeSize             = textDefinition._stroke._strokeSize;
         info.tintColorR             = textDefinition._fontFillColor.r / 255.0f;
         info.tintColorG             = textDefinition._fontFillColor.g / 255.0f;
@@ -487,8 +479,8 @@ Data Device::getTextureDataForText(const char * text, const FontDefinition& text
         }
         height = (short)info.height;
         width = (short)info.width;
-        ret.fastSet(info.data,width * height * 4);
-        hasPremultipliedAlpha = true;
+		ret.fastSet(info.data,width * height * 4);
+		hasPremultipliedAlpha = true;
     } while (0);
     
     return ret;
@@ -497,19 +489,6 @@ Data Device::getTextureDataForText(const char * text, const FontDefinition& text
 void Device::setKeepScreenOn(bool value)
 {
     [[UIApplication sharedApplication] setIdleTimerDisabled:(BOOL)value];
-}
-
-/*!
- @brief Only works on iOS devices that support vibration (such as iPhone). Shoud only be used for important alerts.  Use risks rejection in iTunes Store.
- @param duration ignored for iOS
- */
-void Device::vibrate(float duration)
-{
-    // See https://developer.apple.com/library/ios/documentation/AudioToolbox/Reference/SystemSoundServicesReference/index.html#//apple_ref/c/econst/kSystemSoundID_Vibrate
-    CC_UNUSED_PARAM(duration);
-    
-    // automatically vibrates for approximately 0.4 seconds
-    AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
 }
 
 NS_CC_END

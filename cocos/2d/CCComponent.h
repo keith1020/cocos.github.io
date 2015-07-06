@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2013-2015 Chukong Technologies Inc.
+Copyright (c) 2013-2014 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -25,8 +25,6 @@ THE SOFTWARE.
 #ifndef __CC_FRAMEWORK_COMPONENT_H__
 #define __CC_FRAMEWORK_COMPONENT_H__
 
-/// @cond DO_NOT_SHOW
-
 #include "base/CCRef.h"
 #include "base/CCScriptSupport.h"
 #include <string>
@@ -38,8 +36,6 @@ class Node;
 enum {
     kComponentOnEnter,
     kComponentOnExit,
-    kComponentOnAdd,
-    kComponentOnRemove,
     kComponentOnUpdate
 };
 
@@ -60,8 +56,6 @@ public:
 
     virtual void onEnter();
     virtual void onExit();
-    virtual void onAdd();
-    virtual void onRemove();
     virtual void update(float delta);
     virtual bool serialize(void* r);
     virtual bool isEnabled() const;
@@ -86,5 +80,4 @@ protected:
 
 NS_CC_END
 
-/// @endcond
 #endif  // __FUNDATION__CCCOMPONENT_H__

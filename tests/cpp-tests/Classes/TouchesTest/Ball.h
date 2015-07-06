@@ -5,26 +5,28 @@
 
 class Paddle;
 
-class Ball : public cocos2d::Sprite
+USING_NS_CC;
+
+class Ball : public Sprite
 {
-    cocos2d::Vec2 _velocity;
+    Vec2 _velocity;
 public:
     Ball(void);
     virtual ~Ball(void);
 
     float radius();
-    //BOOL initWithTexture(cocos2d::Texture2D* aTexture);
-    //virtual void setTexture(cocos2d::Texture2D* newTexture);
+    //BOOL initWithTexture(Texture2D* aTexture);
+    //virtual void setTexture(Texture2D* newTexture);
     void move(float delta);
     void collideWithPaddle(Paddle* paddle);
 
 
 public:
-    void setVelocity(cocos2d::Vec2 velocity){_velocity = velocity;}
-    cocos2d::Vec2 getVelocity(){return _velocity;}
+    void setVelocity(Vec2 velocity){_velocity = velocity;}
+    Vec2 getVelocity(){return _velocity;}
 
 public:
-    static Ball* ballWithTexture(cocos2d::Texture2D* aTexture);
+    static Ball* ballWithTexture(Texture2D* aTexture);
 };
 
 #endif

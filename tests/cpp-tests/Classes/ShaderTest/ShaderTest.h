@@ -3,125 +3,126 @@
 
 #include "ui/CocosGUI.h"
 
+#include "../testBasic.h"
 #include "extensions/cocos-ext.h"
 #include "../BaseTest.h"
 
+USING_NS_CC_EXT;
 
-DEFINE_TEST_SUITE(ShaderTests);
-
-class ShaderTestDemo : public TestCase
+class ShaderTestDemo : public BaseTest
 {
 public:
+    ShaderTestDemo(void);
+
+    virtual std::string title() const override;
+    virtual std::string subtitle() const override;
+
+    void restartCallback(Ref* sender);
+    void nextCallback(Ref* sender);
+    void backCallback(Ref* sender);
+
+    CREATE_FUNC(ShaderTestDemo);
 };
 
 class ShaderMonjori : public ShaderTestDemo
 {
 public:
-    CREATE_FUNC(ShaderMonjori);
     ShaderMonjori();
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    virtual bool init() override;
+    virtual bool init();
 };
 
 class ShaderMandelbrot : public ShaderTestDemo
 {
 public:
-    CREATE_FUNC(ShaderMandelbrot);
     ShaderMandelbrot();
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    virtual bool init() override;
+    virtual bool init();
 };
 
 class ShaderJulia : public ShaderTestDemo
 {
 public:
-    CREATE_FUNC(ShaderJulia);
     ShaderJulia();
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    virtual bool init() override;
+    virtual bool init();
 };
 
 class ShaderHeart : public ShaderTestDemo
 {
 public:
-    CREATE_FUNC(ShaderHeart);
     ShaderHeart();
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    virtual bool init() override;
+    virtual bool init();
 };
 
 class ShaderFlower : public ShaderTestDemo
 {
 public:
-    CREATE_FUNC(ShaderFlower);
     ShaderFlower();
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    virtual bool init() override;
+    virtual bool init();
 };
 
 class ShaderPlasma : public ShaderTestDemo
 {
 public:
-    CREATE_FUNC(ShaderPlasma);
     ShaderPlasma();
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    virtual bool init() override;
+    virtual bool init();
 };
 
 class SpriteBlur;
 class ShaderBlur : public ShaderTestDemo
 {
 public:
-    CREATE_FUNC(ShaderBlur);
     ShaderBlur();
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    virtual bool init() override;
+    virtual bool init();
     void createSliderCtls();
-    void onRadiusChanged(cocos2d::Ref* sender, cocos2d::extension::Control::EventType controlEvent);
-    void onSampleNumChanged(cocos2d::Ref* sender, cocos2d::extension::Control::EventType controlEvent);
+    void onRadiusChanged(Ref* sender, Control::EventType controlEvent);
+    void onSampleNumChanged(Ref* sender, Control::EventType controlEvent);
     
 protected:
     SpriteBlur* _blurSprite;
-    cocos2d::extension::ControlSlider* _sliderRadiusCtl;
-    cocos2d::extension::ControlSlider* _sliderNumCtrl;
+    ControlSlider* _sliderRadiusCtl;
+    ControlSlider* _sliderNumCtrl;
 };
 
 class ShaderRetroEffect : public ShaderTestDemo
 {
 public:
-    CREATE_FUNC(ShaderRetroEffect);
     ShaderRetroEffect();
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    bool init() override;
-    void update(float dt) override;
+    bool init();
+    void update(float dt);
 protected:
-    cocos2d::Label* _label;
+    Label* _label;
     float           _accum;
 };
 
-class ShaderNode : public cocos2d::Node
+class ShaderNode : public Node
 {
 public:
-    CREATE_FUNC(ShaderNode);
     static ShaderNode* shaderNodeWithVertex(const std::string &vert, const std::string &frag);
 
-    virtual void update(float dt) override;
-    virtual void setPosition(const cocos2d::Vec2 &newPosition) override;
-    virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
+    virtual void update(float dt);
+    virtual void setPosition(const Vec2 &newPosition);
+    virtual void draw(Renderer *renderer, const Mat4 &transform, uint32_t flags) override;
 
 protected:
     ShaderNode();
@@ -130,52 +131,55 @@ protected:
     bool initWithVertex(const std::string &vert, const std::string &frag);
     void loadShaderVertex(const std::string &vert, const std::string &frag);
 
-    void onDraw(const cocos2d::Mat4& transform, uint32_t flags);
+    void onDraw(const Mat4 &transform, uint32_t flags);
 
-    cocos2d::Vec2 _center;
-    cocos2d::Vec2 _resolution;
+    Vec2 _center;
+    Vec2 _resolution;
     float      _time;
     std::string _vertFileName;
     std::string _fragFileName;
-    cocos2d::CustomCommand _customCommand;
+    CustomCommand _customCommand;
+};
+
+class ShaderTestScene : public TestScene
+{
+public:
+    virtual void runThisTest();
 };
 
 class ShaderLensFlare : public ShaderTestDemo
 {
 public:
-    CREATE_FUNC(ShaderLensFlare);
     ShaderLensFlare();
     
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    virtual bool init() override;
+    virtual bool init();
 };
 
 class ShaderGlow : public ShaderTestDemo
 {
 public:
-    CREATE_FUNC(ShaderGlow);
     ShaderGlow();
     
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    virtual bool init() override;
+    virtual bool init();
 };
 
 class ShaderMultiTexture : public ShaderTestDemo
 {
     static const int rightSpriteTag = 2014;
 public:
-    CREATE_FUNC(ShaderMultiTexture);
     ShaderMultiTexture();
-    cocos2d::ui::Slider* createSliderCtl();
-    void changeTexture(cocos2d::Ref*);
+    ui::Slider* createSliderCtl();
+    void changeTexture(Ref*);
     int _changedTextureId;
-    cocos2d::Sprite* _sprite;
+    Sprite *_sprite;
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    virtual bool init() override;
+    virtual bool init();
 };
 
 #endif

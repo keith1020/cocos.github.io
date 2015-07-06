@@ -40,7 +40,8 @@
 extern "C" {
 #endif
 
-typedef struct spSkeleton {
+typedef struct spSkeleton spSkeleton;
+struct spSkeleton {
 	spSkeletonData* const data;
 
 	int bonesCount;
@@ -59,29 +60,7 @@ typedef struct spSkeleton {
 	float time;
 	int/*bool*/flipX, flipY;
 	float x, y;
-
-#ifdef __cplusplus
-	spSkeleton() :
-		data(0),
-		bonesCount(0),
-		bones(0),
-		root(0),
-		slotsCount(0),
-		slots(0),
-		drawOrder(0),
-
-		ikConstraintsCount(0),
-		ikConstraints(0),
-
-		skin(0),
-		r(0), g(0), b(0), a(0),
-		time(0),
-		flipX(0),
-		flipY(0),
-		x(0), y(0) {
-	}
-#endif
-} spSkeleton;
+};
 
 spSkeleton* spSkeleton_create (spSkeletonData* data);
 void spSkeleton_dispose (spSkeleton* self);
@@ -104,9 +83,8 @@ spSlot* spSkeleton_findSlot (const spSkeleton* self, const char* slotName);
 /* Returns -1 if the slot was not found. */
 int spSkeleton_findSlotIndex (const spSkeleton* self, const char* slotName);
 
-/* Sets the skin used to look up attachments before looking in the SkeletonData defaultSkin. Attachments from the new skin are
- * attached if the corresponding attachment from the old skin was attached. If there was no old skin, each slot's setup mode
- * attachment is attached from the new skin.
+/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
+ * attached if the corresponding attachment from the old skin was attached.
  * @param skin May be 0.*/
 void spSkeleton_setSkin (spSkeleton* self, spSkin* skin);
 /* Returns 0 if the skin was not found. See spSkeleton_setSkin.
@@ -117,8 +95,7 @@ int spSkeleton_setSkinByName (spSkeleton* self, const char* skinName);
 spAttachment* spSkeleton_getAttachmentForSlotName (const spSkeleton* self, const char* slotName, const char* attachmentName);
 /* Returns 0 if the slot or attachment was not found. */
 spAttachment* spSkeleton_getAttachmentForSlotIndex (const spSkeleton* self, int slotIndex, const char* attachmentName);
-/* Returns 0 if the slot or attachment was not found.
- * @param attachmentName May be 0. */
+/* Returns 0 if the slot or attachment was not found. */
 int spSkeleton_setAttachment (spSkeleton* self, const char* slotName, const char* attachmentName);
 
 /* Returns 0 if the IK constraint was not found. */

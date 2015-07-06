@@ -44,11 +44,6 @@ namespace cocostudio
         return instanceScrollViewReader;
     }
     
-    void ScrollViewReader::destroyInstance()
-    {
-        CC_SAFE_DELETE(instanceScrollViewReader);
-    }
-    
     void ScrollViewReader::setPropsFromBinary(cocos2d::ui::Widget *widget, CocoLoader *cocoLoader, stExpCocoNode* cocoNode)
     {
         //TODO: need to refactor...
@@ -489,12 +484,12 @@ namespace cocostudio
             {
                 scrollView->setBackGroundImage(imageFileName, (Widget::TextureResType)imageFileNameType);
             }
-            //else
-            //{
-            //    auto label = Label::create();
-            //    label->setString(__String::createWithFormat("%s missed", errorFilePath.c_str())->getCString());
-            //    scrollView->addChild(label);
-            //}
+            else
+            {
+                auto label = Label::create();
+                label->setString(__String::createWithFormat("%s missed", errorFilePath.c_str())->getCString());
+                scrollView->addChild(label);
+            }
         }
         
         auto widgetOptions = options->widgetOptions();

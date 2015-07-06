@@ -163,9 +163,7 @@ protected:
      */
     const std::string& getGroupVersion(const std::string &group) const;
     
-    /** 
-     * @brief Gets assets.
-     * @lua NA
+    /** @brief Gets assets.
      */
     const std::unordered_map<std::string, Asset>& getAssets() const;
     

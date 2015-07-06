@@ -7,8 +7,12 @@
 #include "cocostudio/DictionaryHelper.h"
 #include "ui/CocosGUI.h"
 
+USING_NS_CC;
+USING_NS_CC_EXT;
+using namespace cocos2d::ui;
+using namespace cocostudio;
 
-class CustomReader : public cocos2d::Ref
+class CustomReader : public Ref
 {
 public:
     CustomReader();
@@ -17,7 +21,7 @@ public:
     static CustomReader* getInstance();
     static void purge();
     
-    virtual void setProperties(const std::string& classType, cocos2d::ui::Widget* widget, const rapidjson::Value& customOptions);
+    virtual void setProperties(const std::string& classType, Widget* widget, const rapidjson::Value& customOptions);
 };
 
 #endif /* defined(__TestCpp__CustomReader__) */

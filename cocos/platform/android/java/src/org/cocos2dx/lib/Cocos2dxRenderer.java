@@ -23,161 +23,260 @@ THE SOFTWARE.
  ****************************************************************************/
 package org.cocos2dx.lib;
 
+import java.util.ArrayList;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.opengl.GLSurfaceView;
 
 import org.cocos2dx.lib.Cocos2dxHelper;
+
 public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
-    // ===========================================================
-    // Constants
-    // ===========================================================
+	// ===========================================================
+	// Constants
+	// ===========================================================
+	
+	private boolean mIsPaused  = false;
+	private int mDelayResumeCount = 0;
+	private static int DELAY_RESUME_COUNT = 3;
+	
+	private final static long NANOSECONDSPERSECOND = 1000000000L;
+	private final static long NANOSECONDSPERMICROSECOND = 1000000;
 
-    private final static long NANOSECONDSPERSECOND = 1000000000L;
-    private final static long NANOSECONDSPERMICROSECOND = 1000000;
+	class TouchPosition {
+		public int mIndex = -1;
+		public float mTouchPositionX = 0;
+		public float mTouchPositionY = 0;
+		public boolean mIsMoving = false;
+	}
 
-    private static long sAnimationInterval = (long) (1.0 / 60 * Cocos2dxRenderer.NANOSECONDSPERSECOND);
+	private ArrayList<TouchPosition> mTouchPositions = new ArrayList<TouchPosition>();
 
-    // ===========================================================
-    // Fields
-    // ===========================================================
+	private static long sAnimationInterval = (long) (1.0 / 60 * Cocos2dxRenderer.NANOSECONDSPERSECOND);
 
-    private long mLastTickInNanoSeconds;
-    private int mScreenWidth;
-    private int mScreenHeight;
-    private boolean mNativeInitCompleted = false;
+	// ===========================================================
+	// Fields
+	// ===========================================================
 
-    // ===========================================================
-    // Constructors
-    // ===========================================================
+	private long mLastTickInNanoSeconds;
+	private int mScreenWidth;
+	private int mScreenHeight;
+	private boolean mNativeInitCompleted = false;
 
-    // ===========================================================
-    // Getter & Setter
-    // ===========================================================
+	// ===========================================================
+	// Constructors
+	// ===========================================================
 
-    public static void setAnimationInterval(final double animationInterval) {
-        Cocos2dxRenderer.sAnimationInterval = (long) (animationInterval * Cocos2dxRenderer.NANOSECONDSPERSECOND);
-    }
+	// ===========================================================
+	// Getter & Setter
+	// ===========================================================
 
-    public void setScreenWidthAndHeight(final int surfaceWidth, final int surfaceHeight) {
-        this.mScreenWidth = surfaceWidth;
-        this.mScreenHeight = surfaceHeight;
-    }
+	public static void setAnimationInterval(final double animationInterval) {
+		Cocos2dxRenderer.sAnimationInterval = (long) (animationInterval * Cocos2dxRenderer.NANOSECONDSPERSECOND);
+	}
 
-    // ===========================================================
-    // Methods for/from SuperClass/Interfaces
-    // ===========================================================
+	public void setScreenWidthAndHeight(final int surfaceWidth,
+			final int surfaceHeight) {
+		this.mScreenWidth = surfaceWidth;
+		this.mScreenHeight = surfaceHeight;
+	}
 
-    @Override
-    public void onSurfaceCreated(final GL10 GL10, final EGLConfig EGLConfig) {
-        Cocos2dxRenderer.nativeInit(this.mScreenWidth, this.mScreenHeight);
-        this.mLastTickInNanoSeconds = System.nanoTime();
-        mNativeInitCompleted = true;
-    }
+	// ===========================================================
+	// Methods for/from SuperClass/Interfaces
+	// ===========================================================
 
-    @Override
-    public void onSurfaceChanged(final GL10 GL10, final int width, final int height) {
-        Cocos2dxRenderer.nativeOnSurfaceChanged(width, height);
-    }
+	@Override
+	public void onSurfaceCreated(final GL10 GL10, final EGLConfig EGLConfig) {
+		Cocos2dxRenderer.nativeInit(this.mScreenWidth, this.mScreenHeight);
+		this.mLastTickInNanoSeconds = System.nanoTime();
+		mNativeInitCompleted = true;
+	}
 
-    @Override
-    public void onDrawFrame(final GL10 gl) {
-        /*
-         * No need to use algorithm in default(60 FPS) situation,
-         * since onDrawFrame() was called by system 60 times per second by default.
-         */
-        if (sAnimationInterval <= 1.0 / 60 * Cocos2dxRenderer.NANOSECONDSPERSECOND) {
-            Cocos2dxRenderer.nativeRender();
-        } else {
-            final long now = System.nanoTime();
-            final long interval = now - this.mLastTickInNanoSeconds;
-        
-            if (interval < Cocos2dxRenderer.sAnimationInterval) {
-                try {
-                    Thread.sleep((Cocos2dxRenderer.sAnimationInterval - interval) / Cocos2dxRenderer.NANOSECONDSPERMICROSECOND);
-                } catch (final Exception e) {
-                }
-            }
-            /*
-             * Render time MUST be counted in, or the FPS will slower than appointed.
-            */
-            this.mLastTickInNanoSeconds = System.nanoTime();
-            Cocos2dxRenderer.nativeRender();
-        }
-    }
+	@Override
+	public void onSurfaceChanged(final GL10 GL10, final int width,
+			final int height) {
+		Cocos2dxRenderer.nativeOnSurfaceChanged(width, height);
+	}
 
-    // ===========================================================
-    // Methods
-    // ===========================================================
+	@Override
+	public void onDrawFrame(final GL10 gl) {
+		/*
+		 * No need to use algorithm in default(60 FPS) situation, since
+		 * onDrawFrame() was called by system 60 times per second by default.
+		 */
+		if( true == mIsPaused ){
+			return;
+		}
+		if( mDelayResumeCount <= DELAY_RESUME_COUNT ){
+			mDelayResumeCount = mDelayResumeCount + 1;
+			if( mDelayResumeCount == DELAY_RESUME_COUNT ){
+				Cocos2dxRenderer.nativeOnResume();
+			}
+			return;
+		}
+		if (sAnimationInterval <= 1.0 / 60 * Cocos2dxRenderer.NANOSECONDSPERSECOND) {
+			Cocos2dxRenderer.nativeRender();
+		} else {
+			final long now = System.nanoTime();
+			final long interval = now - this.mLastTickInNanoSeconds;
 
-    private static native void nativeTouchesBegin(final int id, final float x, final float y);
-    private static native void nativeTouchesEnd(final int id, final float x, final float y);
-    private static native void nativeTouchesMove(final int[] ids, final float[] xs, final float[] ys);
-    private static native void nativeTouchesCancel(final int[] ids, final float[] xs, final float[] ys);
-    private static native boolean nativeKeyDown(final int keyCode);
-    private static native void nativeRender();
-    private static native void nativeInit(final int width, final int height);
-    private static native void nativeOnSurfaceChanged(final int width, final int height);
-    private static native void nativeOnPause();
-    private static native void nativeOnResume();
+			if (interval < Cocos2dxRenderer.sAnimationInterval) {
+				try {
+					Thread.sleep((Cocos2dxRenderer.sAnimationInterval - interval)
+							/ Cocos2dxRenderer.NANOSECONDSPERMICROSECOND);
+				} catch (final Exception e) {
+				}
+			}
+			/*
+			 * Render time MUST be counted in, or the FPS will slower than
+			 * appointed.
+			 */
+			this.mLastTickInNanoSeconds = System.nanoTime();
+			Cocos2dxRenderer.nativeRender();
+		}
+	}
 
-    public void handleActionDown(final int id, final float x, final float y) {
-        Cocos2dxRenderer.nativeTouchesBegin(id, x, y);
-    }
+	// ===========================================================
+	// Methods
+	// ===========================================================
 
-    public void handleActionUp(final int id, final float x, final float y) {
-        Cocos2dxRenderer.nativeTouchesEnd(id, x, y);
-    }
+	private static native void nativeTouchesBegin(final int id, final float x,
+			final float y);
 
-    public void handleActionCancel(final int[] ids, final float[] xs, final float[] ys) {
-        Cocos2dxRenderer.nativeTouchesCancel(ids, xs, ys);
-    }
+	private static native void nativeTouchesEnd(final int id, final float x,
+			final float y);
 
-    public void handleActionMove(final int[] ids, final float[] xs, final float[] ys) {
-        Cocos2dxRenderer.nativeTouchesMove(ids, xs, ys);
-    }
+	private static native void nativeTouchesMove(final int[] ids,
+			final float[] xs, final float[] ys);
 
-    public void handleKeyDown(final int keyCode) {
-        Cocos2dxRenderer.nativeKeyDown(keyCode);
-    }
+	private static native void nativeTouchesCancel(final int[] ids,
+			final float[] xs, final float[] ys);
 
-    public void handleOnPause() {
-    	/**
-    	 * onPause may be invoked before onSurfaceCreated, 
-    	 * and engine will be initialized correctly after
-    	 * onSurfaceCreated is invoked. Can not invoke any
-    	 * native method before onSurfaceCreated is invoked
-    	 */
-        if (! mNativeInitCompleted)
-            return;
+	private static native boolean nativeKeyDown(final int keyCode);
 
-        Cocos2dxHelper.onEnterBackground();
-        Cocos2dxRenderer.nativeOnPause();
-    }
+	private static native void nativeRender();
 
-    public void handleOnResume() {
-        Cocos2dxHelper.onEnterForeground();
-        Cocos2dxRenderer.nativeOnResume();
-    }
+	private static native void nativeInit(final int width, final int height);
 
-    private static native void nativeInsertText(final String text);
-    private static native void nativeDeleteBackward();
-    private static native String nativeGetContentText();
+	private static native void nativeOnSurfaceChanged(final int width,
+			final int height);
 
-    public void handleInsertText(final String text) {
-        Cocos2dxRenderer.nativeInsertText(text);
-    }
+	private static native void nativeOnPause();
 
-    public void handleDeleteBackward() {
-        Cocos2dxRenderer.nativeDeleteBackward();
-    }
+	private static native void nativeOnResume();
 
-    public String getContentText() {
-        return Cocos2dxRenderer.nativeGetContentText();
-    }
+	private void removeTouchPosition(final int id) {
+		for (TouchPosition tp : mTouchPositions) {
+			if (tp.mIndex == id) {
+				mTouchPositions.remove(tp);
+				return;
+			}
+		}
+	}
 
-    // ===========================================================
-    // Inner and Anonymous Classes
-    // ===========================================================
+	private boolean isTouchMoving(final int id, final float x, final float y) {
+		for (TouchPosition tp : mTouchPositions) {
+			if (tp.mIndex == id) {
+				if (tp.mIsMoving) {
+					return true;
+				}
+				float t = (tp.mTouchPositionX - x) * (tp.mTouchPositionX - x)
+						+ (tp.mTouchPositionY - y) * (tp.mTouchPositionY - y);
+				////澶т�� 25 涓����绱�锛���ゅ��涓虹Щ���
+				if( t >= 25 * 25 ){
+					tp.mIsMoving = true;
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public void handleActionDown(final int id, final float x, final float y) {
+		Cocos2dxRenderer.nativeTouchesBegin(id, x, y);
+		TouchPosition tp = new TouchPosition();
+		tp.mIndex = id;
+		tp.mTouchPositionX = x;
+		tp.mTouchPositionY = y;
+		tp.mIsMoving = false;
+		mTouchPositions.add(tp);
+	} 
+
+	public void handleActionUp(final int id, final float x, final float y) {
+		Cocos2dxRenderer.nativeTouchesEnd(id, x, y);
+		removeTouchPosition(id);
+	}
+
+	public void handleActionCancel(final int[] ids, final float[] xs,
+			final float[] ys) {
+		Cocos2dxRenderer.nativeTouchesCancel(ids, xs, ys);
+		for (int id : ids) {
+			removeTouchPosition(id);
+		}
+	}
+
+	public void handleActionMove(final int[] ids, final float[] xs,
+			final float[] ys) {
+		int length = ids.length;
+		boolean isMoving = false;
+		for( int i = 0 ; i < length; i ++ ){
+			if( isTouchMoving( ids[ i ], xs[ i ], ys[ i ]) ){
+				isMoving = true;
+			}
+		}
+		if( true == isMoving ){
+			Cocos2dxRenderer.nativeTouchesMove( ids, xs, ys );
+		}
+	}
+
+	public void handleKeyDown(final int keyCode) {
+		Cocos2dxRenderer.nativeKeyDown(keyCode);
+	}
+
+	public void handleOnPause() {
+		/**
+		 * onPause may be invoked before onSurfaceCreated, and engine will be
+		 * initialized correctly after onSurfaceCreated is invoked. Can not
+		 * invoke any native method before onSurfaceCreated is invoked
+		 */
+		if (!mNativeInitCompleted)
+			return;
+
+		Cocos2dxHelper.onEnterBackground();
+		Cocos2dxRenderer.nativeOnPause();
+		mIsPaused = true;
+		mDelayResumeCount = 0;
+	}
+
+	public void handleOnResume() {
+		mIsPaused = false;
+		mDelayResumeCount = 0;
+	}
+
+	public void handleOnUserPresent() {
+		Cocos2dxHelper.onEnterForeground();
+	}
+
+	private static native void nativeInsertText(final String text);
+
+	private static native void nativeDeleteBackward();
+
+	private static native String nativeGetContentText();
+
+	public void handleInsertText(final String text) {
+		Cocos2dxRenderer.nativeInsertText(text);
+	}
+
+	public void handleDeleteBackward() {
+		Cocos2dxRenderer.nativeDeleteBackward();
+	}
+
+	public String getContentText() {
+		return Cocos2dxRenderer.nativeGetContentText();
+	}
+
+	// ===========================================================
+	// Inner and Anonymous Classes
+	// ===========================================================
 }

@@ -1,17 +1,29 @@
 #ifndef __PERFORMANCE_NODE_CHILDREN_TEST_H__
 #define __PERFORMANCE_NODE_CHILDREN_TEST_H__
 
-#include "BaseTest.h"
+#include "PerformanceTest.h"
 
-DEFINE_TEST_SUITE(PerformceNodeChildrenTests);
-
-class NodeChildrenMainScene : public TestCase
+class NodeChildrenMenuLayer : public PerformBasicLayer
 {
 public:
-    virtual bool init() override;
+    CREATE_FUNC(NodeChildrenMenuLayer);
+
+    NodeChildrenMenuLayer();
+    NodeChildrenMenuLayer(bool bControlMenuVisible, int nMaxCases = 0, int nCurCase = 0);
+    virtual void showCurrentTest();
+    void dumpProfilerInfo(float dt);
+
+    // overrides
+    virtual void onExitTransitionDidStart() override;
+    virtual void onEnterTransitionDidFinish() override;
+};
+
+class NodeChildrenMainScene : public Scene
+{
+public:
     virtual void initWithQuantityOfNodes(unsigned int nNodes);
-    virtual std::string title() const override;
-    virtual std::string subtitle() const override;
+    virtual std::string title() const;
+    virtual std::string subtitle() const;
     virtual void updateQuantityOfNodes() = 0;
 
     const char* profilerName();
@@ -22,28 +34,26 @@ public:
 
     void updateQuantityLabel();
 
-    void dumpProfilerInfo(float dt);
+    int getQuantityOfNodes() { return quantityOfNodes; }
 
-    virtual void onExitTransitionDidStart() override;
-    virtual void onEnterTransitionDidFinish() override;
 protected:
-    static int quantityOfNodes;
     char   _profilerName[256];
     int    lastRenderedCount;
+    int    quantityOfNodes;
     int    currentQuantityOfNodes;
 };
 
 class IterateSpriteSheet : public NodeChildrenMainScene
 {
 public:
-    virtual ~IterateSpriteSheet();
+    ~IterateSpriteSheet();
     virtual void updateQuantityOfNodes();
     virtual void initWithQuantityOfNodes(unsigned int nNodes);
     virtual void update(float dt) = 0;
     virtual const char* testName();
 
 protected:
-    cocos2d::SpriteBatchNode    *batchNode;
+    SpriteBatchNode    *batchNode;
 };
 
 class IterateSpriteSheetForLoop : public IterateSpriteSheet
@@ -52,7 +62,7 @@ public:
     CREATE_FUNC(IterateSpriteSheetForLoop);
 
     IterateSpriteSheetForLoop() {}
-    virtual void update(float dt) override;
+    virtual void update(float dt);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -65,7 +75,7 @@ public:
     CREATE_FUNC(IterateSpriteSheetIterator);
 
     IterateSpriteSheetIterator() {}
-    virtual void update(float dt) override;
+    virtual void update(float dt);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -77,7 +87,7 @@ class IterateSpriteSheetForEach : public IterateSpriteSheet
 public:
     CREATE_FUNC(IterateSpriteSheetForEach);
 
-    virtual void update(float dt) override;
+    virtual void update(float dt);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -88,14 +98,14 @@ public:
 class AddRemoveSpriteSheet : public NodeChildrenMainScene
 {
 public:
-    virtual ~AddRemoveSpriteSheet();
+    ~AddRemoveSpriteSheet();
     virtual void updateQuantityOfNodes();
     virtual void initWithQuantityOfNodes(unsigned int nNodes);
     virtual void update(float dt) = 0;
     virtual const char* testName();
 
 protected:
-    cocos2d::SpriteBatchNode    *batchNode;
+    SpriteBatchNode    *batchNode;
 
 #if CC_ENABLE_PROFILERS
     ProfilingTimer* _profilingTimer;
@@ -109,7 +119,7 @@ class CallFuncsSpriteSheetForEach : public IterateSpriteSheet
 public:
     CREATE_FUNC(CallFuncsSpriteSheetForEach);
 
-    virtual void update(float dt) override;
+    virtual void update(float dt);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -123,7 +133,7 @@ class AddSprite : public AddRemoveSpriteSheet
 public:
     CREATE_FUNC(AddSprite);
 
-    virtual void update(float dt) override;
+    virtual void update(float dt);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -135,7 +145,7 @@ class AddSpriteSheet : public AddRemoveSpriteSheet
 public:
     CREATE_FUNC(AddSpriteSheet);
 
-    virtual void update(float dt) override;
+    virtual void update(float dt);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -147,7 +157,7 @@ class GetSpriteSheet : public AddRemoveSpriteSheet
 public:
     CREATE_FUNC(GetSpriteSheet);
 
-    virtual void update(float dt) override;
+    virtual void update(float dt);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -159,7 +169,7 @@ class RemoveSprite : public AddRemoveSpriteSheet
 public:
     CREATE_FUNC(RemoveSprite);
 
-    virtual void update(float dt) override;
+    virtual void update(float dt);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -171,7 +181,7 @@ class RemoveSpriteSheet : public AddRemoveSpriteSheet
 public:
     CREATE_FUNC(RemoveSpriteSheet);
 
-    virtual void update(float dt) override;
+    virtual void update(float dt);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -183,7 +193,7 @@ class ReorderSpriteSheet : public AddRemoveSpriteSheet
 public:
     CREATE_FUNC(ReorderSpriteSheet);
 
-    virtual void update(float dt) override;
+    virtual void update(float dt);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -195,7 +205,7 @@ class SortAllChildrenSpriteSheet : public AddRemoveSpriteSheet
 public:
     CREATE_FUNC(SortAllChildrenSpriteSheet);
 
-    virtual void update(float dt) override;
+    virtual void update(float dt);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -215,5 +225,7 @@ public:
     virtual std::string subtitle() const override;
     virtual const char* testName() override;
 };
+
+void runNodeChildrenTest();
 
 #endif // __PERFORMANCE_NODE_CHILDREN_TEST_H__

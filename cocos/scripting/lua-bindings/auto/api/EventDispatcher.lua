@@ -5,14 +5,11 @@
 -- @parent_module cc
 
 --------------------------------
---  Pauses all listeners which are associated the specified target.<br>
--- param target A given target node.<br>
--- param recursive True if pause recursively, the default value is false.
+--  Pauses all listeners which are associated the specified target. 
 -- @function [parent=#EventDispatcher] pauseEventListenersForTarget 
 -- @param self
 -- @param #cc.Node target
 -- @param #bool recursive
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 --------------------------------
 --  Adds a event listener for a specified event with the priority of scene graph.<br>
@@ -24,15 +21,12 @@
 -- @param self
 -- @param #cc.EventListener listener
 -- @param #cc.Node node
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 --------------------------------
---  Whether to enable dispatching events.<br>
--- param isEnabled  True if enable dispatching events.
+--  Whether to enable dispatching events 
 -- @function [parent=#EventDispatcher] setEnabled 
 -- @param self
 -- @param #bool isEnabled
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 --------------------------------
 --  Adds a event listener for a specified event with the fixed priority.<br>
@@ -44,51 +38,38 @@
 -- @param self
 -- @param #cc.EventListener listener
 -- @param #int fixedPriority
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 --------------------------------
---  Remove a listener.<br>
+--  Remove a listener<br>
 -- param listener The specified event listener which needs to be removed.
 -- @function [parent=#EventDispatcher] removeEventListener 
 -- @param self
 -- @param #cc.EventListener listener
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 --------------------------------
---  Resumes all listeners which are associated the specified target.<br>
--- param target A given target node.<br>
--- param recursive True if resume recursively, the default value is false.
+--  Resumes all listeners which are associated the specified target. 
 -- @function [parent=#EventDispatcher] resumeEventListenersForTarget 
 -- @param self
 -- @param #cc.Node target
 -- @param #bool recursive
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 --------------------------------
---  Removes all listeners which are associated with the specified target.<br>
--- param target A given target node.<br>
--- param recursive True if remove recursively, the default value is false.
+--  Removes all listeners which are associated with the specified target. 
 -- @function [parent=#EventDispatcher] removeEventListenersForTarget 
 -- @param self
 -- @param #cc.Node target
 -- @param #bool recursive
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 --------------------------------
---  Sets listener's priority with fixed value.<br>
--- param listener A given listener.<br>
--- param fixedPriority The fixed priority value.
+--  Sets listener's priority with fixed value. 
 -- @function [parent=#EventDispatcher] setPriority 
 -- @param self
 -- @param #cc.EventListener listener
 -- @param #int fixedPriority
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 --------------------------------
 --  Adds a Custom event listener.<br>
 -- It will use a fixed priority of 1.<br>
--- param eventName A given name of the event.<br>
--- param callback A given callback method that associated the event name.<br>
 -- return the generated event. Needed in order to remove the event from the dispather
 -- @function [parent=#EventDispatcher] addCustomEventListener 
 -- @param self
@@ -97,48 +78,39 @@
 -- @return EventListenerCustom#EventListenerCustom ret (return value: cc.EventListenerCustom)
         
 --------------------------------
---  Dispatches the event.<br>
+--  Dispatches the event<br>
 -- Also removes all EventListeners marked for deletion from the<br>
--- event dispatcher list.<br>
--- param event The event needs to be dispatched.
+-- event dispatcher list.
 -- @function [parent=#EventDispatcher] dispatchEvent 
 -- @param self
 -- @param #cc.Event event
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 --------------------------------
---  Removes all listeners.
+--  Removes all listeners 
 -- @function [parent=#EventDispatcher] removeAllEventListeners 
 -- @param self
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 --------------------------------
---  Removes all custom listeners with the same event name.<br>
--- param customEventName A given event listener name which needs to be removed.
+--  Removes all custom listeners with the same event name 
 -- @function [parent=#EventDispatcher] removeCustomEventListeners 
 -- @param self
 -- @param #string customEventName
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 --------------------------------
---  Checks whether dispatching events is enabled.<br>
--- return True if dispatching events is enabled.
+--  Checks whether dispatching events is enabled 
 -- @function [parent=#EventDispatcher] isEnabled 
 -- @param self
 -- @return bool#bool ret (return value: bool)
         
 --------------------------------
---  Removes all listeners with the same event listener type.<br>
--- param listenerType A given event listener type which needs to be removed.
+--  Removes all listeners with the same event listener type 
 -- @function [parent=#EventDispatcher] removeEventListenersForType 
 -- @param self
 -- @param #int listenerType
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 --------------------------------
---  Constructor of EventDispatcher.
+--  Constructor of EventDispatcher 
 -- @function [parent=#EventDispatcher] EventDispatcher 
 -- @param self
--- @return EventDispatcher#EventDispatcher self (return value: cc.EventDispatcher)
         
 return nil

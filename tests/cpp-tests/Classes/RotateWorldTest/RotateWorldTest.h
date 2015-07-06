@@ -1,26 +1,22 @@
 #ifndef _ROTATE_WORLD_TEST_H_
 #define _ROTATE_WORLD_TEST_H_
 
-#include "../BaseTest.h"
+#include "../testBasic.h"
 
-DEFINE_TEST_SUITE(RotateWorldTests);
-
-class RotateWorldTest : public TestCase
+class RotateWorldTestScene : public TestScene
 {
 public:
-    CREATE_FUNC(RotateWorldTest);
-
-    virtual bool init() override;
+    virtual void runThisTest();
 };
 
-class SpriteLayer : public cocos2d::Layer
+class SpriteLayer : public Layer
 {
 public:
     virtual void onEnter() override;
     CREATE_FUNC(SpriteLayer)
 };
 
-class TestLayer : public cocos2d::Layer
+class TestLayer : public Layer
 {
 public:
     virtual void onEnter() override;
@@ -28,7 +24,7 @@ public:
     CREATE_FUNC(TestLayer)
 };
 
-class RotateWorldMainLayer : public cocos2d::Layer
+class RotateWorldMainLayer : public Layer
 {
 public:
     virtual void onEnter() override;

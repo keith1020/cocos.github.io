@@ -37,21 +37,13 @@
 extern "C" {
 #endif
 
-typedef struct spEvent {
+typedef struct spEvent spEvent;
+struct spEvent {
 	spEventData* const data;
 	int intValue;
 	float floatValue;
 	const char* stringValue;
-
-#ifdef __cplusplus
-	spEvent() :
-		data(0),
-		intValue(0),
-		floatValue(0),
-		stringValue(0) {
-	}
-#endif
-} spEvent;
+};
 
 spEvent* spEvent_create (spEventData* data);
 void spEvent_dispose (spEvent* self);

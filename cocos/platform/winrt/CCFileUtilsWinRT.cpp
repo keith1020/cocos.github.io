@@ -84,7 +84,7 @@ bool CCFileUtilsWinRT::init()
     return FileUtils::init();
 }
 
-std::string CCFileUtilsWinRT::getPathForFilename(const std::string& filename, const std::string& resolutionDirectory, const std::string& searchPath) const
+std::string CCFileUtilsWinRT::getPathForFilename(const std::string& filename, const std::string& resolutionDirectory, const std::string& searchPath)
 {
     std::string unixFileName = convertPathFormatToUnixStyle(filename);
     std::string unixResolutionDirectory = convertPathFormatToUnixStyle(resolutionDirectory);
@@ -93,7 +93,7 @@ std::string CCFileUtilsWinRT::getPathForFilename(const std::string& filename, co
     return FileUtils::getPathForFilename(unixFileName, unixResolutionDirectory, unixSearchPath);
 }
 
-std::string CCFileUtilsWinRT::getFullPathForDirectoryAndFilename(const std::string& strDirectory, const std::string& strFilename) const
+std::string CCFileUtilsWinRT::getFullPathForDirectoryAndFilename(const std::string& strDirectory, const std::string& strFilename)
 {
     std::string unixDirectory = convertPathFormatToUnixStyle(strDirectory);
     std::string unixFilename = convertPathFormatToUnixStyle(strFilename);
@@ -111,15 +111,16 @@ bool CCFileUtilsWinRT::isFileExistInternal(const std::string& strFilePath) const
         strPath.insert(0, _defaultResRootPath);
     }
 
-    strPath = getSuitableFOpen(strPath);
+    const char* path = strPath.c_str();
 
-    if (!strPath.empty() && (pf = fopen(strPath.c_str(), "rb")))
+	if (path && strlen(path) && (pf = fopen(path, "rb")))
     {
         ret = true;
         fclose(pf);
     }
     return ret;
 }
+
 
 bool CCFileUtilsWinRT::isAbsolutePath(const std::string& strPath) const
 {
@@ -134,10 +135,7 @@ bool CCFileUtilsWinRT::isAbsolutePath(const std::string& strPath) const
 
 static Data getData(const std::string& filename, bool forString)
 {
-    if (filename.empty())
-    {
-        CCASSERT(!filename.empty(), "Invalid filename!");
-    }
+    CCASSERT(!filename.empty(), "Invalid filename!");
     
     Data ret;
     unsigned char* buffer = nullptr;
@@ -183,6 +181,8 @@ static Data getData(const std::string& filename, bool forString)
     return ret;
 }
 
+
+
 std::string CCFileUtilsWinRT::getStringFromFile(const std::string& filename)
 {
     Data data = getData(filename, true);
@@ -193,6 +193,8 @@ std::string CCFileUtilsWinRT::getStringFromFile(const std::string& filename)
     std::string ret((const char*)data.getBytes());
     return ret;
 }
+
+
 
 string CCFileUtilsWinRT::getWritablePath() const
 {

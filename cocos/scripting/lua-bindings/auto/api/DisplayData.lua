@@ -9,7 +9,6 @@
 -- @function [parent=#DisplayData] copy 
 -- @param self
 -- @param #ccs.DisplayData displayData
--- @return DisplayData#DisplayData self (return value: ccs.DisplayData)
         
 --------------------------------
 -- 
@@ -28,6 +27,5 @@
 -- js ctor
 -- @function [parent=#DisplayData] DisplayData 
 -- @param self
--- @return DisplayData#DisplayData self (return value: ccs.DisplayData)
         
 return nil

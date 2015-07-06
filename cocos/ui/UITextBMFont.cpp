@@ -183,6 +183,8 @@ void TextBMFont::copySpecialProperties(Widget *widget)
     {
         setFntFile(labelBMFont->_fntFileName);
         setString(labelBMFont->_stringValue);
+
+		_labelBMFontRenderer->setAdditionalKerning(labelBMFont->_labelBMFontRenderer->getAdditionalKerning()); //[CY ADD: fix clone¶ªÊ§¼ä¾àµÄbug]
     }
 }
 

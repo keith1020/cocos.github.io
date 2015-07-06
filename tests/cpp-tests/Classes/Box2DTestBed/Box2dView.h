@@ -1,34 +1,38 @@
 #ifndef _BOX2D_VIEW_H_
 #define _BOX2D_VIEW_H_
 
-#include "../BaseTest.h"
+//#include "cocos2d.h"
+#include "../testBasic.h"
 #include "renderer/CCCustomCommand.h"
 
-DEFINE_TEST_SUITE(Box2dTestBedSuite);
-
-class Box2dTestBed : public TestCase
+class MenuLayer : public Layer
 {
+    int        m_entryID;
+    EventListenerTouchOneByOne* _touchListener;
 public:
-    static Box2dTestBed* createWithEntryID(int entryId);
-
-    Box2dTestBed();
-    virtual ~Box2dTestBed();
+    MenuLayer(void);
+    virtual ~MenuLayer(void);
 
     bool initWithEntryID(int entryId);
 
-    bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
-    void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
-private:
-    int        m_entryID;
-    cocos2d::EventListenerTouchOneByOne* _touchListener;
+    void restartCallback(Ref* sender);
+    void nextCallback(Ref* sender);
+    void backCallback(Ref* sender);
+
+
+    bool onTouchBegan(Touch* touch, Event* event);
+    void onTouchMoved(Touch* touch, Event* event);
+
+public:
+    static MenuLayer* menuWithEntryID(int entryId);
 };
 
 struct TestEntry;
 class Test;
-class Box2DView : public cocos2d::Layer
+class Box2DView : public Layer
 {
-    cocos2d::EventListenerTouchOneByOne* _touchListener;
-    cocos2d::EventListenerKeyboard* _keyboardListener;
+    EventListenerTouchOneByOne* _touchListener;
+    EventListenerKeyboard* _keyboardListener;
     TestEntry*    m_entry;
     Test*        m_test;
     int            m_entryID;
@@ -38,22 +42,28 @@ public:
 
     bool initWithEntryID(int entryId);
     std::string title() const;
-    virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
+    virtual void draw(Renderer *renderer, const Mat4 &transform, uint32_t flags) override;
 
 //    virtual void registerWithTouchDispatcher();
-    bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
-    void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
-    void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
+    bool onTouchBegan(Touch* touch, Event* event);
+    void onTouchMoved(Touch* touch, Event* event);
+    void onTouchEnded(Touch* touch, Event* event);
     
-    void onKeyPressed(cocos2d::EventKeyboard::KeyCode code, cocos2d::Event* event);
-    void onKeyReleased(cocos2d::EventKeyboard::KeyCode code, cocos2d::Event* event);
-    //virtual void accelerometer(UIAccelerometer* accelerometer, cocos2d::Acceleration* acceleration);
+    void onKeyPressed(EventKeyboard::KeyCode code, Event* event);
+    void onKeyReleased(EventKeyboard::KeyCode code, Event* event);
+    //virtual void accelerometer(UIAccelerometer* accelerometer, Acceleration* acceleration);
 
     static Box2DView* viewWithEntryID(int entryId);
 protected:
-    void onDraw(const cocos2d::Mat4& transform, uint32_t flags);
+    void onDraw(const Mat4 &transform, uint32_t flags);
 
-    cocos2d::CustomCommand _customCmd;
+    CustomCommand _customCmd;
+};
+
+class Box2dTestBedScene : public TestScene
+{
+public:
+    virtual void runThisTest();
 };
 
 #endif

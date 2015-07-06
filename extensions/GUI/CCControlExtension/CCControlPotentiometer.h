@@ -50,7 +50,6 @@ public:
     static ControlPotentiometer* create(const char* backgroundFile, const char* progressFile, const char* thumbFile);
     /**
      * @js ctor
-     * @lua new
      */
     ControlPotentiometer();
     /**

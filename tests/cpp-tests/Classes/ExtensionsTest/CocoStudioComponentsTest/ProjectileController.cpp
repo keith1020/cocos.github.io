@@ -19,9 +19,9 @@ bool ProjectileController::init()
     return true;
 }
 
-void ProjectileController::onAdd()
+void ProjectileController::onEnter()
 {
-    ComController::onAdd();
+    ComController::onEnter();
     auto winSize = Director::getInstance()->getVisibleSize();
     auto origin = Director::getInstance()->getVisibleOrigin();
     _owner->setPosition( Vec2(origin.x+20, origin.y+winSize.height/2) );
@@ -30,7 +30,7 @@ void ProjectileController::onAdd()
     static_cast<SceneController*>(com)->getProjectiles().pushBack(_owner);
 }
 
-void ProjectileController::onRemove()
+void ProjectileController::onExit()
 {
 
 }

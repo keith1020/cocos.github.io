@@ -1,18 +1,20 @@
 #ifndef _CLICK_AND_MOVE_TEST_H_
 #define _CLICK_AND_MOVE_TEST_H_
 
-#include "../BaseTest.h"
+#include "../testBasic.h"
 
-DEFINE_TEST_SUITE(ClickAndMoveTest);
-
-class ClickAndMoveTestCase : public TestCase
+class ClickAndMoveTestScene : public TestScene
 {
 public:
-    CREATE_FUNC(ClickAndMoveTestCase);
+    virtual void runThisTest();
+};
 
-    ClickAndMoveTestCase();
-    bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
-    void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
+class MainLayer : public Layer
+{
+public:
+    MainLayer();
+    bool onTouchBegan(Touch* touch, Event  *event);
+    void onTouchEnded(Touch* touch, Event  *event);
 };
 
 #endif

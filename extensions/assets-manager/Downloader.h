@@ -60,9 +60,7 @@ public:
 
         INVALID_URL,
 
-        INVALID_STORAGE_PATH,
-        
-        PREPARE_HEADER_ERROR
+        INVALID_STORAGE_PATH
     };
 
     struct Error
@@ -101,21 +99,11 @@ public:
         unsigned char *buffer;
     };
     
-    struct HeaderInfo
-    {
-        bool valid;
-        std::string url;
-        std::string contentType;
-        double contentSize;
-        long responseCode;
-    };
-    
     typedef std::unordered_map<std::string, DownloadUnit> DownloadUnits;
     
     typedef std::function<void(const Downloader::Error &)> ErrorCallback;
     typedef std::function<void(double, double, const std::string &, const std::string &)> ProgressCallback;
     typedef std::function<void(const std::string &, const std::string &, const std::string &)> SuccessCallback;
-    typedef std::function<void(const std::string &, const HeaderInfo &)> HeaderCallback;
 
     int getConnectionTimeout();
 
@@ -126,8 +114,6 @@ public:
     void setProgressCallback(const ProgressCallback &callback) { _onProgress = callback; };
     
     void setSuccessCallback(const SuccessCallback &callback) { _onSuccess = callback; };
-    
-    void setHeaderCallback(const HeaderCallback &callback) { _onHeader = callback; };
 
     ErrorCallback getErrorCallback() const { return _onError; };
 
@@ -135,13 +121,7 @@ public:
 
     SuccessCallback getSuccessCallback() const { return _onSuccess; };
     
-    HeaderCallback getHeaderCallback() const { return _onHeader; };
-    
-    long getContentSize(const std::string &srcUrl);
-    
-    HeaderInfo getHeader(const std::string &srcUrl);
-    
-    void getHeaderAsync(const std::string &srcUrl, const HeaderCallback &callback);
+    long getContentSize(const std::string &srcUrl) const;
     
     void downloadToBufferAsync(const std::string &srcUrl, unsigned char *buffer, const long &size, const std::string &customId = "");
     
@@ -172,7 +152,7 @@ protected:
 
     void prepareDownload(const std::string &srcUrl, const std::string &storagePath, const std::string &customId, bool resumeDownload, FileDescriptor *fDesc, ProgressData *pData);
     
-    HeaderInfo prepareHeader(const std::string &srcUrl, void* header = nullptr);
+    bool prepareHeader(void *curl, const std::string &srcUrl) const;
     
     void downloadToBuffer(const std::string &srcUrl, const std::string &customId, const StreamData &buffer, const ProgressData &data);
 
@@ -195,8 +175,6 @@ private:
     ProgressCallback _onProgress;
 
     SuccessCallback _onSuccess;
-    
-    HeaderCallback _onHeader;
 
     std::string getFileNameFromUrl(const std::string &srcUrl);
     

@@ -101,14 +101,13 @@ TMXTiledMap::~TMXTiledMap()
 TMXLayer * TMXTiledMap::parseLayer(TMXLayerInfo *layerInfo, TMXMapInfo *mapInfo)
 {
     TMXTilesetInfo *tileset = tilesetForLayer(layerInfo, mapInfo);
-    if (tileset == nullptr)
-        return nullptr;
-    
     TMXLayer *layer = TMXLayer::create(tileset, layerInfo, mapInfo);
 
     // tell the layerinfo to release the ownership of the tiles map.
     layerInfo->_ownTiles = false;
     layer->setupTiles();
+
+	layer->setQuadsBuffer(&_totalQuads, &_indices); //[CY ADD: 一个地图的所有层，共享一份顶点临时缓存，以节约内存开销]
 
     return layer;
 }
@@ -173,10 +172,6 @@ void TMXTiledMap::buildWithMapInfo(TMXMapInfo* mapInfo)
         if (layerInfo->_visible)
         {
             TMXLayer *child = parseLayer(layerInfo, mapInfo);
-            if (child == nullptr) {
-                idx++;
-                continue;
-            }
             addChild(child, idx, idx);
             
             // update content size with the max size

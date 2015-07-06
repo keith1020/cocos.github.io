@@ -40,8 +40,8 @@ extern void enableAccelerometerJni();
 extern void disableAccelerometerJni();
 extern void setAccelerometerIntervalJni(float interval);
 extern void setKeepScreenOnJni(bool value);
-extern void vibrateJni(float duration);
 extern bool openURLJNI(const char* url);
+extern std::string getMacAddressJNI();
 // functions for UserDefault
 extern bool getBoolForKeyJNI(const char* key, bool defaultValue);
 extern int getIntegerForKeyJNI(const char* key, int defaultValue);

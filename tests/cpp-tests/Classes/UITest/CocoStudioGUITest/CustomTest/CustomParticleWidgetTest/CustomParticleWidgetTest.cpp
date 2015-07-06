@@ -1,3 +1,11 @@
+//
+//  CustomParticleWidgetTest.cpp
+//  CustomUI
+//
+//  Created by cai wenzhi on 14-3-7.
+//
+//
+
 #include "CustomParticleWidgetTest.h"
 #include "../../CustomGUIScene.h"
 #include "../../CustomWidget/CustomParticleWidget.h"
@@ -12,35 +20,60 @@ using namespace cocostudio;
 
 
 // CustomParticleWidgetLayer
-bool CustomParticleWidgetLayer::init()
+
+
+void CustomParticleWidgetLayer::onEnter()
 {
-    if (Layer::init())
-    {
-        GUIReader* guiReader = GUIReader::getInstance();
-        guiReader->registerTypeAndCallBack("CustomParticleWidget",
-            &CustomParticleWidget::createInstance,
-            CustomParticleWidgetReader::getInstance(),
-            parseselector(CustomParticleWidgetReader::setProperties));
-
-        CustomParticleWidget* custom = CustomParticleWidget::create();
-        custom->setParticlePlist("Particles/BoilingFoam.plist");
-        custom->setPosition(Vec2(VisibleRect::center()));
-        addChild(custom, 10, -1);
-
-        return true;
-    }
-
-    return false;
+    CCLayer::onEnter();
+    
+    GUIReader* guiReader = GUIReader::getInstance();
+    guiReader->registerTypeAndCallBack("CustomParticleWidget",
+                                       &CustomParticleWidget::createInstance,
+                                       CustomParticleWidgetReader::getInstance(),
+                                       parseselector(CustomParticleWidgetReader::setProperties));
+    
+    CustomParticleWidget* custom = CustomParticleWidget::create();
+    custom->setParticlePlist("Particles/BoilingFoam.plist");
+    custom->setPosition(Vec2(VisibleRect::center()));
+    addChild(custom, 10, -1);
 }
 
-bool CustomParticleWidgetScene::init()
-{
-    if (TestCase::init())
-    {
-        addChild(CustomParticleWidgetLayer::create());
 
-        return true;
-    }
+// CustomImageScene
+
+
+void CustomParticleWidgetScene::onEnter()
+{
+    CCScene::onEnter();
     
-    return false;
+    Layer* pLayer = new (std::nothrow) CustomParticleWidgetLayer();
+    addChild(pLayer);
+    pLayer->release();
+    
+    auto label = Label::createWithTTF("Back", "fonts/arial.ttf", 20);
+    //#endif
+    MenuItemLabel* pMenuItem = MenuItemLabel::create(label, CC_CALLBACK_1(CustomParticleWidgetScene::BackCallback, this));
+    
+    Menu* pMenu = Menu::create(pMenuItem, nullptr);
+    
+    pMenu->setPosition( Vec2::ZERO );
+    pMenuItem->setPosition(VisibleRect::right().x - 50, VisibleRect::bottom().y + 25);
+    
+    addChild(pMenu, 1);
+}
+
+void CustomParticleWidgetScene::runThisTest()
+{
+    Layer* pLayer = new (std::nothrow) CustomParticleWidgetLayer();
+    addChild(pLayer);
+    pLayer->release();
+    
+    CCDirector::getInstance()->replaceScene(this);
+}
+
+void CustomParticleWidgetScene::BackCallback(Ref* pSender)
+{
+    CustomGUITestScene* pScene = new (std::nothrow) CustomGUITestScene();
+    pScene->runThisTest();
+    pScene->release();
 }

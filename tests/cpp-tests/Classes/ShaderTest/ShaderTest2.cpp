@@ -22,18 +22,89 @@
  THE SOFTWARE.
  ****************************************************************************/
 
+
 #include "ShaderTest2.h"
 #include "ShaderTest.h"
 #include "../testResource.h"
 #include "cocos2d.h"
 #include <tuple>
 
-USING_NS_CC;
-
-Shader2Tests::Shader2Tests()
+namespace ShaderTest2
 {
-    ADD_TEST_CASE(EffectSpriteTest);
-    ADD_TEST_CASE(EffectSpriteLamp);
+    static std::function<Layer*()> createFunctions[] =
+    {
+        CL(EffectSpriteTest),
+        CL(EffectSpriteLamp),
+    };
+    
+    static unsigned int TEST_CASE_COUNT = sizeof(ShaderTest2::createFunctions) / sizeof(ShaderTest2::createFunctions[0]);
+    
+    static int sceneIdx=-1;
+    Layer* createTest(int index)
+    {
+        auto layer = (createFunctions[index])();;
+        return layer;
+    }
+    
+    Layer* nextAction();
+    Layer* backAction();
+    Layer* restartAction();
+    
+    Layer* nextAction()
+    {
+        sceneIdx++;
+        sceneIdx = sceneIdx % TEST_CASE_COUNT;
+        
+        return createTest(sceneIdx);
+    }
+    
+    Layer* backAction()
+    {
+        sceneIdx--;
+        if( sceneIdx < 0 )
+            sceneIdx = TEST_CASE_COUNT -1;
+        
+        return createTest(sceneIdx);
+    }
+    
+    Layer* restartAction()
+    {
+        return createTest(sceneIdx);
+    }
+    
+}
+
+ShaderTestDemo2::ShaderTestDemo2()
+{
+    
+}
+
+void ShaderTestDemo2::backCallback(Ref* sender)
+{
+    auto s = ShaderTestScene2::create();
+    s->addChild( ShaderTest2::backAction() );
+    Director::getInstance()->replaceScene(s);
+}
+
+void ShaderTestDemo2::nextCallback(Ref* sender)
+{
+    auto s = ShaderTestScene2::create();
+    s->addChild( ShaderTest2::nextAction() );
+    Director::getInstance()->replaceScene(s);
+}
+
+void ShaderTestDemo2::restartCallback(Ref* sender)
+{
+    auto s = ShaderTestScene2::create();
+    s->addChild(ShaderTest2::restartAction());    
+    Director::getInstance()->replaceScene(s);
+}
+
+void ShaderTestScene2::runThisTest()
+{
+    auto layer = ShaderTest2::nextAction();
+    addChild(layer);
+    Director::getInstance()->replaceScene(this);
 }
 
 //
@@ -101,8 +172,8 @@ public:
             }
 
             // normal effect: order == 0
-            _trianglesCommand.init(_globalZOrder, _texture->getName(), getGLProgramState(), _blendFunc, _polyInfo.triangles, transform, flags);
-            renderer->addCommand(&_trianglesCommand);
+            _quadCommand.init(_globalZOrder, _texture->getName(), getGLProgramState(), _blendFunc, &_quad, 1, transform, flags);
+            renderer->addCommand(&_quadCommand);
 
             // postive effects: oder >= 0
             for(auto it = std::begin(_effects)+idx; it != std::end(_effects); ++it) {
@@ -140,7 +211,7 @@ bool Effect::initGLProgramState(const std::string &fragmentFilename)
     auto fragSource = fileUtiles->getStringFromFile(fragmentFullPath);
     auto glprogram = GLProgram::createWithByteArrays(ccPositionTextureColor_noMVP_vert, fragSource.c_str());
     
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_WP8 || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
     _fragSource = fragSource;
 #endif
     
@@ -153,7 +224,7 @@ bool Effect::initGLProgramState(const std::string &fragmentFilename)
 Effect::Effect()
 : _glprogramstate(nullptr)
 {
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_WP8 || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
     _backgroundListener = EventListenerCustom::create(EVENT_RENDERER_RECREATED,
                                                       [this](EventCustom*)
                                                       {
@@ -171,7 +242,7 @@ Effect::Effect()
 Effect::~Effect()
 {
     CC_SAFE_RELEASE_NULL(_glprogramstate);
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_WP8 || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
     Director::getInstance()->getEventDispatcher()->removeEventListener(_backgroundListener);
 #endif
 }
@@ -227,7 +298,7 @@ public:
 
     bool init()
     {
-        initGLProgramState("Shaders/example_Outline.fsh");
+        initGLProgramState("Shaders/example_outline.fsh");
 
         Vec3 color(1.0f, 0.2f, 0.3f);
         GLfloat radius = 0.01f;
@@ -267,7 +338,7 @@ public:
 
 protected:
     bool init() {
-        initGLProgramState("Shaders/example_EdgeDetection.fsh");
+        initGLProgramState("Shaders/example_edgeDetection.fsh");
         return true;
     }
 
@@ -286,7 +357,7 @@ public:
 
 protected:
     bool init() {
-        initGLProgramState("Shaders/example_GreyScale.fsh");
+        initGLProgramState("Shaders/example_greyScale.fsh");
         return true;
     }
 };
@@ -299,7 +370,7 @@ public:
 
 protected:
     bool init() {
-        initGLProgramState("Shaders/example_Sepia.fsh");
+        initGLProgramState("Shaders/example_sepia.fsh");
         return true;
     }
 };
@@ -312,7 +383,7 @@ public:
 
 protected:
     bool init() {
-        initGLProgramState("Shaders/example_Bloom.fsh");
+        initGLProgramState("Shaders/example_bloom.fsh");
         return true;
     }
 
@@ -331,7 +402,7 @@ public:
 
 protected:
     bool init() {
-        initGLProgramState("Shaders/example_CelShading.fsh");
+        initGLProgramState("Shaders/example_celShading.fsh");
         return true;
     }
 
@@ -350,7 +421,7 @@ public:
 
 protected:
     bool init() {
-        initGLProgramState("Shaders/example_LensFlare.fsh");
+        initGLProgramState("Shaders/example_lensFlare.fsh");
         return true;
     }
 
@@ -440,9 +511,6 @@ void EffectNormalMapped::setLightColor(const Color4F& color)
 EffectSpriteTest::EffectSpriteTest()
 {
     if (ShaderTestDemo2::init()) {
-
-        auto layer = LayerColor::create(Color4B::BLUE);
-        this->addChild(layer);
 
         auto s = Director::getInstance()->getWinSize();
 

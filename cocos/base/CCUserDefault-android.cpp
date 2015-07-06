@@ -475,12 +475,13 @@ UserDefault* UserDefault::sharedUserDefault()
 }
 
 UserDefault* UserDefault::getInstance()
-{    
+{
+#ifdef KEEP_COMPATABILITY
+    initXMLFilePath();
+#endif
+    
     if (! _userDefault)
     {
-#ifdef KEEP_COMPATABILITY
-        initXMLFilePath();
-#endif
         _userDefault = new (std::nothrow) UserDefault();
     }
 
@@ -489,7 +490,16 @@ UserDefault* UserDefault::getInstance()
 
 bool UserDefault::isXMLFileExist()
 {
-    return FileUtils::getInstance()->isFileExist(_filePath);
+    FILE *fp = fopen(_filePath.c_str(), "r");
+    bool bRet = false;
+    
+    if (fp)
+    {
+        bRet = true;
+        fclose(fp);
+    }
+    
+    return bRet;
 }
 
 void UserDefault::initXMLFilePath()

@@ -3,11 +3,6 @@
 #include "CustomReader.h"
 #include "CustomImageView.h"
 
-USING_NS_CC;
-USING_NS_CC_EXT;
-using namespace cocos2d::ui;
-using namespace cocostudio;
-
 static CustomReader* _instanceCustomReader = nullptr;
 
 CustomReader::CustomReader()

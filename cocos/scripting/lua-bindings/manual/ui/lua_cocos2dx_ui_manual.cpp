@@ -26,8 +26,7 @@
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #include "lua_cocos2dx_experimental_video_auto.hpp"
 #include "lua_cocos2dx_experimental_video_manual.hpp"
-#include "lua_cocos2dx_experimental_webview_auto.hpp"
-#include "lua_cocos2dx_experimental_webview_manual.hpp"
+#include "lua_cocos2dx_experimental_webview.hpp"
 #endif
 #include "cocos2d.h"
 #include "tolua_fix.h"
@@ -84,15 +83,25 @@ static int lua_cocos2dx_Widget_addTouchEventListener(lua_State* L)
             goto tolua_lerror;
         }
 #endif
+		// Lynn check is the function exist
+		const void* p = lua_topointer(L,2);
+		int id = (uintptr_t)p;
+		if ( self->isTouchEventListenerExist(id) )
+		{
+			CCLOG("lua_cocos2dx_Widget_addTouchEventListener: listener has already exist\n" );
+			tolua_pushnumber(L,(lua_Number)id);
+			return 1;
+		}
         
         LUA_FUNCTION handler = (  toluafix_ref_function(L,2,0));
         
         self->addTouchEventListener([=](cocos2d::Ref* ref,Widget::TouchEventType eventType){
             handleUIEvent(handler, ref, (int)eventType);
-        });
+		},id);
+		tolua_pushnumber(L,(lua_Number)id);
         
         ScriptHandlerMgr::getInstance()->addCustomHandler((void*)self, handler);
-        return 0;
+        return 1;
     }
     
     luaL_error(L, "'addTouchEventListener' function of Widget has wrong number of arguments: %d, was expecting %d\n", argc, 1);
@@ -1047,8 +1056,7 @@ int register_ui_moudle(lua_State* L)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
         register_all_cocos2dx_experimental_video(L);
         register_all_cocos2dx_experimental_video_manual(L);
-		register_all_cocos2dx_experimental_webview(L);
-		register_all_cocos2dx_experimental_webview_manual(L);
+        register_all_cocos2dx_experimental_webview(L);
 #endif
         extendEventListenerFocusEvent(L);
     }

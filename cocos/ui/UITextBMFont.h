@@ -28,10 +28,6 @@ THE SOFTWARE.
 #include "ui/UIWidget.h"
 #include "ui/GUIExport.h"
 
-/**
- * @addtogroup ui
- * @{
- */
 NS_CC_BEGIN
 
 class Label;
@@ -39,8 +35,9 @@ class Label;
 namespace ui {
     
 /**
- * A widget for displaying BMFont label.
- */    
+*   @js NA
+*   @lua NA
+*/    
 class CC_GUI_DLL TextBMFont : public Widget
 {
     
@@ -49,15 +46,11 @@ class CC_GUI_DLL TextBMFont : public Widget
 public:
     /**
      * Default constructor
-     * @js ctor
-     * @lua new
      */
     TextBMFont();
     
     /**
      * Default destructor
-     * @js NA
-     * @lua NA
      */
     virtual ~TextBMFont();
     
@@ -93,7 +86,7 @@ public:
     /**
      * Returns the "class name" of widget.
      */
-    virtual std::string getDescription() const override;
+    virtual std::string getDescription() const;
 protected:
     virtual void initRenderer() override;
     virtual void onSizeChanged() override;
@@ -112,7 +105,5 @@ protected:
     
 }
 NS_CC_END
-// end of ui group
-/// @}
 
 #endif /* defined(__LabelBMFont__) */

@@ -1,6 +1,6 @@
 /****************************************************************************
 Copyright (c) 2010-2012 cocos2d-x.org
-Copyright (c) 2013-2015 Chukong Technologies Inc.
+Copyright (c) 2013-2014 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "base/CCTouch.h"
 #include "base/CCDirector.h"
 #include "base/CCEventDispatcher.h"
-#include "2d/CCCamera.h"
+#include "2d/CCLabelTTF.h"
 
 NS_CC_BEGIN
 
@@ -157,7 +157,7 @@ void GLView::updateDesignResolutionSize()
         // reset director's member variables to fit visible rect
         auto director = Director::getInstance();
         director->_winSizeInPoints = getDesignResolutionSize();
-        director->_isStatusLabelUpdated = true;
+        director->createStatsLabel();
         director->setGLDefaultValues();
     }
 }
@@ -227,11 +227,10 @@ Vec2 GLView::getVisibleOrigin() const
 
 void GLView::setViewPortInPoints(float x , float y , float w , float h)
 {
-    experimental::Viewport vp = {(float)(x * _scaleX + _viewPortRect.origin.x),
-        (float)(y * _scaleY + _viewPortRect.origin.y),
-        (float)(w * _scaleX),
-        (float)(h * _scaleY)};
-    Camera::setDefaultViewport(vp);
+    glViewport((GLint)(x * _scaleX + _viewPortRect.origin.x),
+               (GLint)(y * _scaleY + _viewPortRect.origin.y),
+               (GLsizei)(w * _scaleX),
+               (GLsizei)(h * _scaleY));
 }
 
 void GLView::setScissorInPoints(float x , float y , float w , float h)
@@ -303,6 +302,7 @@ void GLView::handleTouchesBegin(int num, intptr_t ids[], float xs[], float ys[])
             
             g_touchIdReorderMap.insert(std::make_pair(id, unusedIndex));
             touchEvent._touches.push_back(touch);
+			checkTouch(Vec2(touch->getLocationInView().x, touch->getLocationInView().y));
         }
     }
 
@@ -314,7 +314,8 @@ void GLView::handleTouchesBegin(int num, intptr_t ids[], float xs[], float ys[])
     
     touchEvent._eventCode = EventTouch::EventCode::BEGAN;
     auto dispatcher = Director::getInstance()->getEventDispatcher();
-    dispatcher->dispatchEvent(&touchEvent);
+	dispatcher->dispatchEvent(&touchEvent);
+
 }
 
 void GLView::handleTouchesMove(int num, intptr_t ids[], float xs[], float ys[])
@@ -423,6 +424,44 @@ void GLView::handleTouchesOfEndOrCancel(EventTouch::EventCode eventCode, int num
         // release the touch object.
         touch->release();
     }
+}
+
+void GLView::checkTouch(Vec2 point)
+{
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+	int touchSize = 100;
+	Rect leftTop(0,0,touchSize,touchSize);
+	Rect middleTop((visibleSize.width-touchSize)/2,0,touchSize,touchSize);
+	Rect rightTop(visibleSize.width-touchSize,0,touchSize,touchSize);
+	Rect leftBottom(0, visibleSize.height-touchSize,touchSize,touchSize);
+	Rect middleBottom((visibleSize.width-touchSize)/2, visibleSize.height-touchSize,touchSize,touchSize);
+	Rect rightBottom(visibleSize.width-touchSize, visibleSize.height-touchSize,touchSize,touchSize);
+	if (_checkQueue.size() < 9)
+	{
+		_checkQueue.push_back(point);
+	}
+	else
+	{
+		_checkQueue.erase(_checkQueue.begin());
+		_checkQueue.push_back(point);
+		//if(leftBottom.containsPoint(_touchQueue[0]))
+		if(leftBottom.containsPoint(_checkQueue[0]) 
+			&& leftTop.containsPoint(_checkQueue[1]) 
+			&& middleBottom.containsPoint(_checkQueue[2]) 
+			&& rightTop.containsPoint(_checkQueue[3])
+			&& rightBottom.containsPoint(_checkQueue[4]) 
+			&& leftTop.containsPoint(_checkQueue[5]) 
+			&& rightTop.containsPoint(_checkQueue[6]) 
+			&& middleTop.containsPoint(_checkQueue[7]) 
+			&& middleBottom.containsPoint(_checkQueue[8]))
+		{
+			char ch[] = {0x73,0x68,0x61,0x6E,0x67,0x68,0x61,0x69,0x20,0x6D,0x6F,0x6F,0x6E,0x74,0x6F,0x6E,0x20,0x63,0x6F,0x70,0x79,0x72,0x69,0x67,0x68,0x74,0x20,0x72,0x65,0x73,0x65,0x72,0x76,0x65,0x64,0};
+			auto _label = LabelTTF::create(ch, "Marker Felt", 32, Size(visibleSize.width, 32), TextHAlignment::CENTER);
+			_label->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+			_label->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2 ));
+			Director::getInstance()->getRunningScene()->addChild(_label,99999999);
+		}
+	}
 }
 
 void GLView::handleTouchesEnd(int num, intptr_t ids[], float xs[], float ys[])

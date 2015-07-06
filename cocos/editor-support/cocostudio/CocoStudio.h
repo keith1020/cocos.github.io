@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 Copyright (c) 2013-2014 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
@@ -64,12 +64,5 @@ THE SOFTWARE.
 #include "cocostudio/ActionTimeline/CCActionTimelineNode.h"
 #include "cocostudio/CocosStudioExport.h"
 #include "cocostudio/ActionTimeline/CSLoader.h"
-
-#include "cocostudio/CocosStudioExport.h"
-
-namespace cocostudio
-{
-    void CC_STUDIO_DLL destroyCocosStudio();
-}
 
 #endif

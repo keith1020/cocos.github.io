@@ -15,13 +15,18 @@
 -- @function [parent=#AlphaFrame] setAlpha 
 -- @param self
 -- @param #unsigned char alpha
--- @return AlphaFrame#AlphaFrame self (return value: ccs.AlphaFrame)
         
 --------------------------------
 -- 
 -- @function [parent=#AlphaFrame] create 
 -- @param self
 -- @return AlphaFrame#AlphaFrame ret (return value: ccs.AlphaFrame)
+        
+--------------------------------
+-- 
+-- @function [parent=#AlphaFrame] apply 
+-- @param self
+-- @param #float percent
         
 --------------------------------
 -- 
@@ -33,6 +38,5 @@
 -- 
 -- @function [parent=#AlphaFrame] AlphaFrame 
 -- @param self
--- @return AlphaFrame#AlphaFrame self (return value: ccs.AlphaFrame)
         
 return nil

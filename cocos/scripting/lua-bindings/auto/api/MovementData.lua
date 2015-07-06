@@ -16,7 +16,12 @@
 -- @function [parent=#MovementData] addMovementBoneData 
 -- @param self
 -- @param #ccs.MovementBoneData movBoneData
--- @return MovementData#MovementData self (return value: ccs.MovementData)
+        
+--------------------------------
+-- 
+-- @function [parent=#MovementData] getDuration 
+-- @param self
+-- @return int#int ret (return value: int)
         
 --------------------------------
 -- 
@@ -28,6 +33,5 @@
 -- js ctor
 -- @function [parent=#MovementData] MovementData 
 -- @param self
--- @return MovementData#MovementData self (return value: ccs.MovementData)
         
 return nil

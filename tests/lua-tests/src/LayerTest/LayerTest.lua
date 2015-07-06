@@ -634,6 +634,7 @@ end
 function LayerTestMain()
     cclog("LayerTestMain")
     Helper.index = 1
+    cc.Director:getInstance():setDepthTest(true)
     local scene = cc.Scene:create()
 
     Helper.createFunctionTable = {

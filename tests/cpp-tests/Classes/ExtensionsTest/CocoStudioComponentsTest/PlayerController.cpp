@@ -20,13 +20,13 @@ bool PlayerController::init()
     return true;
 }
 
-void PlayerController::onAdd()
+void PlayerController::onEnter()
 {
-    ComController::onAdd();
+    ComController::onEnter();
     setTouchEnabled(true);
 }
 
-void PlayerController::onRemove()
+void PlayerController::onExit()
 {
     setTouchEnabled(false);
 }

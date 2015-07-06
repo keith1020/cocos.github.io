@@ -62,7 +62,7 @@ void Device::setAccelerometerEnabled(bool isEnabled)
 
 void Device::setAccelerometerInterval(float interval)
 {
-    setAccelerometerIntervalJni(interval);
+	setAccelerometerIntervalJni(interval);
 }
 
 class BitmapDC
@@ -79,16 +79,69 @@ public:
     ~BitmapDC(void)
     {
     }
-
-    bool getBitmapFromJavaShadowStroke( const char *text,
-                                        int nWidth,
-                                        int nHeight,
-                                        Device::TextAlign eAlignMask,
+    static inline bool is_base64(unsigned char c) {
+        return (isalnum(c) || (c == '+') || (c == '/'));
+    }
+    
+    std::string base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len) {
+        static const std::string base64_chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz"
+        "0123456789+/";
+        if( NULL == bytes_to_encode || 0 == in_len ){
+            return "";
+        }
+        std::string ret;
+        int i = 0;
+        int j = 0;
+        unsigned char char_array_3[3];
+        unsigned char char_array_4[4];
+        
+        while (in_len--) {
+            char_array_3[i++] = *(bytes_to_encode++);
+            if (i == 3) {
+                char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+                char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+                char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+                char_array_4[3] = char_array_3[2] & 0x3f;
+                
+                for(i = 0; (i <4) ; i++)
+                    ret += base64_chars[char_array_4[i]];
+                i = 0;
+            }
+        }
+        
+        if (i)
+        {
+            for(j = i; j < 3; j++)
+                char_array_3[j] = '\0';
+            
+            char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+            char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+            char_array_4[3] = char_array_3[2] & 0x3f;
+            
+            for (j = 0; (j < i + 1); j++)
+                ret += base64_chars[char_array_4[j]];
+            
+            while((i++ < 3))
+                ret += '=';
+            
+        }
+        
+        return ret;
+        
+    }
+    bool getBitmapFromJavaShadowStroke(	const char *text,
+    									int nWidth,
+    									int nHeight,
+    									Device::TextAlign eAlignMask,
                       const FontDefinition& textDefinition )
     {
+      try{
            JniMethodInfo methodInfo;
            if (! JniHelper::getStaticMethodInfo(methodInfo, "org/cocos2dx/lib/Cocos2dxBitmap", "createTextBitmapShadowStroke",
-               "([BLjava/lang/String;IIIIIIIIZFFFFZIIIIF)Z"))
+               "(Ljava/lang/String;Ljava/lang/String;IIIIIIIIZFFFFZIIIIF)Z"))
            {
                CCLOG("%s %d: error to get methodInfo", __FILE__, __LINE__);
                return false;
@@ -102,7 +155,7 @@ public:
            // requires this portion of the path to be omitted for assets inside the app package.
            if (fullPathOrFontName.find("assets/") == 0)
            {
-               fullPathOrFontName = fullPathOrFontName.substr(strlen("assets/"));   // Chop out the 'assets/' portion of the path.
+               fullPathOrFontName = fullPathOrFontName.substr(strlen("assets/"));	// Chop out the 'assets/' portion of the path.
            }
 
            /**create bitmap
@@ -111,12 +164,14 @@ public:
             * and data.
             * use this approach to decrease the jni call number
            */
-           int count = strlen(text);
-           jbyteArray strArray = methodInfo.env->NewByteArray(count);
-           methodInfo.env->SetByteArrayRegion(strArray, 0, count, reinterpret_cast<const jbyte*>(text));
+           if( NULL == text ){
+               return false;
+           }
+           std::string sBase64String = base64_encode((unsigned char const*)text,strnlen(text,1024));
+           jstring jstrText = methodInfo.env->NewStringUTF(sBase64String.c_str());
            jstring jstrFont = methodInfo.env->NewStringUTF(fullPathOrFontName.c_str());
 
-           if(!methodInfo.env->CallStaticBooleanMethod(methodInfo.classID, methodInfo.methodID, strArray,
+           if(!methodInfo.env->CallStaticBooleanMethod(methodInfo.classID, methodInfo.methodID, jstrText,
                jstrFont, textDefinition._fontSize, textDefinition._fontFillColor.r, textDefinition._fontFillColor.g, 
                textDefinition._fontFillColor.b, textDefinition._fontAlpha,
                eAlignMask, nWidth, nHeight, 
@@ -128,11 +183,14 @@ public:
                 return false;
            }
 
-           methodInfo.env->DeleteLocalRef(strArray);
+           methodInfo.env->DeleteLocalRef(jstrText);
            methodInfo.env->DeleteLocalRef(jstrFont);
            methodInfo.env->DeleteLocalRef(methodInfo.classID);
 
            return true;
+         }catch(...){
+          return false;
+         }
     }
 
 public:
@@ -168,14 +226,10 @@ Data Device::getTextureDataForText(const char * text, const FontDefinition& text
     return ret;
 }
 
+
 void Device::setKeepScreenOn(bool value)
 {
     setKeepScreenOnJni(value);
-}
-
-void Device::vibrate(float duration)
-{
-    vibrateJni(duration);
 }
 
 NS_CC_END

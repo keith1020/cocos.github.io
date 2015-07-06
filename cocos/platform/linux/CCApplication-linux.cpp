@@ -253,14 +253,6 @@ LanguageType Application::getCurrentLanguage()
     {
         ret = LanguageType::UKRAINIAN;
     }
-    else if (0 == strcmp("ro", pLanguageName))
-    {
-        ret = LanguageType::ROMANIAN;
-    }
-    else if (0 == strcmp("bg", pLanguageName))
-    {
-        ret = LanguageType::BULGARIAN;
-    }
     
     return ret;
 }

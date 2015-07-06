@@ -37,7 +37,9 @@ THE SOFTWARE.
 #include "cocostudio/CCDatas.h"
 
 #include "cocostudio/CocoLoader.h"
-
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 using namespace cocos2d;
 
@@ -59,6 +61,7 @@ static const char *TEXTURE_ATLAS = "TextureAtlas";
 static const char *SUB_TEXTURE = "SubTexture";
 
 static const char *A_NAME = "name";
+static const char *A_FRAME_RATE = "frameRate";
 static const char *A_DURATION = "dr";
 static const char *A_FRAME_INDEX = "fi";
 static const char *A_DURATION_TO = "to";
@@ -145,13 +148,23 @@ namespace cocostudio {
 
 
 float s_PositionReadScale = 1;
+char *DataReaderHelper::_buffer = nullptr;
+unsigned long DataReaderHelper::_pointer = 0;
+std::vector<std::string>DataReaderHelper::_nameList;
 
 std::vector<std::string> DataReaderHelper::_configFileList;
 
 DataReaderHelper *DataReaderHelper::_dataReaderHelper = nullptr;
 
 
-
+void DataReaderHelper::lockMutex()
+{
+	_dataReaderHelper->_addDataMutex.lock();
+}
+void DataReaderHelper::unlockMutex()
+{
+	_dataReaderHelper->_addDataMutex.unlock();
+}
 //! Async load
 void DataReaderHelper::loadData()
 {
@@ -200,6 +213,10 @@ void DataReaderHelper::loadData()
         {
             DataReaderHelper::addDataFromBinaryCache(pAsyncStruct->fileContent.c_str(),pDataInfo);
         }
+		else if (pAsyncStruct->configType == Custom_Binary)
+		{
+			DataReaderHelper::addDataFromUBNCache(pAsyncStruct->fileContent.c_str(),pDataInfo);
+		}
 
         // put the image info into the queue
         _dataInfoMutex.lock();
@@ -309,7 +326,10 @@ void DataReaderHelper::addDataFromFile(const std::string& filePath)
     ssize_t filesize;
     
     _dataReaderHelper->_getFileMutex.lock();
-    unsigned char *pBytes = FileUtils::getInstance()->getFileData(filePath, filemode.c_str(), &filesize);
+    ///!unsigned char *pBytes = FileUtils::getInstance()->getFileData(filePath, filemode.c_str(), &filesize);
+	Data byteData = FileUtils::getInstance()->getDataFromFile( filePath );
+	unsigned char *pBytes = byteData.getBytes();
+	filesize = byteData.getSize();
     std::string contentStr((const char*)pBytes,filesize);
     _dataReaderHelper->_getFileMutex.unlock();
     
@@ -321,6 +341,11 @@ void DataReaderHelper::addDataFromFile(const std::string& filePath)
     {
         DataReaderHelper::addDataFromCache(contentStr, &dataInfo);
     }
+	else if (str == ".ubn")
+	{
+		//DataReaderHelper::addDataFromUBNCache((const char*)pBytes, &dataInfo);
+		DataReaderHelper::addDataFromUBNCache(contentStr.c_str(), &dataInfo);
+	}
     else if(str == ".json" || str == ".ExportJson")
     {
         DataReaderHelper::addDataFromJsonCache(contentStr, &dataInfo);
@@ -330,7 +355,7 @@ void DataReaderHelper::addDataFromFile(const std::string& filePath)
         DataReaderHelper::addDataFromBinaryCache(contentStr.c_str(),&dataInfo);
     }
 
-	free(pBytes);
+	// free(pBytes);
 }
 
 void DataReaderHelper::addDataFromFileAsync(const std::string& imagePath, const std::string& plistPath, const std::string& filePath, Ref *target, SEL_SCHEDULE selector)
@@ -414,7 +439,7 @@ void DataReaderHelper::addDataFromFileAsync(const std::string& imagePath, const 
 
     std::string fullPath = FileUtils::getInstance()->fullPathForFilename(filePath);
 
-    bool isbinaryfilesrc = str==".csb";
+    bool isbinaryfilesrc = (str==".csb" || str == ".ubn");
     std::string filereadmode("r");
     if (isbinaryfilesrc) {
         filereadmode += "b";
@@ -422,23 +447,29 @@ void DataReaderHelper::addDataFromFileAsync(const std::string& imagePath, const 
     ssize_t size;
     // FIXME: fileContent is being leaked
     
-    // This getFileData only read exportJson file, it takes only a little time.
-    // Large image files are loaded in DataReaderHelper::addDataFromJsonCache(dataInfo) asynchronously.
     _dataReaderHelper->_getFileMutex.lock();
-    unsigned char *pBytes = FileUtils::getInstance()->getFileData(fullPath.c_str() , filereadmode.c_str(), &size);
+    //unsigned char *pBytes = FileUtils::getInstance()->getFileData(fullPath.c_str() , filereadmode.c_str(), &size);
+	Data bytecpy = FileUtils::getInstance()->getDataFromFile( fullPath );
     _dataReaderHelper->_getFileMutex.unlock();
     
+	/*
 	Data bytecpy;
     bytecpy.copy(pBytes, size);
+	*/
+	size = bytecpy.getSize();
     data->fileContent = std::string((const char*)bytecpy.getBytes(), size);
 
     // fix memory leak for v3.3
-    free(pBytes);
+    //free(pBytes);
     
     if (str == ".xml")
     {
         data->configType = DragonBone_XML;
     }
+	else if (str == ".ubn")
+	{
+		data->configType = Custom_Binary;
+	}
     else if(str == ".json" || str == ".ExportJson")
     {
         data->configType = CocoStudio_JSON;
@@ -516,7 +547,6 @@ void DataReaderHelper::addDataAsyncCallBack(float dt)
     }
 }
 
-
 void DataReaderHelper::removeConfigFile(const std::string& configFile)
 {
     std::vector<std::string>::iterator it = _configFileList.end();
@@ -525,6 +555,7 @@ void DataReaderHelper::removeConfigFile(const std::string& configFile)
         if (*i == configFile)
         {
             it = i;
+			break;
         }
     }
 
@@ -555,6 +586,7 @@ void DataReaderHelper::addDataFromCache(const std::string& pFileContent, DataInf
     while(armatureXML)
     {
         ArmatureData *armatureData = DataReaderHelper::decodeArmature(armatureXML, dataInfo);
+		root->QueryIntAttribute(A_FRAME_RATE, &armatureData->frameRate);
 
         if (dataInfo->asyncStruct)
         {
@@ -619,7 +651,7 @@ void DataReaderHelper::addDataFromCache(const std::string& pFileContent, DataInf
 ArmatureData *DataReaderHelper::decodeArmature(tinyxml2::XMLElement *armatureXML, DataInfo *dataInfo)
 {
     ArmatureData *armatureData = new (std::nothrow) ArmatureData();
-    armatureData->init();
+    armatureData->init(); 
 
     armatureData->name = armatureXML->Attribute(A_NAME);
 
@@ -737,7 +769,7 @@ AnimationData *DataReaderHelper::decodeAnimation(tinyxml2::XMLElement *animation
     ArmatureData *armatureData = ArmatureDataManager::getInstance()->getArmatureData(name);
 
     aniData->name = name;
-
+	
     tinyxml2::XMLElement *movementXML = animationXML->FirstChildElement(MOVEMENT);
 
     while( movementXML )
@@ -762,6 +794,7 @@ MovementData *DataReaderHelper::decodeMovement(tinyxml2::XMLElement *movementXML
 
 
     int duration, durationTo, durationTween, loop, tweenEasing = 0;
+	float scale = 1.0f;
 
     if( movementXML->QueryIntAttribute(A_DURATION, &(duration)) == tinyxml2::XML_SUCCESS)
     {
@@ -779,6 +812,10 @@ MovementData *DataReaderHelper::decodeMovement(tinyxml2::XMLElement *movementXML
     {
         movementData->loop = (loop != 0);
     }
+	if( movementXML->QueryFloatAttribute(A_MOVEMENT_SCALE, &(scale)) == tinyxml2::XML_SUCCESS)
+	{
+		movementData->scale = scale;
+	}
 
     const char *_easing = movementXML->Attribute(A_TWEEN_EASING);
     if(_easing != nullptr)
@@ -1247,7 +1284,7 @@ void DataReaderHelper::addDataFromJsonCache(const std::string& fileContent, Data
     
     json.ParseStream<0>(stream);
     if (json.HasParseError()) {
-        CCLOG("GetParseError %d\n",json.GetParseError());
+        CCLOG("GetParseError %s\n",json.GetParseError());
     }
 	
 	dataInfo->contentScale = DICTOOL->getFloatValue_json(json, CONTENT_SCALE, 1.0f);
@@ -1334,13 +1371,10 @@ void DataReaderHelper::addDataFromJsonCache(const std::string& fileContent, Data
             {
                 std::string plistPath = filePath + ".plist";
                 std::string pngPath =  filePath + ".png";
-                if (FileUtils::getInstance()->isFileExist(dataInfo->baseFilePath + plistPath) && FileUtils::getInstance()->isFileExist(dataInfo->baseFilePath + pngPath))
-                {
-                    ValueMap dict = FileUtils::getInstance()->getValueMapFromFile(dataInfo->baseFilePath + plistPath);
-                    if (dict.find("particleLifespan") != dict.end()) continue;
+                ValueMap dict = FileUtils::getInstance()->getValueMapFromFile(dataInfo->baseFilePath + plistPath);
+                if (dict.find("particleLifespan") != dict.end()) continue;
 
-                    ArmatureDataManager::getInstance()->addSpriteFrameFromFile((dataInfo->baseFilePath + plistPath).c_str(), (dataInfo->baseFilePath + pngPath).c_str(), dataInfo->filename.c_str());
-                }
+                ArmatureDataManager::getInstance()->addSpriteFrameFromFile((dataInfo->baseFilePath + plistPath).c_str(), (dataInfo->baseFilePath + pngPath).c_str(), dataInfo->filename.c_str());
             }
         }
     }
@@ -1417,33 +1451,29 @@ DisplayData *DataReaderHelper::decodeBoneDisplay(const rapidjson::Value& json, D
     {
         displayData = new (std::nothrow) SpriteDisplayData();
 
-        const char *name =  DICTOOL->getStringValue_json(json, A_NAME);
+		const char *name =  DICTOOL->getStringValue_json(json, A_NAME);
         if(name != nullptr)
         {
             ((SpriteDisplayData *)displayData)->displayName = name;
         }
-        if(json.HasMember(SKIN_DATA))
-        {
-            const rapidjson::Value &dicArray = DICTOOL->getSubDictionary_json(json, SKIN_DATA);
-            if(!dicArray.IsNull())
-            {
-                rapidjson::SizeType index = 0;
-                const rapidjson::Value &dic = DICTOOL->getSubDictionary_json(dicArray, index);
-                if (!dic.IsNull())
-                {
-                    SpriteDisplayData *sdd = (SpriteDisplayData *)displayData;
-                    sdd->skinData.x = DICTOOL->getFloatValue_json(dic, A_X) * s_PositionReadScale;
-                    sdd->skinData.y = DICTOOL->getFloatValue_json(dic, A_Y) * s_PositionReadScale;
-                    sdd->skinData.scaleX = DICTOOL->getFloatValue_json(dic, A_SCALE_X, 1.0f);
-                    sdd->skinData.scaleY = DICTOOL->getFloatValue_json(dic, A_SCALE_Y, 1.0f);
-                    sdd->skinData.skewX = DICTOOL->getFloatValue_json(dic, A_SKEW_X, 1.0f);
-                    sdd->skinData.skewY = DICTOOL->getFloatValue_json(dic, A_SKEW_Y, 1.0f);
+		const rapidjson::Value &dicArray = DICTOOL->getSubDictionary_json(json, SKIN_DATA);
+		if(!dicArray.IsNull())
+		{
+			rapidjson::SizeType index = 0;
+			const rapidjson::Value &dic = DICTOOL->getSubDictionary_json(dicArray, index);
+			if (!dic.IsNull())
+			{
+				SpriteDisplayData *sdd = (SpriteDisplayData *)displayData;
+				sdd->skinData.x = DICTOOL->getFloatValue_json(dic, A_X) * s_PositionReadScale;
+				sdd->skinData.y = DICTOOL->getFloatValue_json(dic, A_Y) * s_PositionReadScale;
+				sdd->skinData.scaleX = DICTOOL->getFloatValue_json(dic, A_SCALE_X, 1.0f);
+				sdd->skinData.scaleY = DICTOOL->getFloatValue_json(dic, A_SCALE_Y, 1.0f);
+				sdd->skinData.skewX = DICTOOL->getFloatValue_json(dic, A_SKEW_X, 1.0f);
+				sdd->skinData.skewY = DICTOOL->getFloatValue_json(dic, A_SKEW_Y, 1.0f);
 
-                    sdd->skinData.x *= dataInfo->contentScale;
-                    sdd->skinData.y *= dataInfo->contentScale;
-                }
-            }
-
+                sdd->skinData.x *= dataInfo->contentScale;
+                sdd->skinData.y *= dataInfo->contentScale;
+			}
         }
     }
 
@@ -1651,7 +1681,6 @@ FrameData *DataReaderHelper::decodeFrame(const rapidjson::Value& json, DataInfo 
     if (length != 0)
     {
         frameData->easingParams = new float[length];
-        frameData->easingParamNumber = length;
         
         for (int i = 0; i < length; i++)
         {
@@ -2595,4 +2624,656 @@ void DataReaderHelper::decodeNode(BaseData *node, const rapidjson::Value& json, 
         }
     }
 
+
+
+
+
+
+
+	// 自定义接口
+	void DataReaderHelper::readNameList(){
+		_nameList.clear();
+		std::string allNames((const char*)(_buffer));
+
+		std::string name;
+		size_t begPos = 0;
+		size_t endPos = allNames.find("@");
+
+		long num = strtol((allNames.substr(begPos, endPos - begPos)).c_str(), NULL, 10);
+		begPos = endPos + 1;
+		endPos = allNames.find("@", begPos);
+		for(long i = 0; i < num; i++)
+		{
+			name = allNames.substr(begPos, endPos - begPos);
+			_nameList.push_back(name);
+			begPos = endPos + 1;
+			endPos = allNames.find("@", begPos);
+		}
+		_pointer = begPos;
+	}
+
+	bool DataReaderHelper::readI3(float &data){
+		unsigned char c[3] = { 0 };
+		data = 0;
+
+		for (int k = 0; k < 3; k++)
+		{
+			c[k] |= _buffer[_pointer++];
+		}
+		if (c[0] == 255 && c[1] == 255 && c[2] == 255)return false;
+
+		if ((c[2] & 0x80) > 0)
+		{
+			c[2] &= 0x7f;
+			unsigned char uc = 0;
+			for (int k = 2; k >= 0; k--)
+			{
+				uc = c[k];
+				data += (int)uc * (1 << (k * 8));
+			}
+			data *=  -1;
+		}
+		else {
+			unsigned char uc = 0;
+			for (int k = 2; k >= 0; k--)
+			{
+				uc = c[k];
+				data += (int)uc * (1 << (k * 8));
+			}
+		}
+		data /= 100.0;
+		return true;
+	}
+
+	bool DataReaderHelper::readI2p(float &data){
+		//char c[2] = { 0 };
+		unsigned char c[2] = { 0 };
+		data = 0;
+
+		for (int k = 0; k < 2; k++)
+		{
+			//c[k] = _buffer[_pointer++];
+			c[k] |= _buffer[_pointer++];
+		}
+		//if(c[0] == -1 && c[1] == -1)return false;
+		if(c[0] == 255 && c[1] == 255)return false;
+
+		if ((c[1] & 0x80) > 0)
+		{
+			c[1] &= 0x7f;
+			unsigned char uc = 0;
+			for (int k = 1; k >= 0; k--)
+			{
+				// uc = static_cast<unsigned char>(c[k]);
+				uc = c[k];
+				data += uc * (1 << (k * 8));
+			}
+			data *=  -1;
+		}
+		else {
+			unsigned char uc = 0;
+			for (int k = 1; k >= 0; k--)
+			{
+				uc = c[k];
+				data += uc * (1 << (k * 8));
+			}
+		}
+		data /= 100.0;
+		return true;
+	}
+
+	bool DataReaderHelper::readI2u(float &data){
+		unsigned char c[2] = { 0 };
+		data = 0;
+
+		for (int k = 0; k < 2; k++)
+		{
+			c[k] |= _buffer[_pointer++];
+		}
+		if(c[0] == 255 && c[1] == 255)return false;
+
+		unsigned char uc = 0;
+		for (int k = 1; k >= 0; k--){
+			uc = c[k];
+			data += uc * (1 << (k * 8));
+		}
+
+		data /= 100.0;
+		return true;
+	}
+
+	bool DataReaderHelper::readI2(int &data){
+		unsigned char c[2] = { 0 };
+		data = 0;
+
+		for (int k = 0; k < 2; k++)
+		{
+			c[k] |= _buffer[_pointer++];
+		}
+		if(c[0] == 255 && c[1] == 255)return false;
+
+		unsigned char uc = 0;
+		for (int k = 1; k >= 0; k--){
+			uc = c[k];
+			data += uc * (1 << (k * 8));
+		}
+		return true;
+	}
+
+	bool DataReaderHelper::readI1(int &data){
+		unsigned char c = 0;
+		data = 0;
+
+		c |= _buffer[_pointer++];
+		// if(c == -1)return false;
+		if(c == 255)return false;
+
+		data = static_cast<int>(c);
+
+		return true;
+	}
+
+	bool DataReaderHelper::readName(std::string &name){
+		name = "";
+
+		char c[2] = { 0 };
+		int data = 0;
+
+		for (int k = 0; k < 2; k++)
+		{
+			c[k] = _buffer[_pointer++];
+		}
+		if(c[0] == -1 && c[1] == -1)return false;
+
+		unsigned char uc = 0;
+		for (int k = 1; k >= 0; k--){
+			uc = static_cast<unsigned char>(c[k]);
+			data += uc * (1 << (k * 8));
+		}
+		name = _nameList[data];
+		return true;
+	}
+
+	void DataReaderHelper::addDataFromUBNCache(const char *fileContent, DataInfo *dataInfo){
+		_dataReaderHelper->_readUbnMutex.lock();
+		_buffer = (char*)fileContent;
+		DataReaderHelper::readNameList();
+
+		ArmatureData *armatureData = DataReaderHelper::decodeArmature(dataInfo);
+		if (dataInfo->asyncStruct)
+		{
+			_dataReaderHelper->_addDataMutex.lock();
+		}
+		ArmatureDataManager::getInstance()->addArmatureData(armatureData->name.c_str(), armatureData, dataInfo->filename.c_str());
+		armatureData->release();
+		if (dataInfo->asyncStruct)
+		{
+			_dataReaderHelper->_addDataMutex.unlock();
+		}
+
+		AnimationData *animationData = DataReaderHelper::decodeAnimation(dataInfo);
+		if (dataInfo->asyncStruct)
+		{
+			_dataReaderHelper->_addDataMutex.lock();
+		}
+		ArmatureDataManager::getInstance()->addAnimationData(animationData->name.c_str(), animationData, dataInfo->filename.c_str());
+		animationData->release();
+		if (dataInfo->asyncStruct)
+		{
+			_dataReaderHelper->_addDataMutex.unlock();
+		}
+
+		int size;
+		if(!DataReaderHelper::readI2(size)){
+			throw std::runtime_error("Binary file error: missing textures number description.");
+		}
+		for (int i = 0; i < size; i++){
+			TextureData *textureData = DataReaderHelper::decodeTexture();
+
+			if (dataInfo->asyncStruct)
+			{
+				_dataReaderHelper->_addDataMutex.lock();
+			}
+			ArmatureDataManager::getInstance()->addTextureData(textureData->name.c_str(), textureData, dataInfo->filename.c_str());
+			textureData->release();
+			if (dataInfo->asyncStruct)
+			{
+				_dataReaderHelper->_addDataMutex.unlock();
+			}
+		}
+
+		_buffer = nullptr;
+		_dataReaderHelper->_readUbnMutex.unlock();
+	}
+
+	ArmatureData * DataReaderHelper::decodeArmature(DataInfo *dataInfo)
+	{
+		ArmatureData *armatureData = new (std::nothrow) ArmatureData();
+		armatureData->init(); 
+
+		if(!readI1(armatureData->frameRate)){
+			throw std::runtime_error("Binary file error: missing frame rate.");
+		}
+		dataInfo->flashToolVersion = 2.2f;
+		armatureData->dataVersion = 2.2f;
+
+		if(!readName(armatureData->name)){
+			throw std::runtime_error("Binary file error: missing armature name.");
+		}
+
+		int size;
+		if(!readI2(size)){
+			throw std::runtime_error("Binary file error: missing bone data number.");
+		}
+
+		for (int i = 0; i < size; i++){
+			BoneData *boneData = decodeBone(dataInfo);
+			armatureData->addBoneData(boneData);
+			boneData->release();
+		}
+
+		return armatureData;
+	}
+
+	BoneData * DataReaderHelper::decodeBone(DataInfo *dataInfo)
+	{
+		BoneData *boneData = new (std::nothrow) BoneData();
+		boneData->init();
+
+		if(!readName(boneData->name)){
+			throw std::runtime_error("Binary file error: missing bone data name.");
+		}
+		if(!readI1(boneData->zOrder)){
+			throw std::runtime_error("Binary file error: missing bone data zOrder.");
+		}
+
+		int size;
+		if(!readI2(size)){
+			throw std::runtime_error("Binary file error: missing bone display data size.");
+		}
+
+		for (int i = 0; i < size; i++){
+			DisplayData *displayData = decodeBoneDisplay(dataInfo);
+			boneData->addDisplayData(displayData);
+			displayData->release();
+		}
+
+		return boneData;
+	}
+
+	DisplayData* DataReaderHelper::decodeBoneDisplay(DataInfo *dataInfo)
+	{
+		DisplayData *displayData;
+
+		displayData = new (std::nothrow) SpriteDisplayData();
+		displayData->displayType  = CS_DISPLAY_SPRITE;
+		if (!readName(displayData->displayName)){
+			throw std::runtime_error("Binary file error: missing bone display name.");
+		}
+
+		return displayData;
+	}
+
+	AnimationData* DataReaderHelper::decodeAnimation(DataInfo *dataInfo)
+	{
+		AnimationData *aniData =  new AnimationData();
+
+		std::string name = "";
+		if(!readName(name)){
+			throw std::runtime_error("Binary file error: missing animation name.");
+		}
+		ArmatureData *armatureData = ArmatureDataManager::getInstance()->getArmatureData(name);
+		aniData->name = name;
+
+		int size;
+		if(!readI2(size)){
+			throw std::runtime_error("Binary file error: missing movement data size.");
+		}
+
+		int flag_1;
+		if(!readI1(flag_1)){
+			throw std::runtime_error("Binary file error: missing movement data flag.");
+		}
+
+		int flag_2;
+		if(!readI1(flag_2)){
+			throw std::runtime_error("Binary file error: missing movement data flag.");
+		}
+
+		// 根据标志位采用不同解压策略
+		for (int i = 0; i < size; i++){
+			MovementData *movementData = decodeMovement(armatureData, (flag_1 != 0), (flag_2 != 0), dataInfo);
+			aniData->addMovement(movementData);
+			movementData->release();
+		}
+		
+		return aniData;
+	}
+
+	MovementData* DataReaderHelper::decodeMovement(ArmatureData *armatureData, bool flag_1, bool flag_2, DataInfo *dataInfo)
+	{
+		MovementData *movementData = new (std::nothrow) MovementData();
+
+		if(!DataReaderHelper::readName(movementData->name)){
+			throw std::runtime_error("二进制文件格式错误");
+		}
+
+		int loop, tweenEasing = 0;
+		int scale;
+
+		if(!DataReaderHelper::readI2(movementData->duration)){
+			throw std::runtime_error("二进制文件格式错误");
+		}
+
+		if(!DataReaderHelper::readI2(movementData->durationTo)){
+			throw std::runtime_error("二进制文件格式错误");
+		}
+
+		if(!DataReaderHelper::readI2(movementData->durationTween)){
+
+		}
+
+		if(!DataReaderHelper::readI1(loop)){
+
+		}
+		movementData->loop = (loop != 0);
+
+		if(DataReaderHelper::readI1(scale)){
+			movementData->scale = static_cast<float>(scale);
+		}
+		else
+		{
+			movementData->scale = 1.0f;
+		}
+
+		if(DataReaderHelper::readI1(tweenEasing)){			
+			if (tweenEasing == -2){
+				movementData->tweenEasing = cocos2d::tweenfunc::Linear;
+			} 
+			else {
+				movementData->tweenEasing = tweenEasing == 2 ? cocos2d::tweenfunc::Sine_EaseInOut : (TweenType)tweenEasing;
+			}
+		}
+
+		int size;
+		if(!DataReaderHelper::readI2(size)){
+			throw std::runtime_error("二进制文件格式错误");
+		}
+		for (int i = 0; i < size; i++){
+			MovementBoneData *moveBoneData = decodeMovementBone(movementData, armatureData, flag_1, flag_2, dataInfo);
+			movementData->addMovementBoneData(moveBoneData);
+			moveBoneData->release();
+		}
+
+		return movementData;
+	}
+
+	MovementBoneData* DataReaderHelper::decodeMovementBone(MovementData *movementData, ArmatureData *armatureData, 
+		bool flag_1, bool flag_2, DataInfo *dataInfo)
+	{
+		MovementBoneData *movBoneData = new (std::nothrow) MovementBoneData();
+		movBoneData->init();
+
+		if(!DataReaderHelper::readName(movBoneData->name)){
+			throw std::runtime_error("二进制文件格式错误");
+		}
+
+		const char *boneName = (movBoneData->name).c_str();
+		BoneData *boneData = (BoneData *)armatureData->getBoneData(boneName);
+		std::string parentName = boneData->parentName;
+		MovementBoneData *parent = nullptr;
+		if (parentName.length() != 0 && parentName == movBoneData->name)
+		{
+			parent = movBoneData;
+		}
+
+		movBoneData->scale = movementData->scale;
+		movBoneData->delay = 0;
+
+		unsigned long length = 0;
+		unsigned long index = 0;
+		int parentTotalDuration = 0;
+		int currentDuration = 0;
+		int totalDuration = 0;
+
+		int size;
+		if(!DataReaderHelper::readI2(size)){
+			throw std::runtime_error("二进制文件格式错误");
+		}
+		FrameData *frame = nullptr;
+		for (int i = 0; i < size; i++){
+			if (parent){
+				while(index < movBoneData->frameList.size() && 
+					(frame ? (totalDuration < parentTotalDuration || totalDuration >= parentTotalDuration + currentDuration) : true))
+				{
+					frame = movBoneData->frameList.at(i);
+					parentTotalDuration += currentDuration;
+					currentDuration = frame->duration;
+					index++;
+				}
+			}
+
+			FrameData *frameData = decodeFrame(flag_1, flag_2, dataInfo);
+			movBoneData->addFrameData(frameData);
+			frameData->release();
+
+			if(frame != nullptr){
+				BaseData helpNode;
+				helpNode.x = frame->x / s_PositionReadScale;
+				helpNode.y = frame->y / s_PositionReadScale;
+				helpNode.skewX = frame->skewX;
+				helpNode.skewY = frame->skewY;
+
+				TransformHelp::transformFromParent(*frame, helpNode);
+			}
+
+			frameData->frameID = totalDuration;
+			totalDuration += frameData->duration;
+			movBoneData->duration = totalDuration;
+		}
+
+		movBoneData->duration = totalDuration;
+
+		auto frames = movBoneData->frameList;
+		for (long j = movBoneData->frameList.size() - 1; j >= 0; j--)
+		{
+			if (j > 0)
+			{
+				if ( frames.at(j-1)->displayIndex != -1 )
+				{
+					float difSkewX = frames.at(j)->skewX -  frames.at(j-1)->skewX;
+					float difSkewY = frames.at(j)->skewY -  frames.at(j-1)->skewY;
+
+					if (difSkewX < -M_PI || difSkewX > M_PI)
+					{
+						frames.at(j-1)->skewX = difSkewX < 0 ? frames.at(j-1)->skewX - 2 * M_PI : frames.at(j-1)->skewX + 2 * M_PI;
+					}
+
+					if (difSkewY < -M_PI || difSkewY > M_PI)
+					{
+						frames.at(j-1)->skewY = difSkewY < 0 ? frames.at(j-1)->skewY - 2 * M_PI : frames.at(j-1)->skewY + 2 * M_PI;
+					}
+				}
+			}
+		}
+
+		FrameData *frameData = new (std::nothrow) FrameData();
+		frameData->copy((FrameData *)movBoneData->frameList.back());
+		frameData->frameID = movBoneData->duration;
+		movBoneData->addFrameData(frameData);
+		frameData->release();
+
+		return movBoneData;
+	}
+
+	FrameData* DataReaderHelper::decodeFrame(bool flag_1, bool flag_2, DataInfo *dataInfo)
+	{
+		FrameData *frameData = new (std::nothrow) FrameData();
+
+		float skew_x = 0, skew_y = 0, tweenRotate = 0;
+		int duration = 0, displayIndex = 0, zOrder = 0, tweenEasing = 0, blendType = 0;
+
+		if (flag_1){
+			if(!DataReaderHelper::readI2p(frameData->x)){			// cocos2d_x
+				//throw std::runtime_error("二进制文件格式错误");
+			}
+			if(!DataReaderHelper::readI2p(frameData->y)){			// cocos2d_y
+				//throw std::runtime_error("二进制文件格式错误");
+			}
+			if(DataReaderHelper::readI2p(frameData->skewX)){			
+			}
+			if(DataReaderHelper::readI2p(frameData->skewY)){			
+			}
+		} 
+		else {
+			if(!DataReaderHelper::readI3(frameData->x)){			// cocos2d_x
+				//throw std::runtime_error("二进制文件格式错误");
+			}
+			if(!DataReaderHelper::readI3(frameData->y)){			// cocos2d_y
+				//throw std::runtime_error("二进制文件格式错误");
+			}
+			if(!DataReaderHelper::readI3(frameData->skewX)){			
+				//throw std::runtime_error("二进制文件格式错误");
+			}
+			if(!DataReaderHelper::readI3(frameData->skewY)){			
+				//throw std::runtime_error("二进制文件格式错误");
+			}
+		}
+		frameData->x *= s_PositionReadScale;
+		frameData->y = -(frameData->y);
+		frameData->y *= s_PositionReadScale;
+
+		frameData->skewX = CC_DEGREES_TO_RADIANS(frameData->skewX);
+		frameData->skewY = CC_DEGREES_TO_RADIANS(-(frameData->skewY));
+
+		if(!DataReaderHelper::readI2u(frameData->scaleX)){			
+			//throw std::runtime_error("二进制文件格式错误");
+		}
+		if(!DataReaderHelper::readI2u(frameData->scaleY)){			
+			//throw std::runtime_error("二进制文件格式错误");
+		}
+
+		if(!DataReaderHelper::readI1(frameData->zOrder)){			
+			//throw std::runtime_error("二进制文件格式错误");
+		}
+		if(!DataReaderHelper::readI1(frameData->displayIndex)){			
+			frameData->displayIndex = -1;
+		}
+		if(!DataReaderHelper::readI1(frameData->duration)){			
+			throw std::runtime_error("二进制文件格式错误");
+		}
+
+		int tweenFrame = 0;
+		if (flag_2 && readI1(tweenFrame))
+		{
+			frameData->isTween = (tweenFrame != 0);
+		}
+
+		if(DataReaderHelper::readI1(tweenEasing)){			
+			if ((unsigned char)tweenEasing == 0xfe){
+				frameData->tweenEasing = TweenType::Linear;
+			} 
+			else {
+				frameData->tweenEasing = tweenEasing == 2 ? TweenType::Sine_EaseInOut : (TweenType)tweenEasing;
+			}
+		}
+		else {
+			frameData->tweenEasing = TweenType::Linear;
+		}
+
+		if(!DataReaderHelper::readI2p(frameData->tweenRotate)){			
+			frameData->tweenRotate = tweenRotate;
+		}
+
+// 		frameData->blendFunc.src = CC_BLEND_SRC;
+// 		frameData->blendFunc.dst = CC_BLEND_DST;
+
+		int flag_col = 0;
+		int alpha, red, green, blue = 100;
+		int alphaOffset, redOffset, greenOffset, blueOffset = 0;
+
+		if(DataReaderHelper::readI1(flag_col) && flag_col != 0){			
+			frameData->isUseColorInfo = true;
+
+			if(!DataReaderHelper::readI1(alpha)){			
+				alpha = 255;
+			}
+			if(!DataReaderHelper::readI1(red)){			
+				red = 255;
+			}
+			if(!DataReaderHelper::readI1(green)){			
+				green = 255;
+			}
+			if(!DataReaderHelper::readI1(blue)){			
+				blue = 255;
+			}
+
+			if(!DataReaderHelper::readI1(alphaOffset)){			
+				alphaOffset = 0;
+			}
+			if(!DataReaderHelper::readI1(redOffset)){			
+				redOffset = 0;
+			}
+			if(!DataReaderHelper::readI1(greenOffset)){			
+				greenOffset = 0;
+			}
+			if(!DataReaderHelper::readI1(blueOffset)){			
+				blueOffset = 0;
+			}
+
+			frameData->a = 2.55f * alphaOffset + alpha;
+			frameData->r = 2.55f * redOffset + red;
+			frameData->g = 2.55f * greenOffset + green;
+			frameData->b = 2.55f * blueOffset + blue;
+		}
+		else {
+			frameData->isUseColorInfo = false;
+		}
+
+		return frameData;
+	}
+
+	TextureData* DataReaderHelper::decodeTexture()
+	{
+		TextureData *textureData = new (std::nothrow) TextureData();
+		textureData->init();
+
+		if(!readName(textureData->name)){			
+			throw std::runtime_error("Binary file error: missing subtexture name.");
+		}
+
+		float px = 0, py = 0;
+		int width = 0, height = 0;
+		if(!readI2(width)){			
+			throw std::runtime_error("Binary file error: missing subtexture width.");
+		}
+		if(!readI2(height)){			
+			throw std::runtime_error("Binary file error: missing subtexture height.");
+		}
+
+		textureData->width = static_cast<float>(width);
+		textureData->height = static_cast<float>(height);
+
+		if(!readI3(px)){			
+			throw std::runtime_error("Binary file error: missing subtexture px.");
+		}
+		if(!readI3(py)){			
+			throw std::runtime_error("Binary file error: missing subtexture py.");
+		}
+
+		float anchorPointX = px / width;
+		float anchorPointY = (height - py) / height;
+
+		textureData->pivotX = anchorPointX;
+		textureData->pivotY = anchorPointY;
+
+		return textureData;
+	}
+
+	ContourData* DataReaderHelper::decodeContour()
+	{
+		return nullptr;
+	}
+
 }
+

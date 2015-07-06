@@ -61,7 +61,7 @@ public:
     virtual ~ControlHuePicker();
     virtual bool initWithTargetAndPos(Node* target, Vec2 pos);
 
-    virtual void setEnabled(bool enabled) override;
+    virtual void setEnabled(bool enabled);
 
     // overrides
     virtual bool onTouchBegan(Touch* touch, Event* pEvent) override;

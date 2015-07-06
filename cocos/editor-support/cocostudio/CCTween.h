@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 Copyright (c) 2013-2014 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
@@ -91,6 +91,8 @@ public:
 
     virtual void setMovementBoneData(MovementBoneData *data) { _movementBoneData = data; }
     virtual const MovementBoneData *getMovementBoneData() const { return _movementBoneData; }
+
+	//!virtual void setAnimationInternal( float f ) { }
 protected:
 
     /**
@@ -139,8 +141,10 @@ protected:
     int _betweenDuration;           //! Current key frame will last _betweenDuration frames
     int _totalDuration;
 
+	float _tweenScale;
 
-    int _fromIndex;                    //! The current frame index in FrameList of MovementBoneData, it's different from m_iFrameIndex
+
+    int _fromIndex;				    //! The current frame index in FrameList of MovementBoneData, it's different from m_iFrameIndex
     int _toIndex;                   //! The next frame index in FrameList of MovementBoneData, it's different from m_iFrameIndex
 
     ArmatureAnimation *_animation;

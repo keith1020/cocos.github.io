@@ -4,10 +4,8 @@
 -- @parent_module cc
 
 --------------------------------
---  Returns the Ease action that will be performed on a linear action.<br>
--- since v0.8.2<br>
--- param action A given interval action.<br>
--- return The Ease action that will be performed on a linear action.
+--  returns the Ease action that will be performed on a linear action.<br>
+-- since v0.8.2
 -- @function [parent=#TransitionEaseScene] easeActionWithAction 
 -- @param self
 -- @param #cc.ActionInterval action

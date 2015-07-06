@@ -33,10 +33,6 @@
 #include <set>
 #include <vector>
 
-/**
- * @addtogroup ui
- * @{
- */
 NS_CC_EXT_BEGIN
 
 class TableView;
@@ -188,7 +184,6 @@ public:
     static TableView* create(TableViewDataSource* dataSource, Size size, Node *container);
     /**
      * @js ctor
-     * @lua new
      */
     TableView();
     /**
@@ -333,8 +328,7 @@ public:
 
 };
 
+
 NS_CC_EXT_END
-// end of ui group
-/// @}
 
 #endif /* __CCTABLEVIEW_H__ */

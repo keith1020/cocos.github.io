@@ -4,16 +4,12 @@
 cocos2d-x
 =========
 
-|  |iOS|Mac|Linux|Win32|Android|Win8.1-Universal|
-| ----|----|----- | ---|----|------|---|
-|v3|[![Build Status](http://45.56.80.45:8080/buildStatus/icon?job=daily-build-v3/node=ios)](http://45.56.80.45:8080/job/daily-build-v3/node=ios)|[![Build Status](http://45.56.80.45:8080/buildStatus/icon?job=daily-build-v3/node=mac)](http://45.56.80.45:8080/job/daily-build-v3/node=mac)|[![Build Status](http://45.56.80.45:8080/buildStatus/icon?job=daily-build-v3/node=linux)](http://45.56.80.45:8080/job/daily-build-v3/node=linux)|[![Build Status](http://45.56.80.45:8080/buildStatus/icon?job=daily-build-v3/node=win32)](http://45.56.80.45:8080/job/daily-build-v3/node=win32)|[![Build Status](http://45.56.80.45:8080/buildStatus/icon?job=daily-build-v3/node=android)](http://45.56.80.45:8080/job/daily-build-v3/node=android)|[![Build Status](http://45.56.80.45:8080/buildStatus/icon?job=daily-build-v3/node=windows-universal)](http://45.56.80.45:8080/job/daily-build-v3/node=windows-universal)|
-|v4|[![Build Status](http://45.56.80.45:8080/buildStatus/icon?job=daily-build-v4/node=ios)](http://45.56.80.45:8080/job/daily-build-v4/node=ios)|[![Build Status](http://45.56.80.45:8080/buildStatus/icon?job=daily-build-v4/node=mac)](http://45.56.80.45:8080/job/daily-build-v4/node=mac)|[![Build Status](http://45.56.80.45:8080/buildStatus/icon?job=daily-build-v4/node=linux)](http://45.56.80.45:8080/job/daily-build-v4/node=linux)|[![Build Status](http://45.56.80.45:8080/buildStatus/icon?job=daily-build-v4/node=win32)](http://45.56.80.45:8080/job/daily-build-v4/node=win32)|[![Build Status](http://45.56.80.45:8080/buildStatus/icon?job=daily-build-v4/node=android)](http://45.56.80.45:8080/job/daily-build-v4/node=android)|[![Build Status](http://45.56.80.45:8080/buildStatus/icon?job=daily-build-v4/node=windows-universal)](http://45.56.80.45:8080/job/daily-build-v4/node=windows-universal)|
-
-
+[![Build Status](https://travis-ci.org/cocos2d/cocos2d-x.png?branch=v3)](https://travis-ci.org/cocos2d/cocos2d-x)
+[![Build Status](https://travis-ci.org/cocos-travis-mac/cocos2d-x.png?branch=v3)](https://travis-ci.org/cocos-travis-mac/cocos2d-x)
 
 [cocos2d-x][1] is a multi-platform framework for building 2d games, interactive books, demos and other graphical applications.
 It is based on [cocos2d-iphone][2], but instead of using Objective-C, it uses C++.
-It works on iOS, Android, Windows Phone and Store Apps, OS X, Windows and Linux.
+It works on iOS, Android, Windows Phone, OS X, Windows and Linux.
 
 cocos2d-x is:
 
@@ -25,18 +21,19 @@ cocos2d-x is:
 Git user attention
 -----------------------
 
-1. Clone the repo from GitHub.
+1. clone the repo from GitHub.
 
-         $ git clone https://github.com/cocos2d/cocos2d-x.git
+         $ git clone git@github.com:cocos2d/cocos2d-x.git
 
 2. After cloning the repo, please execute `download-deps.py` to download and install dependencies.
 
          $ cd cocos2d-x
-         cocos2d-x $ python download-deps.py
+         $ python download-deps.py
 
 3. After running `download-deps.py`.
 
-         cocos2d-x $ git submodule update --init
+         $ cd cocos2d-x
+         $ git submodule update --init
 
 How to start a new game
 -----------------------
@@ -60,7 +57,7 @@ Example:
 ### Build and run a new project for iOS ###
 
     $ cocos run -p ios
-
+    
 ### Build and run a new project for OSX ###
 
     $ cocos run -p mac
@@ -77,7 +74,7 @@ Then
 
     $ cd NEW_PROJECTS_DIR/MyGame
     $ cocos run -p linux
-
+    
 Run
 
     $ bin/MyGame
@@ -86,20 +83,12 @@ Run
 
     $ cocos run -p win32
 
-### Build and run new project for Windows 8.1/10.0 and Windows Phone 8.1/10.0 ###
+### Build and run new project for Windows 8.1 and Windows Phone 8.1 ###
 
-    $ cocos new MyGame -p com.your_company.mygame -l cpp -d projects
+    $ cocos new MyGame -p com.bar.foo -l cpp -d projects
 
-* Visual Studio 2013 Update 4 or later is required for Windows 8.1 Universal Apps
-
-* Visual Studio 2015 RC and Windows 10.0 (build 10074 or higher) is required for Windows 10.0 UWP Apps
-
-Starting with Cocos2d-x v3.3, you can create Windows 8.1 Universal Apps (Windows Store and Windows Phone 8.1).
-Starting with Cocos2d-x v3.6 you can create Windows 10.0 UWP Apps (Windows Store and Windows Phone 10.0).
-Starting with Cocos2d-x v3.6 there will no longer be support for Windows Phone 8.0.
-
+With the Cocos2d-x v3.3, you can create Universal App (Two projects at the same time: Windows(Tablet) and Windows Phone 8.1 )
 See more info on How to install and Create games on Windows RT (Windows and Windows Phone 8.1) at http://msopentech.github.io/cocos2d-x/
-
 
 Main features
 -------------
@@ -138,10 +127,10 @@ Build Requirements
 
 * Mac OS X 10.7+, Xcode 5.1+
 * or Ubuntu 12.10+, CMake 2.6+
-* or Windows 7+, VS 2013+
+* or Windows 7+, VS 2012+
 * Python 2.7.5
 * NDK r10c+ is required to build Android games
-* Windows Phone/Store 8.0 VS 2013+
+* Windows Phone/Store 8.0 VS 2012+
 * Windows Phone/Store 8.1 VS 2013 Update 3+
 
 
@@ -149,10 +138,10 @@ Runtime Requirements
 --------------------
   * iOS 5.0+ for iPhone / iPad games
   * Android 2.3+ for Android games
-  * Windows 8.1 for Windows Phone/Store 8.1 games
-  * Windows 10.0 for Windows Phone/Store 10.0  games
+  * Windows Phone 8 and 8.1 for Windows Phone games
   * OS X v10.6+ for Mac games
   * Windows 7+ for Win games
+  * Windows 8+ for WinRT games (Modern Apps)
 
 
 Running Tests
@@ -164,7 +153,7 @@ Select the test you want from Xcode Scheme chooser.
 
 ```
 $ cd cocos2d-x/build
-$ open cocos2d_tests.xcodeproj
+$ open cocos_tests.xcodeproj
 ```
 
 * For Linux
@@ -189,11 +178,7 @@ $ bin/lua-empty-test/lua-empty-test
 
 * For Windows
 
-Open the `cocos2d-x/build/cocos2d-win32.sln`
-
-* For Windows 8.1 Universal Apps (Phone and Store)
-
-Open the `cocos2d-x/build/cocos2d-win8.1-universal.sln`
+Open the `cocos2d-x/build/cocos2d-win32.vc2012.sln`
 
 * For Android
 

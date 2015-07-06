@@ -10,7 +10,6 @@
 -- @function [parent=#ActionScaleFrame] setScaleY 
 -- @param self
 -- @param #float scaleY
--- @return ActionScaleFrame#ActionScaleFrame self (return value: ccs.ActionScaleFrame)
         
 --------------------------------
 -- Changes the scale action scaleX.<br>
@@ -18,7 +17,6 @@
 -- @function [parent=#ActionScaleFrame] setScaleX 
 -- @param self
 -- @param #float scaleX
--- @return ActionScaleFrame#ActionScaleFrame self (return value: ccs.ActionScaleFrame)
         
 --------------------------------
 -- Gets the scale action scaleY.<br>
@@ -47,6 +45,5 @@
 -- Default constructor
 -- @function [parent=#ActionScaleFrame] ActionScaleFrame 
 -- @param self
--- @return ActionScaleFrame#ActionScaleFrame self (return value: ccs.ActionScaleFrame)
         
 return nil

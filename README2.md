@@ -1,2 +1,0 @@
-# cocos.github.io
-cocos

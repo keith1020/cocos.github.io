@@ -5,21 +5,19 @@
 -- @parent_module cc
 
 --------------------------------
+-- 
+-- @function [parent=#ControlSwitch] setEnabled 
+-- @param self
+-- @param #bool enabled
+        
+--------------------------------
 -- @overload self, bool         
 -- @overload self, bool, bool         
 -- @function [parent=#ControlSwitch] setOn
 -- @param self
 -- @param #bool isOn
 -- @param #bool animated
--- @return ControlSwitch#ControlSwitch self (return value: cc.ControlSwitch)
 
---------------------------------
--- 
--- @function [parent=#ControlSwitch] locationFromTouch 
--- @param self
--- @param #cc.Touch touch
--- @return vec2_table#vec2_table ret (return value: vec2_table)
-        
 --------------------------------
 -- 
 -- @function [parent=#ControlSwitch] isOn 
@@ -46,6 +44,13 @@
 -- @return bool#bool ret (return value: bool)
         
 --------------------------------
+-- 
+-- @function [parent=#ControlSwitch] locationFromTouch 
+-- @param self
+-- @param #cc.Touch touch
+-- @return vec2_table#vec2_table ret (return value: vec2_table)
+        
+--------------------------------
 -- @overload self, cc.Sprite, cc.Sprite, cc.Sprite, cc.Sprite         
 -- @overload self, cc.Sprite, cc.Sprite, cc.Sprite, cc.Sprite, cc.Label, cc.Label         
 -- @function [parent=#ControlSwitch] create
@@ -60,18 +65,10 @@
 
 --------------------------------
 -- 
--- @function [parent=#ControlSwitch] setEnabled 
--- @param self
--- @param #bool enabled
--- @return ControlSwitch#ControlSwitch self (return value: cc.ControlSwitch)
-        
---------------------------------
--- 
 -- @function [parent=#ControlSwitch] onTouchMoved 
 -- @param self
 -- @param #cc.Touch pTouch
 -- @param #cc.Event pEvent
--- @return ControlSwitch#ControlSwitch self (return value: cc.ControlSwitch)
         
 --------------------------------
 -- 
@@ -79,7 +76,6 @@
 -- @param self
 -- @param #cc.Touch pTouch
 -- @param #cc.Event pEvent
--- @return ControlSwitch#ControlSwitch self (return value: cc.ControlSwitch)
         
 --------------------------------
 -- 
@@ -87,7 +83,6 @@
 -- @param self
 -- @param #cc.Touch pTouch
 -- @param #cc.Event pEvent
--- @return ControlSwitch#ControlSwitch self (return value: cc.ControlSwitch)
         
 --------------------------------
 -- 
@@ -98,10 +93,8 @@
 -- @return bool#bool ret (return value: bool)
         
 --------------------------------
--- js ctor<br>
--- lua new
+-- js ctor
 -- @function [parent=#ControlSwitch] ControlSwitch 
 -- @param self
--- @return ControlSwitch#ControlSwitch self (return value: cc.ControlSwitch)
         
 return nil

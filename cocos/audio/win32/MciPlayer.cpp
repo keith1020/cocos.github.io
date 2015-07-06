@@ -1,5 +1,6 @@
 #include "MciPlayer.h"
 #include <tchar.h>
+#include <Digitalv.h>
 
 #define WIN_CLASS_NAME        "CocosDenshionCallbackWnd"
 #define BREAK_IF(cond)      if (cond) break;
@@ -104,6 +105,26 @@ void MciPlayer::Open(const char* pFileName, UINT uId)
     } while (0);
 }
 
+void MciPlayer::Volume(UINT volume) 
+{
+    if (!_dev)  
+        return;
+    MCI_DGV_SETAUDIO_PARMS mciParams = {0};
+    mciParams.dwItem = MCI_DGV_SETAUDIO_VOLUME;
+    mciParams.dwValue = volume;
+    mciSendCommand(_dev, MCI_SETAUDIO, MCI_DGV_SETAUDIO_ITEM | MCI_DGV_SETAUDIO_VALUE, (DWORD)&mciParams);
+}
+    
+UINT MciPlayer::Volume() const
+{
+    if (!_dev)
+         return 0;
+    MCI_STATUS_PARMS mciParams = {0};
+    mciParams.dwItem = MCI_DGV_STATUS_VOLUME;
+    mciSendCommand(_dev, MCI_STATUS, MCI_STATUS_ITEM, (DWORD)&mciParams);
+    return mciParams.dwReturn;
+}
+
 void MciPlayer::Play(UINT uTimes /* = 1 */)
 {
     if (! _dev)
@@ -137,6 +158,7 @@ void MciPlayer::Close()
 void MciPlayer::Pause()
 {
     _SendGenericCommand(MCI_PAUSE);
+    _playing = false;
 }
 
 void MciPlayer::Resume()
@@ -154,7 +176,8 @@ void MciPlayer::Resume()
     else
     {
         _SendGenericCommand(MCI_RESUME);
-    }   
+    }
+    _playing = true;
 }
 
 void MciPlayer::Stop()

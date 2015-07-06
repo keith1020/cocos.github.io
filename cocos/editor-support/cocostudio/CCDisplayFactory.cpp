@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "cocostudio/CCSkin.h"
 #include "cocostudio/CCArmatureDataManager.h"
 #include "cocostudio/CCTransformHelp.h"
+#include "cocostudio/CCDataReaderHelper.h"
 
 #include "2d/CCParticleSystemQuad.h"
 
@@ -196,8 +197,11 @@ void DisplayFactory::initSpriteDisplay(Bone *bone, DecorativeDisplay *decoDispla
     {
         textureName = textureName.erase(startPos);
     }
+	DataReaderHelper::getInstance()->lockMutex();
 
     TextureData *textureData = ArmatureDataManager::getInstance()->getTextureData(textureName.c_str());
+
+	DataReaderHelper::getInstance()->unlockMutex();
     if(textureData)
     {
         //! Init display anchorPoint, every Texture have a anchor point

@@ -24,7 +24,9 @@
  ****************************************************************************/
 
 #include "base/CCData.h"
-#include "base/CCConsole.h"
+
+#include <string>
+#include "../external/crypto/CCCrypto.h"
 
 NS_CC_BEGIN
 
@@ -32,14 +34,16 @@ const Data Data::Null;
 
 Data::Data() :
 _bytes(nullptr),
-_size(0)
+_size(0),
+m_pOld(nullptr)
 {
     CCLOGINFO("In the empty constructor of Data.");
 }
 
 Data::Data(Data&& other) :
 _bytes(nullptr),
-_size(0)
+_size(0),
+m_pOld(nullptr)
 {
     CCLOGINFO("In the move constructor of Data.");
     move(other);
@@ -47,7 +51,8 @@ _size(0)
 
 Data::Data(const Data& other) :
 _bytes(nullptr),
-_size(0)
+_size(0),
+m_pOld(nullptr)
 {
     CCLOGINFO("In the copy constructor of Data.");
     copy(other._bytes, other._size);
@@ -75,9 +80,11 @@ Data& Data::operator= (Data&& other)
 
 void Data::move(Data& other)
 {
+	m_pOld = other.m_pOld;
     _bytes = other._bytes;
     _size = other._size;
     
+	other.m_pOld = nullptr;
     other._bytes = nullptr;
     other._size = 0;
 }
@@ -117,9 +124,80 @@ void Data::fastSet(unsigned char* bytes, const ssize_t size)
 
 void Data::clear()
 {
-    free(_bytes);
+    if (m_pOld!=nullptr)
+        free(m_pOld);
+    else
+        free(_bytes);
     _bytes = nullptr;
     _size = 0;
+}
+
+bool Data::isEncryed() const
+{
+	if ( _size > sizeof(EncryedHeader) )
+	{
+		EncryedHeader* header = (EncryedHeader*)(_bytes);
+		return header->isEncryed();
+	}
+	return false;
+}
+void Data::decryptData()
+{
+	if ( _size < sizeof(EncryedHeader) )
+		return;
+	EncryedHeader* header = (EncryedHeader*)(_bytes);
+	if ( !header->isEncryed() )
+		return;
+	if ( header->getDecryptSize()==0 )
+		return;
+
+	if ( header->m_nType==ENCRYPT_AES )
+	{
+		char* realBuffer = (char*) malloc(header->getDecryptSize()+1);
+		realBuffer[header->getDecryptSize()] = 0;
+		bool isOK = CCCrypto::aes_decrypt( (char const*)(_bytes+sizeof(EncryedHeader)),(char const*)(_bytes+_size),CCCrypto::getKey(),(char*)realBuffer,header->getDecryptSize());
+		if( isOK )
+		{
+			int totalSize = header->getDecryptSize();
+			clear();
+			_bytes = (unsigned char*)realBuffer;
+			_size = totalSize;
+
+			// uncompress
+			unsigned char* pOutData = NULL;
+			SizeT nOutSize = 0;
+			isOK = CCCrypto::uncompressData( (char*)_bytes, _size, &pOutData, nOutSize );
+			if ( isOK )
+			{
+				clear();
+				_bytes = (unsigned char*)pOutData;
+				_size = nOutSize;
+			}
+		}
+		else
+			free( realBuffer );
+	}
+	else if ( header->m_nType==ENCRYPT_XOR )
+	{
+		int totalSize = header->getDecryptSize();
+		CCCrypto::xor_decrypt( (char*)(_bytes+sizeof(EncryedHeader)), totalSize);
+		// uncompress
+		unsigned char* pOutData = NULL;
+		SizeT nOutSize = 0;
+		bool isOK = CCCrypto::uncompressData( (char*)_bytes+sizeof(EncryedHeader), totalSize, &pOutData, nOutSize );
+		if ( isOK )
+		{
+			clear();
+			_bytes = (unsigned char*)pOutData;
+			_size = nOutSize;
+		}
+        else
+        {
+            m_pOld = _bytes;
+            _bytes = _bytes+sizeof(EncryedHeader);
+            _size = totalSize;
+        }
+	}
 }
 
 NS_CC_END

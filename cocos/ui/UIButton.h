@@ -28,67 +28,61 @@ THE SOFTWARE.
 #include "ui/UIWidget.h"
 #include "ui/GUIExport.h"
 
-/**
- * @addtogroup ui
- * @{
- */
 NS_CC_BEGIN
 
 class Label;
-class SpriteFrame;
 
 namespace ui{
-
+    
     class Scale9Sprite;
 /**
- * Represents a push-button widget.
- * Push-buttons can be pressed, or clicked, by the user to perform an action.
- */
+*   @js NA
+*   @lua NA
+*/
 class CC_GUI_DLL Button : public Widget
 {
-
+    
     DECLARE_CLASS_GUI_INFO
-
+    
 public:
 
     /**
-     * Default constructor.
+     * Default constructor
      */
     Button();
 
     /**
-     * Default destructor.
-     *
-     * @lua NA
+     * Default destructor
      */
     virtual ~Button();
 
     /**
-     * Create a empty Button.
-     *@return A empty Button instance.
+     * Allocates and initializes.
      */
     static Button* create();
-
+    
     /**
-     * Create a button with custom textures.
-     * @param normalImage normal state texture name.
-     * @param selectedImage  selected state texture name.
-     * @param disableImage disabled state texture name.
-     * @param texType    @see `TextureResType`
-     * @return a Button instance.
+     * create a button with custom textures
+     * @normalImage normal state texture name
+     * @selectedImage  selected state texture name
+     * @disableImage disabled state texture name
+     * @param texType    @see UI_TEX_TYPE_LOCAL
      */
     static Button* create(const std::string& normalImage,
                           const std::string& selectedImage = "",
                           const std::string& disableImage = "",
                           TextureResType texType = TextureResType::LOCAL);
-
+    
     /**
      * Load textures for button.
      *
      * @param normal    normal state texture name.
+     *
      * @param selected    selected state texture name.
+     *
      * @param disabled    disabled state texture name.
-     * @param texType    @see `TextureResType`
+     *
+     * @param texType    @see TextureResType
      */
     void loadTextures(const std::string& normal,
                       const std::string& selected,
@@ -99,7 +93,8 @@ public:
      * Load normal state texture for button.
      *
      * @param normal    normal state texture.
-     * @param texType    @see `TextureResType`
+     *
+     * @param texType    @see TextureResType
      */
     void loadTextureNormal(const std::string& normal, TextureResType texType = TextureResType::LOCAL);
 
@@ -107,174 +102,111 @@ public:
      * Load selected state texture for button.
      *
      * @param selected    selected state texture.
-     * @param texType    @see `TextureResType`
+     *
+     * @param texType    @see TextureResType
      */
     void loadTexturePressed(const std::string& selected, TextureResType texType = TextureResType::LOCAL);
 
     /**
-     * Load disabled state texture for button.
+     * Load dark state texture for button.
      *
      * @param disabled    dark state texture.
-     * @param texType    @see `TextureResType`
+     *
+     * @param texType    @see TextureResType
      */
     void loadTextureDisabled(const std::string& disabled, TextureResType texType = TextureResType::LOCAL);
 
     /**
-     * Sets capInsets for button.
-     * The capInset affects  all button scale9 renderer only if `setScale9Enabled(true)` is called
+     * Sets capinsets for button, if button is using scale9 renderer.
      *
-     * @param capInsets    capInset in Rect.
+     * @param capInsets    capinsets for button
      */
     void setCapInsets(const Rect &capInsets);
 
     /**
-     * Sets capInsets for button, only the normal state scale9 renderer will be affected.
+     * Sets capinsets for button, if button is using scale9 renderer.
      *
-     * @param capInsets    capInsets in Rect.
+     * @param capInsets    capinsets for button
      */
     void setCapInsetsNormalRenderer(const Rect &capInsets);
 
-    /**
-     * Return the capInsets of normal state scale9sprite.
-     *@return The normal scale9 renderer capInsets.
-     */
     const Rect& getCapInsetsNormalRenderer()const;
 
     /**
-     * Sets capInsets for button, only the pressed state scale9 renderer will be affected.
+     * Sets capinsets for button, if button is using scale9 renderer.
      *
-     * @param capInsets    capInsets in Rect
+     * @param capInsets    capinsets for button
      */
     void setCapInsetsPressedRenderer(const Rect &capInsets);
 
-    /**
-     * Return the capInsets of pressed state scale9sprite.
-     *@return The pressed scale9 renderer capInsets.
-     */
     const Rect& getCapInsetsPressedRenderer()const;
 
     /**
-     * Sets capInsets for button, only the disabled state scale9 renderer will be affected.
+     * Sets capinsets for button, if button is using scale9 renderer.
      *
-     * @param capInsets  capInsets in Rect.
+     * @param capInsets    capinsets for button
      */
     void setCapInsetsDisabledRenderer(const Rect &capInsets);
 
-    /**
-     * Return the capInsets of disabled state scale9sprite.
-     *@return The disabled scale9 renderer capInsets.
-     */
     const Rect& getCapInsetsDisabledRenderer()const;
 
     /**
-     * Enable scale9 renderer.
+     * Sets if button is using scale9 renderer.
      *
-     * @param enable Set to true will use scale9 renderer, false otherwise.
+     * @param true that using scale9 renderer, false otherwise.
      */
-    virtual void setScale9Enabled(bool enable);
+    virtual void setScale9Enabled(bool able);
 
-    /**
-     * Query whether button is using scale9 renderer or not.
-     *@return whether button use scale9 renderer or not.
-     */
     bool isScale9Enabled()const;
 
     /**
-     * Enable zooming action when button is pressed.
+     * Changes if button can be clicked zoom effect.
      *
-     * @param enabled Set to true will enable zoom effect, false otherwise.
+     * @param true that can be clicked zoom effect, false otherwise.
      */
     void setPressedActionEnabled(bool enabled);
 
-    //override methods
+    //override "ignoreContentAdaptWithSize" method of widget.
     virtual void ignoreContentAdaptWithSize(bool ignore) override;
-    virtual Size getVirtualRendererSize() const override;
-    virtual Node* getVirtualRenderer() override;
-    virtual std::string getDescription() const override;
 
+    //override "getVirtualRendererSize" method of widget.
+    virtual Size getVirtualRendererSize() const override;
+
+    //override "getVirtualRenderer" method of widget.
+    virtual Node* getVirtualRenderer() override;
+    
     /**
-     * Return the inner title renderer of Button.
-     * @return The button title.
+     * Return the inner title renderer of Button
      * @since v3.3
      */
     Label* getTitleRenderer()const;
 
     /**
-     * Change the content of button's title.
-     *@param text The title in std::string.
+     * Returns the "class name" of widget.
      */
+    virtual std::string getDescription() const;
+
+	const Node* getButtonTextLabel() const;
+
     void setTitleText(const std::string& text);
-
-    /**
-     * Query the button title content.
-     *@return Get the button's title content.
-     */
-    const std::string getTitleText() const;
-
-    /**
-     * Change the color of button's title.
-     *@param color The title color in Color3B.
-     */
+    const std::string& getTitleText() const;
     void setTitleColor(const Color3B& color);
-
-    /**
-     * Query the button title color.
-     *@return Color3B of button title.
-     */
     Color3B getTitleColor() const;
-
-    /**
-     * Change the font size of button's title
-     *@param size Title font size in float.
-     */
     void setTitleFontSize(float size);
-
-    /**
-     * Query the font size of button title
-     *@return font size in float.
-     */
     float getTitleFontSize() const;
-
-    /**
-     * Change the font name of button's title
-     *@param fontName a font name string.
-     */
     void setTitleFontName(const std::string& fontName);
-
-    /**
-     * Query the font name of button's title
-     *@return font name in std::string
-     */
-    const std::string getTitleFontName() const;
-
-    /**
-     * Sets the title's text horizontal alignment.
-     *
-     * @param hAlignment see TextHAlignment
-     */
-    void setTitleAlignment(TextHAlignment hAlignment);
-
-    /**
-     * Sets the title's text vertical alignment.
-     *
-     * @param hAlignment see TextHAlignment.
-     * @param vAlignment see TextVAlignment.
-     */
-    void setTitleAlignment(TextHAlignment hAlignment, TextVAlignment vAlignment);
-
-    /** @brief When user pressed the button, the button will zoom to a scale.
+    const std::string& getTitleFontName() const;
+    /** When user pressed the button, the button will zoom to a scale.
      * The final scale of the button  equals (button original scale + _zoomScale)
      * @since v3.3
      */
     void setZoomScale(float scale);
-
     /**
-     * @brief Return a zoom scale
-     * @return the zoom scale in float
+     * @brief Return a zoom scale 
      * @since v3.3
      */
     float getZoomScale()const;
-
+    
 CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
     virtual bool init(const std::string& normalImage,
@@ -290,51 +222,45 @@ protected:
     virtual void onPressStateChangedToPressed() override;
     virtual void onPressStateChangedToDisabled() override;
     virtual void onSizeChanged() override;
-
-    void loadTextureNormal(SpriteFrame* normalSpriteFrame);
-    void setupNormalTexture();
-    void loadTexturePressed(SpriteFrame* pressedSpriteFrame);
-    void setupPressedTexture();
-    void loadTextureDisabled(SpriteFrame* disabledSpriteFrame);
-    void setupDisabledTexture();
-
+  
     void normalTextureScaleChangedWithSize();
     void pressedTextureScaleChangedWithSize();
     void disabledTextureScaleChangedWithSize();
-
+    
     virtual void adaptRenderers() override;
     void updateTitleLocation();
     void updateContentSize();
-    void createTitleRenderer();
-
+    
     virtual Widget* createCloneInstance() override;
     virtual void copySpecialProperties(Widget* model) override;
-
+   
     virtual Size getNormalSize() const;
 protected:
     Scale9Sprite* _buttonNormalRenderer;
     Scale9Sprite* _buttonClickedRenderer;
     Scale9Sprite* _buttonDisableRenderer;
     Label* _titleRenderer;
-
+   
     float _zoomScale;
+    std::string _normalFileName;
+    std::string _clickedFileName;
+    std::string _disabledFileName;
     bool _prevIgnoreSize;
     bool _scale9Enabled;
-    bool _pressedActionEnabled;
-
     Rect _capInsetsNormal;
     Rect _capInsetsPressed;
     Rect _capInsetsDisabled;
-
+    TextureResType _normalTexType;
+    TextureResType _pressedTexType;
+    TextureResType _disabledTexType;
     Size _normalTextureSize;
     Size _pressedTextureSize;
     Size _disabledTextureSize;
-
+    bool _pressedActionEnabled;
     float _normalTextureScaleXInSize;
     float _normalTextureScaleYInSize;
     float _pressedTextureScaleXInSize;
     float _pressedTextureScaleYInSize;
-
     bool _normalTextureLoaded;
     bool _pressedTextureLoaded;
     bool _disabledTextureLoaded;
@@ -346,10 +272,10 @@ private:
     enum class FontType
     {
         SYSTEM,
-        TTF,
-        BMFONT
+        TTF
     };
 
+    std::string _fontName;
     int _fontSize;
     FontType _type;
 };
@@ -357,7 +283,5 @@ private:
 }
 
 NS_CC_END
-// end of ui group
-/// @}
 
 #endif /* defined(__CocoGUI__Button__) */

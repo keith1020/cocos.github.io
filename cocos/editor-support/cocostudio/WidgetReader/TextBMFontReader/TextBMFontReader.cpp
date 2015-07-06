@@ -42,11 +42,6 @@ namespace cocostudio
         return instanceTextBMFontReader;
     }
     
-    void TextBMFontReader::destroyInstance()
-    {
-        CC_SAFE_DELETE(instanceTextBMFontReader);
-    }
-    
     void TextBMFontReader::setPropsFromBinary(cocos2d::ui::Widget *widget, CocoLoader *cocoLoader, stExpCocoNode *cocoNode)
     {
         this->beginSetBasicProperties(widget);
@@ -218,11 +213,11 @@ namespace cocostudio
                         fileExist = false;
                     }
                 }
-                //else
-                //{
-                //    errorContent = "missed";
-                //    fileExist = false;
-                //}
+                else
+                {
+                    errorContent = "missed";
+                    fileExist = false;
+                }
                 break;
             }
                 
@@ -235,13 +230,10 @@ namespace cocostudio
         }
         else
         {
-            if (!errorContent.empty())
-            {
-                errorFilePath = path;
-                auto label = Label::create();
-                label->setString(__String::createWithFormat("%s %s", errorFilePath.c_str(), errorContent.c_str())->getCString());
-                labelBMFont->addChild(label);
-            }
+            errorFilePath = path;
+            auto label = Label::create();
+            label->setString(__String::createWithFormat("%s %s", errorFilePath.c_str(), errorContent.c_str())->getCString());
+            labelBMFont->addChild(label);
         }
         
         std::string text = options->text()->c_str();

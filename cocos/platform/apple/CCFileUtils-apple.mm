@@ -337,15 +337,17 @@ FileUtils* FileUtils::getInstance()
 
 std::string FileUtilsApple::getWritablePath() const
 {
-    if (_writablePath.length())
-    {
-        return _writablePath;
-    }
-
     // save to document folder
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     std::string strRet = [documentsDirectory UTF8String];
+    strRet.append("/");
+    return strRet;
+}
+std::string FileUtilsApple::getResRootPath() const
+{
+    NSString* fullpath = [[NSBundle mainBundle] resourcePath];
+    std::string strRet = [fullpath UTF8String];
     strRet.append("/");
     return strRet;
 }
@@ -392,7 +394,7 @@ bool FileUtilsApple::isFileExistInternal(const std::string& filePath) const
     return ret;
 }
 
-std::string FileUtilsApple::getFullPathForDirectoryAndFilename(const std::string& directory, const std::string& filename) const
+std::string FileUtilsApple::getFullPathForDirectoryAndFilename(const std::string& directory, const std::string& filename)
 {
     if (directory[0] != '/')
     {
@@ -412,25 +414,6 @@ std::string FileUtilsApple::getFullPathForDirectoryAndFilename(const std::string
         }
     }
     return "";
-}
-
-ValueMap FileUtilsApple::getValueMapFromFile(const std::string& filename)
-{
-    std::string fullPath = fullPathForFilename(filename);
-    NSString* path = [NSString stringWithUTF8String:fullPath.c_str()];
-    NSDictionary* dict = [NSDictionary dictionaryWithContentsOfFile:path];
-
-    ValueMap ret;
-
-    if (dict != nil)
-    {
-        for (id key in [dict allKeys])
-        {
-            id value = [dict objectForKey:key];
-            addValueToDict(key, value, ret);
-        }
-    }
-    return ret;
 }
 
 ValueMap FileUtilsApple::getValueMapFromData(const char* filedata, int filesize)
@@ -470,6 +453,30 @@ bool FileUtilsApple::writeToFile(ValueMap& dict, const std::string &fullPath)
     return true;
 }
 
+
+ValueMap FileUtilsApple::getValueMapFromFile(const std::string& filename)
+{
+    std::string s = FileUtils::getInstance()->getStringFromFile(filename);
+    /*
+    std::string fullPath = fullPathForFilename(filename);
+    NSString* path = [NSString stringWithUTF8String:fullPath.c_str()];
+    NSDictionary* dict = [NSDictionary dictionaryWithContentsOfFile:path];
+    */
+    NSData* plistData = [[NSString stringWithUTF8String:s.c_str()] dataUsingEncoding:NSUTF8StringEncoding];
+    NSString *error;
+    NSPropertyListFormat format;
+    NSDictionary* dict = [NSPropertyListSerialization propertyListFromData:plistData mutabilityOption:NSPropertyListImmutable format:&format errorDescription:&error];
+    ValueMap ret;
+    if (dict != nil)
+    {
+        for (id key in [dict allKeys])
+        {
+            id value = [dict objectForKey:key];
+            addValueToDict(key, value, ret);
+        }
+    }
+    return ret;
+}
 ValueVector FileUtilsApple::getValueVectorFromFile(const std::string& filename)
 {
     //    NSString* pPath = [NSString stringWithUTF8String:pFileName];

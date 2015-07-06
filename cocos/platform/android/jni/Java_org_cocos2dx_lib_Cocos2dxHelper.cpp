@@ -219,17 +219,7 @@ void setKeepScreenOnJni(bool value) {
     }
 }
 
-void vibrateJni(float duration) {
-    JniMethodInfo t;
-    
-    if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "vibrate", "(F)V")) {
-        t.env->CallStaticVoidMethod(t.classID, t.methodID, duration);
-        
-        t.env->DeleteLocalRef(t.classID);
-    }
-}
-
-extern bool openURLJNI(const char* url) {
+bool openURLJNI(const char* url) {
     JniMethodInfo t;
     
     bool ret = false;
@@ -240,6 +230,21 @@ extern bool openURLJNI(const char* url) {
         t.env->DeleteLocalRef(t.classID);
         t.env->DeleteLocalRef(stringArg);
     }
+    return ret;
+}
+
+std::string getMacAddressJNI() {
+    JniMethodInfo t;
+    std::string ret("");
+    
+    CCLOG("getMacAddressJNI()");
+    if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "getMacAddress", "()Ljava/lang/String;")) {
+        jstring str = (jstring)t.env->CallStaticObjectMethod(t.classID, t.methodID);
+        t.env->DeleteLocalRef(t.classID);
+        ret = JniHelper::jstring2string(str);
+        t.env->DeleteLocalRef(str);
+    }
+
     return ret;
 }
 

@@ -54,18 +54,6 @@ void ComController::onExit()
 {
 }
 
-void ComController::onAdd()
-{
-    if (_owner != nullptr)
-    {
-       _owner->scheduleUpdate();
-    }
-}
-
-void ComController::onRemove()
-{
-}
-
 void ComController::update(float delta)
 {
 }

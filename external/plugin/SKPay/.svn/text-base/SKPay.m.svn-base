@@ -1,0 +1,130 @@
+
+#import "SKPay.h"
+#import "IAPWrapper.h"
+
+@implementation SKPay
+
+@synthesize dictionaryData;
+
+- (void)dealloc
+{
+    [dictionaryData release];
+    [[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
+
+    [super dealloc];
+}
+
+- (void) configDeveloperInfo: (NSMutableDictionary*) cpInfo
+{
+    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+    dictionaryData = [[NSMutableDictionary alloc] init];
+}
+
+- (void) payForProduct: (NSMutableDictionary*) profuctInfo
+{
+    if (![SKPaymentQueue canMakePayments]) {
+        [IAPWrapper onPayResult:self withRet:PayFail withMsg:@"Cannot pay"];
+        return;
+    }
+
+    NSString* productId = (NSString*)[profuctInfo objectForKey:@"productId"];
+    NSSet * set = [NSSet setWithArray:@[productId]];
+    SKProductsRequest * request = [[SKProductsRequest alloc] initWithProductIdentifiers:set];
+    request.delegate = self;
+    [request start];
+}
+
+- (void) setDebugMode: (BOOL) debug
+{
+    
+}
+
+- (NSString*) getSDKVersion
+{
+    return @"0.1";
+}
+
+- (NSString*) getPluginVersion
+{
+    return @"0.1";
+}
+
+- (NSString*) getValue:(NSString*)key
+{
+    return [dictionaryData objectForKey:key];
+}
+
+- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
+    NSArray *myProduct = response.products;
+    if (myProduct.count == 0) {
+        [dictionaryData setObject:@"Unregistered product" forKey:@"errorMsg"];
+        [IAPWrapper onPayResult:self withRet:PayFail withMsg:@"Invalid product"];
+        return;
+    }
+    SKPayment * payment = [SKPayment paymentWithProduct:myProduct[0]];
+    [[SKPaymentQueue defaultQueue] addPayment:payment];
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions {
+    for (SKPaymentTransaction *transaction in transactions)
+    {
+        switch (transaction.transactionState)
+        {
+            case SKPaymentTransactionStatePurchased://交易完成
+                [self completeTransaction:transaction];
+                break;
+            case SKPaymentTransactionStateFailed://交易失败
+                [self failedTransaction:transaction];
+                break;
+            case SKPaymentTransactionStateRestored://已经购买过该商品
+                [self restoreTransaction:transaction];
+                break;
+            case SKPaymentTransactionStatePurchasing:      //商品添加进列表
+                NSLog(@"商品添加进列表");
+                break;
+            default:
+                break;
+        }
+    }
+
+}
+
+- (void)completeTransaction:(SKPaymentTransaction *)transaction {
+    // Your application should implement these two methods.
+    NSString * productIdentifier = transaction.payment.productIdentifier;
+    NSString * receipt = [transaction.transactionReceipt base64EncodedStringWithOptions:0];
+    if ([productIdentifier length] > 0) {
+        [dictionaryData setObject:productIdentifier forKey:@"productId"];
+        [dictionaryData setObject:receipt forKey:@"receipt"];
+        [IAPWrapper onPayResult:self withRet:PaySuccess withMsg:@"Everything is ok"];
+    }
+
+    // Remove the transaction from the payment queue.
+    [[SKPaymentQueue defaultQueue] finishTransaction: transaction];
+}
+
+- (void)failedTransaction:(SKPaymentTransaction *)transaction {
+    if(transaction.error.code != SKErrorPaymentCancelled) {
+        NSString* errorMsg = [transaction.error localizedDescription];
+        [dictionaryData setObject:errorMsg forKey:@"errorMsg"];
+        [IAPWrapper onPayResult:self withRet:PayFail withMsg:errorMsg];
+    } else {
+        [IAPWrapper onPayResult:self withRet:PayCancel withMsg:@"Player cancelled the transaction"];
+    }
+    [[SKPaymentQueue defaultQueue] finishTransaction: transaction];
+}
+
+- (void)restoreTransaction:(SKPaymentTransaction *)transaction {
+    NSString * productIdentifier = transaction.payment.productIdentifier;
+    NSString * receipt = [transaction.transactionReceipt base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
+    if ([productIdentifier length] > 0) {
+        [dictionaryData setObject:productIdentifier forKey:@"productId"];
+        [dictionaryData setObject:receipt forKey:@"receipt"];
+        [IAPWrapper onPayResult:self withRet:PaySuccess withMsg:@"Everything is ok"];
+    }
+
+    // 对于已购商品，处理恢复购买的逻辑
+    [[SKPaymentQueue defaultQueue] finishTransaction: transaction];
+}
+
+@end

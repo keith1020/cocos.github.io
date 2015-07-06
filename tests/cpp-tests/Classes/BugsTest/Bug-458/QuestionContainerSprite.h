@@ -6,7 +6,7 @@
 class QuestionContainerSprite : public cocos2d::Sprite 
 {
 public:
-    virtual bool init() override;
+    virtual bool init();
 };
 
 #endif // __QUESTION_CONTAINER_SPRITE_H__

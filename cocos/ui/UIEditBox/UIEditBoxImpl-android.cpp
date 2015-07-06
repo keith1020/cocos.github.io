@@ -76,7 +76,7 @@ bool EditBoxImplAndroid::initWithSize(const Size& size)
 	// align the text vertically center
     _label->setAnchorPoint(Vec2(0, 0.5f));
     _label->setPosition(Vec2(CC_EDIT_BOX_PADDING, size.height / 2.0f));
-    _label->setTextColor(_colText);
+    _label->setColor(_colText);
     _editBox->addChild(_label);
 	
     _labelPlaceHolder = Label::create();
@@ -85,7 +85,7 @@ bool EditBoxImplAndroid::initWithSize(const Size& size)
     _labelPlaceHolder->setAnchorPoint(Vec2(0, 0.5f));
     _labelPlaceHolder->setPosition(CC_EDIT_BOX_PADDING, size.height / 2.0f);
     _labelPlaceHolder->setVisible(false);
-    _labelPlaceHolder->setTextColor(_colPlaceHolder);
+    _labelPlaceHolder->setColor(_colPlaceHolder);
     _editBox->addChild(_labelPlaceHolder);
     
     _editSize = size;
@@ -105,10 +105,10 @@ void EditBoxImplAndroid::setFont(const char* pFontName, int fontSize)
 	}
 }
 
-void EditBoxImplAndroid::setFontColor(const Color4B& color)
+void EditBoxImplAndroid::setFontColor(const Color3B& color)
 {
     _colText = color;
-    _label->setTextColor(color);
+    _label->setColor(color);
 }
 
 void EditBoxImplAndroid::setPlaceholderFont(const char* pFontName, int fontSize)
@@ -119,10 +119,10 @@ void EditBoxImplAndroid::setPlaceholderFont(const char* pFontName, int fontSize)
 	}
 }
 
-void EditBoxImplAndroid::setPlaceholderFontColor(const Color4B& color)
+void EditBoxImplAndroid::setPlaceholderFontColor(const Color3B& color)
 {
     _colPlaceHolder = color;
-    _labelPlaceHolder->setTextColor(color);
+    _labelPlaceHolder->setColor(color);
 }
 
 void EditBoxImplAndroid::setInputMode(EditBox::InputMode inputMode)
@@ -307,6 +307,14 @@ void EditBoxImplAndroid::openKeyboard()
 	
 }
 
+void EditBoxImplAndroid::enableMultiline( bool enable )
+{
+    
+}
+void EditBoxImplAndroid::finishEdit()
+{
+    
+}
 void EditBoxImplAndroid::closeKeyboard()
 {
 	

@@ -53,9 +53,9 @@ public:
     
     virtual bool initWithSize(const Size& size);
 	virtual void setFont(const char* pFontName, int fontSize);
-    virtual void setFontColor(const Color4B& color);
+    virtual void setFontColor(const Color3B& color);
     virtual void setPlaceholderFont(const char* pFontName, int fontSize);
-    virtual void setPlaceholderFontColor(const Color4B& color);
+    virtual void setPlaceholderFontColor(const Color3B& color);
     virtual void setInputMode(EditBox::InputMode inputMode);
     virtual void setInputFlag(EditBox::InputFlag inputFlag);
     virtual void setMaxLength(int maxLength);
@@ -83,6 +83,9 @@ public:
      * @lua NA
      */
     virtual void onEnter(void);
+    
+	virtual void enableMultiline( bool enable ){};
+	virtual void finishEdit(){};
 private:
 
     Label* _label;
@@ -94,8 +97,8 @@ private:
     std::string _text;
     std::string _placeHolder;
     
-    Color4B _colText;
-    Color4B _colPlaceHolder;
+    Color3B _colText;
+    Color3B _colPlaceHolder;
 
     int   _maxLength;
     Size _editSize;

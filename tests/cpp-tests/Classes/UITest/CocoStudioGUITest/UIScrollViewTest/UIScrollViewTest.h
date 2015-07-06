@@ -27,104 +27,88 @@
 
 #include "../UIScene.h"
 
-DEFINE_TEST_SUITE(UIScrollViewTests);
-
 class UIScrollViewTest_Vertical : public UIScene
 {
 public:
-    CREATE_FUNC(UIScrollViewTest_Vertical);
-
     UIScrollViewTest_Vertical();
     ~UIScrollViewTest_Vertical();
-    virtual bool init() override;
+    bool init();
     
 protected:
-    
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UIScrollViewTest_Vertical)
+    Text* _displayValueLabel;
 };
 
 class UIScrollViewTest_Horizontal : public UIScene
 {
 public:
-    CREATE_FUNC(UIScrollViewTest_Horizontal);
-
     UIScrollViewTest_Horizontal();
     ~UIScrollViewTest_Horizontal();
-    virtual bool init() override;
+    bool init();
     
 protected:
-    
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UIScrollViewTest_Horizontal)
+    Text* _displayValueLabel;
 };
 
 class UIScrollViewTest_Both : public UIScene
 {
 public:
-    CREATE_FUNC(UIScrollViewTest_Both);
-
     UIScrollViewTest_Both();
     ~UIScrollViewTest_Both();
-    virtual bool init() override;
+    bool init();
     
 protected:
-    
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UIScrollViewTest_Both)
+    Text* _displayValueLabel;
 };
 
 class UIScrollViewTest_ScrollToPercentBothDirection : public UIScene
 {
 public:
-    CREATE_FUNC(UIScrollViewTest_ScrollToPercentBothDirection);
-
     UIScrollViewTest_ScrollToPercentBothDirection();
     ~UIScrollViewTest_ScrollToPercentBothDirection();
-    virtual bool init() override;
+    bool init();
     
 protected:
-    
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UIScrollViewTest_ScrollToPercentBothDirection)
+    Text* _displayValueLabel;
 };
 
 class UIScrollViewTest_ScrollToPercentBothDirection_Bounce : public UIScene
 {
 public:
-    CREATE_FUNC(UIScrollViewTest_ScrollToPercentBothDirection_Bounce);
-
     UIScrollViewTest_ScrollToPercentBothDirection_Bounce();
     ~UIScrollViewTest_ScrollToPercentBothDirection_Bounce();
-    virtual bool init() override;
+    bool init();
     
 protected:
-    
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UIScrollViewTest_ScrollToPercentBothDirection_Bounce)
+    Text* _displayValueLabel;
 };
 
 class UIScrollViewNestTest : public UIScene
 {
 public:
-    CREATE_FUNC(UIScrollViewNestTest);
-
     UIScrollViewNestTest();
     ~UIScrollViewNestTest();
-    virtual bool init() override;
+    bool init();
     
 protected:
-    
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UIScrollViewNestTest)
+    Text* _displayValueLabel;
 };
 
 class UIScrollViewRotated : public UIScene
 {
 public:
-    CREATE_FUNC(UIScrollViewRotated);
-
     UIScrollViewRotated();
     ~UIScrollViewRotated();
-    virtual bool init() override;
+    bool init();
     
 protected:
-    
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UIScrollViewRotated)
+    Text* _displayValueLabel;
 };
 
 #endif /* defined(__TestCpp__UIScrollViewTest__) */

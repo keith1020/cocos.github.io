@@ -27,14 +27,12 @@
 
 #include "UIScene.h"
 
-DEFINE_TEST_SUITE(UIEditBoxTests);
-
 class UIEditBoxTest : public UIScene, public cocos2d::ui::EditBoxDelegate
 {
 public:
-    CREATE_FUNC(UIEditBoxTest);
-
-    virtual bool init() override;
+    UIEditBoxTest();
+    ~UIEditBoxTest();
+    bool init();
     
     virtual void editBoxEditingDidBegin(cocos2d::ui::EditBox* editBox);
     virtual void editBoxEditingDidEnd(cocos2d::ui::EditBox* editBox);
@@ -47,6 +45,8 @@ protected:
     cocos2d::ui::EditBox* _editName;
     cocos2d::ui::EditBox* _editPassword;
     cocos2d::ui::EditBox* _editEmail;
+    
+    UI_SCENE_CREATE_FUNC(UIEditBoxTest)
 };
 
 #endif /* defined(__cocos2d_tests__UIEditBoxTest__) */

@@ -45,11 +45,6 @@ namespace cocostudio
         return instanceTextAtalsReader;
     }
     
-    void TextAtlasReader::destroyInstance()
-    {
-        CC_SAFE_DELETE(instanceTextAtalsReader);
-    }
-    
     void TextAtlasReader::setPropsFromBinary(cocos2d::ui::Widget *widget, CocoLoader *cocoLoader, stExpCocoNode *cocoNode)
     {
         this->beginSetBasicProperties(widget);
@@ -77,12 +72,18 @@ namespace cocostudio
                 stringValue = value;
             }
             else if(key == P_CharMapFileData){
-                stExpCocoNode *backGroundChildren = stChildArray[i].GetChildArray(cocoLoader);
-                std::string resType = backGroundChildren[2].GetValue(cocoLoader);;
-                
-                Widget::TextureResType imageFileNameType = (Widget::TextureResType)valueToInt(resType);
-                
-                std::string backgroundValue = this->getResourcePath(cocoLoader, &stChildArray[i], imageFileNameType);
+                //stExpCocoNode *backGroundChildren = stChildArray[i].GetChildArray(cocoLoader);
+                //std::string resType = backGroundChildren[2].GetValue(cocoLoader);;
+                //
+                //Widget::TextureResType imageFileNameType = (Widget::TextureResType)valueToInt(resType);
+                //
+                //std::string backgroundValue = this->getResourcePath(cocoLoader, &stChildArray[i], imageFileNameType);
+
+				// CharMapfile use font floder not ui path by jonyu
+				stExpCocoNode *backGroundChildren = stChildArray[i].GetChildArray(cocoLoader);
+				std::string backgroundValue = backGroundChildren[0].GetValue(cocoLoader);
+				std::string resType = backGroundChildren[2].GetValue(cocoLoader);;
+				Widget::TextureResType imageFileNameType = (Widget::TextureResType)valueToInt(resType);
                 
                 charMapFileName = backgroundValue;
                 type  = imageFileNameType;
@@ -124,7 +125,7 @@ namespace cocostudio
             {
                 std::string tp_c = jsonPath;
                 const char* cmfPath = DICTOOL->getStringValue_json(cmftDic, P_Path);
-                const char* cmf_tp = tp_c.append(cmfPath).c_str();
+                const char* cmf_tp = cmfPath;
                 labelAtlas->setProperty(DICTOOL->getStringValue_json(options, P_StringValue,"12345678"),
                                         cmf_tp,
                                         DICTOOL->getIntValue_json(options, P_ItemWidth,24),
@@ -252,42 +253,19 @@ namespace cocostudio
             case 0:
             {
                 const char* cmfPath = cmftDic->path()->c_str();
-                
-                bool fileExist = false;
-                std::string errorFilePath = "";
-                
-                if (FileUtils::getInstance()->isFileExist(cmfPath))
-                {
-                    fileExist = true;
-                    
-                    std::string stringValue = options->stringValue()->c_str();
-                    int itemWidth = options->itemWidth();
-                    int itemHeight = options->itemHeight();
-                    labelAtlas->setProperty(stringValue,
-                                            cmfPath,
-                                            itemWidth,
-                                            itemHeight,
-                                            options->startCharMap()->c_str());
-                }
-                else
-                {
-                    errorFilePath = cmfPath;
-                    fileExist = false;
-                }
-                
-                //if (!fileExist)
-                //{
-                //    auto label = Label::create();
-                //    label->setString(__String::createWithFormat("%s missed", errorFilePath.c_str())->getCString());
-                //    labelAtlas->addChild(label);
-                //}
+                std::string stringValue = options->stringValue()->c_str();
+                int itemWidth = options->itemWidth();
+                int itemHeight = options->itemHeight();
+                labelAtlas->setProperty(stringValue,
+                                        cmfPath,
+                                        itemWidth,
+                                        itemHeight,
+                                        options->startCharMap()->c_str());
                 break;
             }
-                
             case 1:
                 CCLOG("Wrong res type of LabelAtlas!");
                 break;
-                
             default:
                 break;
         }

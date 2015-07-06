@@ -15,7 +15,6 @@
 -- @function [parent=#BaseData] setColor 
 -- @param self
 -- @param #color4b_table color
--- @return BaseData#BaseData self (return value: ccs.BaseData)
         
 --------------------------------
 -- 
@@ -27,6 +26,5 @@
 -- js ctor
 -- @function [parent=#BaseData] BaseData 
 -- @param self
--- @return BaseData#BaseData self (return value: ccs.BaseData)
         
 return nil

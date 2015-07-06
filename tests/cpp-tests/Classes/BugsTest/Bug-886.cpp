@@ -5,11 +5,9 @@
 
 #include "Bug-886.h"
 
-USING_NS_CC;
-
 bool Bug886Layer::init()
 {
-    if(BugsTestBase::init())
+    if(BugsTestBaseLayer::init())
     {
         // ask director the the window size
         //        auto size = [[Director sharedDirector] winSize];

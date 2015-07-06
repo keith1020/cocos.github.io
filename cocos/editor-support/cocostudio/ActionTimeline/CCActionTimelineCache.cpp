@@ -183,7 +183,7 @@ ActionTimeline* ActionTimelineCache::loadAnimationActionWithContent(const std::s
     doc.Parse<0>(content.c_str());
     if (doc.HasParseError()) 
     {
-        CCLOG("GetParseError %d\n", doc.GetParseError());
+        CCLOG("GetParseError %s\n", doc.GetParseError());
     }
 
     const rapidjson::Value& json = DICTOOL->getSubDictionary_json(doc, ACTION);
@@ -350,10 +350,12 @@ Frame* ActionTimelineCache::loadColorFrame(const rapidjson::Value& json)
 {
     ColorFrame* frame = ColorFrame::create();
 
+    GLubyte alpha = (GLubyte)DICTOOL->getIntValue_json(json, ALPHA);
     GLubyte red   = (GLubyte)DICTOOL->getIntValue_json(json, RED);
     GLubyte green = (GLubyte)DICTOOL->getIntValue_json(json, GREEN);
     GLubyte blue  = (GLubyte)DICTOOL->getIntValue_json(json, BLUE);
 
+    frame->setAlpha(alpha);
     frame->setColor(Color3B(red, green, blue));
 
     return frame;
@@ -574,12 +576,6 @@ Frame* ActionTimelineCache::loadVisibleFrameWithFlatBuffers(const flatbuffers::B
     bool tween = flatbuffers->tween() != 0;
     frame->setTween(tween);
     
-    auto easingData = flatbuffers->easingData();
-    if (easingData)
-    {
-        loadEasingDataWithFlatBuffers(frame, easingData);
-    }
-    
     return frame;
 }
     
@@ -596,12 +592,6 @@ Frame* ActionTimelineCache::loadPositionFrameWithFlatBuffers(const flatbuffers::
     
     bool tween = flatbuffers->tween() != 0;
     frame->setTween(tween);
-    
-    auto easingData = flatbuffers->easingData();
-    if (easingData)
-    {
-        loadEasingDataWithFlatBuffers(frame, easingData);
-    }
     
     return frame;
 }
@@ -621,12 +611,6 @@ Frame* ActionTimelineCache::loadScaleFrameWithFlatBuffers(const flatbuffers::Sca
     bool tween = flatbuffers->tween() != 0;
     frame->setTween(tween);
     
-    auto easingData = flatbuffers->easingData();
-    if (easingData)
-    {
-        loadEasingDataWithFlatBuffers(frame, easingData);
-    }
-    
     return frame;
 }
 
@@ -645,12 +629,6 @@ Frame* ActionTimelineCache::loadRotationSkewFrameWithFlatBuffers(const flatbuffe
     bool tween = flatbuffers->tween() != 0;
     frame->setTween(tween);
     
-    auto easingData = flatbuffers->easingData();
-    if (easingData)
-    {
-        loadEasingDataWithFlatBuffers(frame, easingData);
-    }
-    
     return frame;
 }
 
@@ -667,12 +645,6 @@ Frame* ActionTimelineCache::loadColorFrameWithFlatBuffers(const flatbuffers::Col
     
     bool tween = flatbuffers->tween() != 0;
     frame->setTween(tween);
-    
-    auto easingData = flatbuffers->easingData();
-    if (easingData)
-    {
-        loadEasingDataWithFlatBuffers(frame, easingData);
-    }
     
     return frame;
 }
@@ -731,12 +703,6 @@ Frame* ActionTimelineCache::loadTextureFrameWithFlatBuffers(const flatbuffers::T
     bool tween = flatbuffers->tween() != 0;
     frame->setTween(tween);
     
-    auto easingData = flatbuffers->easingData();
-    if (easingData)
-    {
-        loadEasingDataWithFlatBuffers(frame, easingData);
-    }
-    
     return frame;
 }
     
@@ -747,19 +713,15 @@ Frame* ActionTimelineCache::loadEventFrameWithFlatBuffers(const flatbuffers::Eve
     std::string event = flatbuffers->value()->c_str();
     
     if (event != "")
-        frame->setEvent(event);    
+        frame->setEvent(event);
+    
+    CCLOG("event = %s", event.c_str());
     
     int frameIndex = flatbuffers->frameIndex();
     frame->setFrameIndex(frameIndex);
     
     bool tween = flatbuffers->tween() != 0;
     frame->setTween(tween);
-    
-    auto easingData = flatbuffers->easingData();
-    if (easingData)
-    {
-        loadEasingDataWithFlatBuffers(frame, easingData);
-    }
     
     return frame;
 }
@@ -781,28 +743,22 @@ Frame* ActionTimelineCache::loadAlphaFrameWithFlatBuffers(const flatbuffers::Int
     return frame;
 }
     
-Frame* ActionTimelineCache::loadAnchorPointFrameWithFlatBuffers(const flatbuffers::ScaleFrame *flatbuffers)
-{
-    AnchorPointFrame* frame = AnchorPointFrame::create();
-    
-    auto f_scale = flatbuffers->scale();
-    Vec2 scale(f_scale->scaleX(), f_scale->scaleY());
-    frame->setAnchorPoint(scale);
-    
-    int frameIndex = flatbuffers->frameIndex();
-    frame->setFrameIndex(frameIndex);
-    
-    bool tween = flatbuffers->tween() != 0;
-    frame->setTween(tween);
-    
-    auto easingData = flatbuffers->easingData();
-    if (easingData)
+    Frame* ActionTimelineCache::loadAnchorPointFrameWithFlatBuffers(const flatbuffers::ScaleFrame *flatbuffers)
     {
-        loadEasingDataWithFlatBuffers(frame, easingData);
+        AnchorPointFrame* frame = AnchorPointFrame::create();
+        
+        auto f_scale = flatbuffers->scale();
+        Vec2 scale(f_scale->scaleX(), f_scale->scaleY());
+        frame->setAnchorPoint(scale);
+        
+        int frameIndex = flatbuffers->frameIndex();
+        frame->setFrameIndex(frameIndex);
+        
+        bool tween = flatbuffers->tween() != 0;
+        frame->setTween(tween);
+        
+        return frame;
     }
-    
-    return frame;
-}
     
 Frame* ActionTimelineCache::loadZOrderFrameWithFlatBuffers(const flatbuffers::IntFrame *flatbuffers)
 {
@@ -817,12 +773,6 @@ Frame* ActionTimelineCache::loadZOrderFrameWithFlatBuffers(const flatbuffers::In
     
     bool tween = flatbuffers->tween() != 0;
     frame->setTween(tween);
-    
-    auto easingData = flatbuffers->easingData();
-    if (easingData)
-    {
-        loadEasingDataWithFlatBuffers(frame, easingData);
-    }
     
     return frame;
 }
@@ -849,31 +799,7 @@ Frame* ActionTimelineCache::loadInnerActionFrameWithFlatBuffers(const flatbuffer
     frame->setEnterWithName(true);
     frame->setAnimationName(currentAnimationFrame);
     
-    auto easingData = flatbuffers->easingData();
-    if (easingData)
-    {
-        loadEasingDataWithFlatBuffers(frame, easingData);
-    }
-    
     return frame;
-}
-    
-void ActionTimelineCache::loadEasingDataWithFlatBuffers(cocostudio::timeline::Frame *frame,
-                                                        const flatbuffers::EasingData *flatbuffers)
-{
-    int type = flatbuffers->type();
-    frame->setTweenType((cocos2d::tweenfunc::TweenType)type);
-    auto points = flatbuffers->points();
-    if (points)
-    {
-        std::vector<float> easings;
-        for (auto it = points->begin(); it != points->end(); ++it)
-        {
-            easings.push_back(it->x());
-            easings.push_back(it->y());
-        }
-        frame->setEasingParams(easings);
-    }
 }
     
 ActionTimeline* ActionTimelineCache::createActionWithFlatBuffersForSimulator(const std::string& fileName)

@@ -45,8 +45,8 @@ function Sprite:playAnimationOnce(animation, args)
         actions[#actions + 1] = cc.RemoveSelf:create()
     end
 
-    if args.onComplete then
-        actions[#actions + 1] = cc.CallFunc:create(args.onComplete)
+    if onComplete then
+        actions[#actions + 1] = cc.CallFunc:create(onComplete)
     end
 
     local action

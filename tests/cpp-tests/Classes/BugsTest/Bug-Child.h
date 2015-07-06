@@ -11,36 +11,24 @@
 
 #include "BugsTest.h"
 
-class BugChild : public BugsTestBase
+class BugChild : public BugsTestBaseLayer
 {
 public:
-    CREATE_FUNC(BugChild);
-
-    virtual bool init() override;
+    static Scene* scene();
+    virtual bool init();
     
-    void switchChild(cocos2d::Ref* sender);
+    void switchChild(Ref* sender);
+    
+    CREATE_FUNC(BugChild);
     
 protected:
     
-    cocos2d::Sprite* parent1;
-    cocos2d::Sprite* parent2;
+    Sprite* parent1;
+    Sprite* parent2;
     
-    cocos2d::Sprite* child;
+    Sprite* child;
     
-    cocos2d::Menu* menu;
-};
-
-class BugCameraMask : public BugsTestBase
-{
-public:
-    CREATE_FUNC(BugCameraMask);
-    
-    virtual bool init() override;
-    
-    void switchSpriteFlag(cocos2d::Ref* sender);
-    void updateSpriteMaskLabel();
-    Node* _sprite;
-    cocos2d::Label* _spriteMaskLabel;
+    Menu* menu;
 };
 
 #endif /* defined(__Bug_Child__) */

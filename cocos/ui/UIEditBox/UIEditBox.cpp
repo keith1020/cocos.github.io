@@ -45,6 +45,7 @@ EditBox::EditBox(void)
 , _colPlaceHolder(Color3B::GRAY)
 , _maxLength(0)
 , _adjustHeight(0.0f)
+, _enableMultiline( false )
 #if CC_ENABLE_SCRIPT_BINDING
 , _scriptEditBoxHandler(0)
 #endif
@@ -69,9 +70,11 @@ void EditBox::touchDownAction(Ref *sender, TouchEventType controlEvent)
 
 EditBox* EditBox::create(const Size& size,
                          const std::string& normalSprite,
-                        TextureResType texType /*= TextureResType::LOCAL*/)
+                        TextureResType texType /*= TextureResType::LOCAL*/,
+                        bool isMultilineEnabled/*=false*/)
 {
     EditBox* pRet = new EditBox();
+    pRet->enableMultiline( isMultilineEnabled );
     
     if (pRet != nullptr && pRet->initWithSizeAndBackgroundSprite(size, normalSprite, texType))
     {
@@ -234,11 +237,6 @@ void EditBox::setFontSize(int fontSize)
 
 void EditBox::setFontColor(const Color3B& color)
 {
-    setFontColor(Color4B(color));
-}
-
-void EditBox::setFontColor(const Color4B& color)
-{
     _colText = color;
     if (_editBoxImpl != nullptr)
     {
@@ -279,12 +277,7 @@ void EditBox::setPlaceholderFontSize(int fontSize)
 
 void EditBox::setPlaceholderFontColor(const Color3B& color)
 {
-    setPlaceholderFontColor(Color4B(color));
-}
-
-void EditBox::setPlaceholderFontColor(const Color4B& color)
-{
-    _colPlaceHolder = color;
+    _colText = color;
     if (_editBoxImpl != nullptr)
     {
         _editBoxImpl->setPlaceholderFontColor(color);
@@ -314,6 +307,32 @@ void EditBox::setInputMode(EditBox::InputMode inputMode)
     if (_editBoxImpl != nullptr)
     {
         _editBoxImpl->setInputMode(inputMode);
+    }
+}
+bool EditBox::isMultilineEnabled() const
+{
+    return _enableMultiline;
+}
+void EditBox::enableMultiline( bool enable)
+{
+    _enableMultiline = enable;
+    if (_editBoxImpl != nullptr)
+    {
+        _editBoxImpl->enableMultiline( enable );
+    }
+}
+void EditBox::startEdit()
+{
+    if( _editBoxImpl != nullptr )
+    {
+        _editBoxImpl->openKeyboard();
+    }
+}
+void EditBox::finishEdit()
+{
+    if (_editBoxImpl != nullptr)
+    {
+        _editBoxImpl->finishEdit();
     }
 }
 

@@ -31,6 +31,10 @@ extern "C" {
 #include "tolua++.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#include "luaconf.h"
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
+#include "network/lua_extensions.h"
+#endif
 }
 
 #include "Cocos2dxLuaLoader.h"
@@ -53,6 +57,14 @@ extern "C" {
 #include "lua_cocos2dx_physics_manual.hpp"
 #include "lua_cocos2dx_experimental_auto.hpp"
 #include "lua_cocos2dx_experimental_manual.hpp"
+
+#include "lua_cocos2dx_extra_manual.hpp"
+#include "extension/lua_cocos2dx_extension_manual.h"
+#include "network/lua_cocos2dx_network_manual.h"
+#include "ui/lua_cocos2dx_ui_manual.hpp"
+#include "cocostudio/lua_cocos2dx_coco_studio_manual.hpp"
+#include "audioengine/lua_cocos2dx_audioengine_manual.h"
+#include "cocosdenshion/lua_cocos2dx_cocosdenshion_manual.h"
 
 
 namespace {
@@ -149,6 +161,7 @@ LuaStack::~LuaStack()
     {
         lua_close(_state);
     }
+	m_cbOnLuaError = nullptr;
 }
 
 LuaStack *LuaStack::create(void)
@@ -185,12 +198,21 @@ bool LuaStack::init(void)
     register_all_cocos2dx(_state);
     tolua_opengl_open(_state);
     register_all_cocos2dx_manual(_state);
-    register_all_cocos2dx_module_manual(_state);
+	register_all_cocos2dx_module_manual(_state);
     register_all_cocos2dx_math_manual(_state);
     register_all_cocos2dx_experimental(_state);
     register_all_cocos2dx_experimental_manual(_state);
 
     register_glnode_manual(_state);
+
+	luaopen_cocos2dx_extra_luabinding(_state);
+	register_network_module(_state);
+	register_ui_moudle(_state);
+	register_extension_module(_state);
+	register_cocostudio_module(_state);
+	register_audioengine_module(_state);
+	register_cocosdenshion_module(_state);
+
 #if CC_USE_PHYSICS
     register_all_cocos2dx_physics(_state);
     register_all_cocos2dx_physics_manual(_state);
@@ -210,7 +232,7 @@ bool LuaStack::init(void)
 
     // add cocos2dx loader
     addLuaLoader(cocos2dx_lua_loader);
-
+	m_cbOnLuaError = nullptr;
     return true;
 }
 
@@ -272,61 +294,13 @@ int LuaStack::executeString(const char *codes)
     return executeFunction(0);
 }
 
-static const std::string BYTECODE_FILE_EXT    = ".luac";
-static const std::string NOT_BYTECODE_FILE_EXT = ".lua";
-
-int LuaStack::executeScriptFile(const char* filename)
+int LuaStack::executeScriptFile(const char* codes)
 {
-    CCAssert(filename, "CCLuaStack::executeScriptFile() - invalid filename");
-   
-    std::string buf(filename);
-    //
-    // remove .lua or .luac
-    //
-    size_t pos = buf.rfind(BYTECODE_FILE_EXT);
-    if (pos != std::string::npos)
-    {
-        buf = buf.substr(0, pos);
-    }
-    else
-    {
-        pos = buf.rfind(NOT_BYTECODE_FILE_EXT);
-        if (pos == buf.length() - NOT_BYTECODE_FILE_EXT.length())
-        {
-            buf = buf.substr(0, pos);
-        }
-    }
-    
-    FileUtils *utils = FileUtils::getInstance();
-    //
-    // 1. check .lua suffix
-    // 2. check .luac suffix
-    //
-    std::string tmpfilename = buf + NOT_BYTECODE_FILE_EXT;
-    if (utils->isFileExist(tmpfilename))
-    {
-        buf = tmpfilename;
-    }
-    else
-    {
-        tmpfilename = buf + BYTECODE_FILE_EXT;
-        if (utils->isFileExist(tmpfilename))
-        {
-            buf = tmpfilename;
-        }
-    }
-    
-    std::string fullPath = utils->fullPathForFilename(buf);
-    Data data = utils->getDataFromFile(fullPath);
-    int rn = 0;
-    if (!data.isNull())
-    {
-        if (luaLoadBuffer(_state, (const char*)data.getBytes(), (int)data.getSize(), fullPath.c_str()) == 0)
-        {
-            rn = executeFunction(0);
-        }
-    }
-    return rn;
+	std::string filename(codes);
+    std::string code("require \"");
+    code.append(filename);
+    code.append("\"");
+    return executeString(code.c_str());
 }
 
 int LuaStack::executeGlobalFunction(const char* functionName)
@@ -482,10 +456,13 @@ int LuaStack::executeFunction(int numArgs)
     --_callFromLua;
     if (error)
     {
+		if (m_cbOnLuaError!=nullptr)
+			m_cbOnLuaError( false );
         if (traceback == 0)
         {
-            CCLOG("[LUA ERROR] %s", lua_tostring(_state, - 1));        /* L: ... error */
-            lua_pop(_state, 1); // remove error message from stack
+//			debugError(_state);
+			CCLOG("[LUA ERROR] %s", lua_tostring(_state, -1));
+			lua_pop(_state, 1);
         }
         else                                                            /* L: ... G error */
         {
@@ -595,6 +572,8 @@ int LuaStack::executeFunctionReturnArray(int handler,int numArgs,int numResults,
         --_callFromLua;
         if (error)
         {
+			if (m_cbOnLuaError!=nullptr)
+				m_cbOnLuaError( false );
             if (traceback == 0)
             {
                 CCLOG("[LUA ERROR] %s", lua_tostring(_state, - 1));        /* L: ... error */
@@ -842,14 +821,11 @@ int LuaStack::luaLoadChunksFromZIP(lua_State *L)
                 ssize_t bufferSize = 0;
                 unsigned char *zbuffer = zip->getFileData(filename.c_str(), &bufferSize);
                 if (bufferSize) {
-                    // remove .lua or .luac extension
-                    size_t pos = filename.find_last_of('.');
-                    if (pos != std::string::npos)
+                    // remove extension
+                    std::size_t found = filename.rfind(".lua");
+                    if (found != std::string::npos)
                     {
-                        std::string suffix = filename.substr(pos, filename.length());
-                        if (suffix == NOT_BYTECODE_FILE_EXT || suffix == BYTECODE_FILE_EXT) {
-                            filename.erase(pos);
-                        }
+                        filename.erase(found);
                     }
                     // replace path seperator '/' '\' to '.'
                     for (int i=0; i<filename.size(); i++) {
@@ -932,6 +908,33 @@ int LuaStack::luaLoadBuffer(lua_State *L, const char *chunk, int chunkSize, cons
     }
 #endif
     return r;
+}
+
+void LuaStack::debugError(lua_State *L)
+{
+	std::string errStr = lua_tostring(L, - 1);
+	CCLOG("[LUA ERROR] %s", errStr.c_str());        /* L: ... error */
+	lua_pop(L, 1); // remove error message from stack
+
+	size_t pos = errStr.find_first_of("\"");
+	while (pos != std::string::npos)
+	{
+		errStr.replace(pos, 1, "");
+		pos = errStr.find_first_of("\"");
+	}
+	pos = errStr.find_first_of("\\");
+	while (pos != std::string::npos)
+	{
+		errStr.replace(pos, 1, "/");
+		pos = errStr.find_first_of("\\");
+	}
+	std::string luaStr = "if mtPopupMsgView() then mtPopupMsgView():showMessage(nil, \""+ errStr +"\"); end";
+	luaL_dostring(L,luaStr.c_str());
+}
+
+void LuaStack::setLuaErrorCB( onLuaErrorCB cb )
+{
+	m_cbOnLuaError = cb;
 }
 
 NS_CC_END

@@ -35,27 +35,21 @@ NS_CC_BEGIN
  * @{
  */
 
-/**
-@brief ShakyTiles3D action.
-@details This action is make the target node shake with many tiles.
-        You can create the action by these parameters:
-        duration, grid size, range, whether shake on the z axis.
- */
+/** @brief ShakyTiles3D action */
 class CC_DLL ShakyTiles3D : public TiledGrid3DAction
 {
 public:
     /** 
-    @brief Create the action with a range, shake Z vertices, a grid and duration.
-    @param duration Specify the duration of the ShakyTiles3D action. It's a value in seconds.
-    @param gridSize Specify the size of the grid.
-    @param range Specify the range of the shaky effect.
-    @param shakeZ Specify whether shake on the z axis.
-    @return If the creation success, return a pointer of ShakyTiles3D action; otherwise, return nil.
-    */
+     * creates the action with a range, whether or not to shake Z vertices, a grid size, and duration 
+     * @param duration in seconds
+     */
     static ShakyTiles3D* create(float duration, const Size& gridSize, int range, bool shakeZ);
 
     // Override
 	virtual ShakyTiles3D* clone() const override;
+    /**
+     * @param time in seconds
+     */
     virtual void update(float time) override;
     
 CC_CONSTRUCTOR_ACCESS:
@@ -63,13 +57,9 @@ CC_CONSTRUCTOR_ACCESS:
     virtual ~ShakyTiles3D() {}
 
     /** 
-    @brief Initializes the action with a range, shake Z vertices, grid size and duration.
-    @param duration Specify the duration of the ShakyTiles3D action. It's a value in seconds.
-    @param gridSize Specify the size of the grid.
-    @param range Specify the range of the shaky effect.
-    @param shakeZ Specify whether shake on the z axis.
-    @return If the Initialization success, return true; otherwise, return false.
-    */
+     * initializes the action with a range, whether or not to shake Z vertices, a grid size, and duration
+     * @param duration in seconds
+     */
     bool initWithDuration(float duration, const Size& gridSize, int range, bool shakeZ);
 
 protected:
@@ -80,27 +70,21 @@ private:
     CC_DISALLOW_COPY_AND_ASSIGN(ShakyTiles3D);
 };
 
-/**
-@brief ShatteredTiles3D action.
-@details This action make the target node shattered with many tiles.
-        You can create the action by these parameters:
-        duration, grid size, range, whether shatter on the z axis.
-*/
+/** @brief ShatteredTiles3D action */
 class CC_DLL ShatteredTiles3D : public TiledGrid3DAction
 {
 public:
     /** 
-     * @brief Create the action with a range, whether of not to shatter Z vertices, grid size and duration.
-     * @param duration Specify the duration of the ShatteredTiles3D action. It's a value in seconds.
-     * @param gridSize Specify the size of the grid.
-     * @param range Specify the range of the shatter effect.
-     * @param shatterZ Specify whether shatter on the z axis.
-     * @return If the creation success, return a pointer of ShatteredTiles3D action; otherwise, return nil.
+     * creates the action with a range, whether of not to shatter Z vertices, a grid size and duration 
+     * @param duration in seconds
      */
     static ShatteredTiles3D* create(float duration, const Size& gridSize, int range, bool shatterZ);
 
     // Override
 	virtual ShatteredTiles3D* clone() const override;
+    /**
+     * @param time in seconds
+     */
     virtual void update(float time) override;
     
 CC_CONSTRUCTOR_ACCESS:
@@ -108,13 +92,7 @@ CC_CONSTRUCTOR_ACCESS:
     virtual ~ShatteredTiles3D() {}
 
     /** 
-    @brief Initializes the action with a range, shatter Z vertices, grid size and duration.
-    @param duration Specify the duration of the ShatteredTiles3D action. It's a value in seconds.
-    @param gridSize Specify the size of the grid.
-    @param range Specify the range of the shatter effect.
-    @param shatterZ Specify whether shake on the z axis.
-    @return If the Initialization success, return true; otherwise, return false.
-    */
+     * initializes the action with a range, whether or not to shatter Z vertices, a grid size and duration */
     bool initWithDuration(float duration, const Size& gridSize, int range, bool shatterZ);
 
 protected:
@@ -127,22 +105,16 @@ private:
 };
 
 struct Tile;
-/**
-@brief ShuffleTiles action.
-@details This action make the target node shuffle with many tiles in random order.
-        You can create the action by these parameters:
-        duration, grid size, the random seed.
-*/
+/** @brief ShuffleTiles action
+ Shuffle the tiles in random order
+ */
 class CC_DLL ShuffleTiles : public TiledGrid3DAction
 {
 public:
     /** 
-    * @brief Create the action with grid size, random seed and duration.
-    * @param duration Specify the duration of the ShuffleTiles action. It's a value in seconds.
-    * @param gridSize Specify the size of the grid.
-    * @param seed Specify the random seed.
-    * @return If the creation success, return a pointer of ShuffleTiles action; otherwise, return nil.
-    */
+     * creates the action with a random seed, the grid size and the duration
+     * @param duration in seconds
+     */
     static ShuffleTiles* create(float duration, const Size& gridSize, unsigned int seed);
 
     void shuffle(unsigned int *array, unsigned int len);
@@ -151,6 +123,9 @@ public:
 
     // Overrides
     virtual void startWithTarget(Node *target) override;
+    /**
+     * @param time in seconds
+     */
     virtual void update(float time) override;
 	virtual ShuffleTiles* clone() const override;
     
@@ -159,12 +134,9 @@ CC_CONSTRUCTOR_ACCESS:
     virtual ~ShuffleTiles();
 
     /** 
-    * @brief Initializes the action with grid size, random seed and duration.
-    * @param duration Specify the duration of the ShuffleTiles action. It's a value in seconds.
-    * @param gridSize Specify the size of the grid.
-    * @param seed Specify the random seed.
-    * @return If the Initialization success, return true; otherwise, return false.
-    */
+     * initializes the action with a random seed, the grid size and the duration
+     * @param duration in seconds
+     */
     bool initWithDuration(float duration, const Size& gridSize, unsigned int seed);
 
 protected:
@@ -177,49 +149,27 @@ private:
     CC_DISALLOW_COPY_AND_ASSIGN(ShuffleTiles);
 };
 
-/**
-@brief FadeOutTRTiles action.
-@details Fades out the target node with many tiles from Bottom-Left to Top-Right.
+/** @brief FadeOutTRTiles action
+ Fades out the tiles in a Top-Right direction
  */
 class CC_DLL FadeOutTRTiles : public TiledGrid3DAction
 {
 public:
     /** 
-    * @brief Create the action with the grid size and the duration.
-    * @param duration Specify the duration of the FadeOutTRTiles action. It's a value in seconds.
-    * @param gridSize Specify the size of the grid.
-    * @return If the creation success, return a pointer of FadeOutTRTiles action; otherwise, return nil.
-    */
+     * creates the action with the grid size and the duration
+     * @param duration in seconds
+     */
     static FadeOutTRTiles* create(float duration, const Size& gridSize);
 
-    /**
-    @brief Calculate the percentage a tile should be shown.
-    @param pos The position index of the tile.
-    @param time The current percentage of the action.
-    @return Return the percentage the tile should be shown.
-    */
     virtual float testFunc(const Size& pos, float time);
-
-    /**
-    @brief Show the tile at specified position.
-    @param pos The position index of the tile should be shown.
-    */
     void turnOnTile(const Vec2& pos);
-
-    /**
-    @brief Hide the tile at specified position.
-    @param pos The position index of the tile should be hide.
-    */
     void turnOffTile(const Vec2& pos);
-
-    /**
-    @brief Show part of the tile.
-    @param pos The position index of the tile should be shown.
-    @param distance The percentage that the tile should be shown.
-    */
     virtual void transformTile(const Vec2& pos, float distance);
 
     // Overrides
+    /**
+     * @param time in seconds
+     */
     virtual void update(float time) override;
 	virtual FadeOutTRTiles* clone() const override;
 
@@ -231,19 +181,16 @@ private:
     CC_DISALLOW_COPY_AND_ASSIGN(FadeOutTRTiles);
 };
 
-/**
-@brief FadeOutBLTiles action.
-@details Fades out the target node with many tiles from Top-Right to Bottom-Left.
+/** @brief FadeOutBLTiles action.
+ Fades out the tiles in a Bottom-Left direction
  */
 class CC_DLL FadeOutBLTiles : public FadeOutTRTiles
 {
 public:
     /** 
-    * @brief Create the action with the grid size and the duration.
-    * @param duration Specify the duration of the FadeOutBLTiles action. It's a value in seconds.
-    * @param gridSize Specify the size of the grid.
-    * @return If the creation success, return a pointer of FadeOutBLTiles action; otherwise, return nil.
-    */
+     * creates the action with the grid size and the duration 
+     * @param duration in seconds
+     */
     static FadeOutBLTiles* create(float duration, const Size& gridSize);
 
     // Overrides
@@ -258,22 +205,19 @@ private:
     CC_DISALLOW_COPY_AND_ASSIGN(FadeOutBLTiles);
 };
 
-/**
-@brief FadeOutUpTiles action.
-@details Fades out the target node with many tiles from bottom to top.
+/** @brief FadeOutUpTiles action.
+ Fades out the tiles in upwards direction
  */
 class CC_DLL FadeOutUpTiles : public FadeOutTRTiles
 {
 public:
     /** 
-    * @brief Create the action with the grid size and the duration.
-    * @param duration Specify the duration of the FadeOutUpTiles action. It's a value in seconds.
-    * @param gridSize Specify the size of the grid.
-    * @return If the creation success, return a pointer of FadeOutUpTiles action; otherwise, return nil.
-    */
+     * creates the action with the grid size and the duration 
+     * @param duration in seconds
+     */
     static FadeOutUpTiles* create(float duration, const Size& gridSize);
 
-    virtual void transformTile(const Vec2& pos, float distance) override;
+    virtual void transformTile(const Vec2& pos, float distance);
 
     // Overrides
 	virtual FadeOutUpTiles* clone() const override;
@@ -287,19 +231,16 @@ private:
     CC_DISALLOW_COPY_AND_ASSIGN(FadeOutUpTiles);
 };
 
-/**
-@brief FadeOutDownTiles action.
-@details Fades out the target node with many tiles from top to bottom.
+/** @brief FadeOutDownTiles action.
+ Fades out the tiles in downwards direction
  */
 class CC_DLL FadeOutDownTiles : public FadeOutUpTiles
 {
 public:
     /** 
-    * @brief Create the action with the grid size and the duration.
-    * @param duration Specify the duration of the FadeOutDownTiles action. It's a value in seconds.
-    * @param gridSize Specify the size of the grid.
-    * @return If the creation success, return a pointer of FadeOutDownTiles action; otherwise, return nil.
-    */
+     * creates the action with the grid size and the duration
+     * @param duration in seconds
+     */
     static FadeOutDownTiles* create(float duration, const Size& gridSize);
 
     // Overrides
@@ -314,46 +255,25 @@ private:
     CC_DISALLOW_COPY_AND_ASSIGN(FadeOutDownTiles);
 };
 
-/**
-@brief TurnOffTiles action.
-@details Turn off the target node with many tiles in random order.
+/** @brief TurnOffTiles action.
+ Turn off the files in random order
  */
 class CC_DLL TurnOffTiles : public TiledGrid3DAction
 {
 public:
     /** 
-    * @brief Create the action with the grid size and the duration.
-    * @param duration Specify the duration of the TurnOffTiles action. It's a value in seconds.
-    * @param gridSize Specify the size of the grid.
-    * @return If the creation success, return a pointer of TurnOffTiles action; otherwise, return nil.
-    */
+     * creates the action with the grid size and the duration 
+     * @param duration in seconds
+     */
     static TurnOffTiles* create(float duration, const Size& gridSize);
     /** 
-    * @brief Create the action with the grid size and the duration.
-    * @param duration Specify the duration of the TurnOffTiles action. It's a value in seconds.
-    * @param gridSize Specify the size of the grid.
-    * @param seed Specify the random seed.
-    * @return If the creation success, return a pointer of TurnOffTiles action; otherwise, return nil.
-    */
+     * creates the action with a random seed, the grid size and the duration 
+     * @param duration in seconds
+     */
     static TurnOffTiles* create(float duration, const Size& gridSize, unsigned int seed);
 
-    /**
-    @brief Shuffle the array specified.
-    @param array The array will be shuffled.
-    @param len The size of the array.
-    */
     void shuffle(unsigned int *array, unsigned int len);
-
-    /**
-    @brief Show the tile at specified position.
-    @param pos The position index of the tile should be shown.
-    */
     void turnOnTile(const Vec2& pos);
-
-    /**
-    @brief Hide the tile at specified position.
-    @param pos The position index of the tile should be hide.
-    */
     void turnOffTile(const Vec2& pos);
 
     // Overrides
@@ -365,13 +285,7 @@ CC_CONSTRUCTOR_ACCESS:
     TurnOffTiles() {}
     virtual ~TurnOffTiles();
 
-    /** 
-    * @brief Initializes the action with grid size, random seed and duration.
-    * @param duration Specify the duration of the TurnOffTiles action. It's a value in seconds.
-    * @param gridSize Specify the size of the grid.
-    * @param seed Specify the random seed.
-    * @return If the Initialization success, return true; otherwise, return false.
-    */
+    /** initializes the action with a random seed, the grid size and the duration */
     bool initWithDuration(float duration, const Size& gridSize, unsigned int seed);
 
 protected:
@@ -383,61 +297,36 @@ private:
     CC_DISALLOW_COPY_AND_ASSIGN(TurnOffTiles);
 };
 
-/**
-@brief WavesTiles3D action.
-@details This action wave the target node with many tiles.
-*/
+/** @brief WavesTiles3D action. */
 class CC_DLL WavesTiles3D : public TiledGrid3DAction
 {
 public:
     /** 
-     * @brief Create the action with a number of waves, the waves amplitude, the grid size and the duration.
-     * @param duration Specify the duration of the WavesTiles3D action. It's a value in seconds.
-     * @param gridSize Specify the size of the grid.
-     * @param waves Specify the waves count of the WavesTiles3D action.
-     * @param amplitude Specify the amplitude of the WavesTiles3D action.
-     * @return If the creation success, return a pointer of WavesTiles3D action; otherwise, return nil.
+     * creates the action with a number of waves, the waves amplitude, the grid size and the duration 
+     * @param duration in seconds
      */
     static WavesTiles3D* create(float duration, const Size& gridSize, unsigned int waves, float amplitude);
 
-    /**
-    @brief Get the amplitude of the effect.
-    @return Return the amplitude of the effect.
-    */
+    /** waves amplitude */
     inline float getAmplitude() const { return _amplitude; }
-    /**
-    @brief Set the amplitude to the effect.
-    @param amplitude The value of amplitude will be set.
-    */
     inline void setAmplitude(float amplitude) { _amplitude = amplitude; }
 
-    /**
-    @brief Get the amplitude rate of the effect.
-    @return Return the amplitude rate of the effect.
-    */
+    /** waves amplitude rate */
     inline float getAmplitudeRate() const { return _amplitudeRate; }
-    /**
-    @brief Set the ampliture rate of the effect.
-    @param amplitudeRate The value of amplitude rate will be set.
-    */
     inline void setAmplitudeRate(float amplitudeRate) { _amplitudeRate = amplitudeRate; }
 
     // Override
 	virtual WavesTiles3D* clone() const override;
+    /**
+     * @param duration in seconds
+     */
     virtual void update(float time) override;
     
 CC_CONSTRUCTOR_ACCESS:
     WavesTiles3D() {}
     virtual ~WavesTiles3D() {}
 
-    /** 
-    @brief Initializes an action with duration, grid size, waves count and amplitude.
-    @param duration Specify the duration of the WavesTiles3D action. It's a value in seconds.
-    @param gridSize Specify the size of the grid.
-    @param waves Specify the waves count of the WavesTiles3D action.
-    @param amplitude Specify the amplitude of the WavesTiles3D action.
-    @return If the initialization success, return true; otherwise, return false.
-    */
+    /** initializes the action with a number of waves, the waves amplitude, the grid size and the duration */
     bool initWithDuration(float duration, const Size& gridSize, unsigned int waves, float amplitude);
 
 protected:
@@ -449,61 +338,38 @@ private:
     CC_DISALLOW_COPY_AND_ASSIGN(WavesTiles3D);
 };
 
-/**
-@brief JumpTiles3D action.
-@details Move the tiles of a target node across the Z axis.
-*/
+/** @brief JumpTiles3D action.
+ A sin function is executed to move the tiles across the Z axis
+ */
 class CC_DLL JumpTiles3D : public TiledGrid3DAction
 {
 public:
     /** 
-     * @brief Create the action with the number of jumps, the sin amplitude, the grid size and the duration.
-     * @param duration Specify the duration of the JumpTiles3D action. It's a value in seconds.
-     * @param gridSize Specify the size of the grid.
-     * @param numberOfJumps Specify the jump tiles count.
-     * @param amplitude Specify the amplitude of the JumpTiles3D action.
-     * @return If the creation success, return a pointer of JumpTiles3D action; otherwise, return nil.
+     * creates the action with the number of jumps, the sin amplitude, the grid size and the duration 
+     * @param duration in seconds
      */
     static JumpTiles3D* create(float duration, const Size& gridSize, unsigned int numberOfJumps, float amplitude);
 
-    /**
-    @brief Get the amplitude of the effect.
-    @return Return the amplitude of the effect.
-    */
+    /** amplitude of the sin*/
     inline float getAmplitude() const { return _amplitude; }
-    /**
-    @brief Set the amplitude to the effect.
-    @param amplitude The value of amplitude will be set.
-    */
     inline void setAmplitude(float amplitude) { _amplitude = amplitude; }
 
-    /**
-    @brief Get the amplitude rate of the effect.
-    @return Return the amplitude rate of the effect.
-    */
+    /** amplitude rate */
     inline float getAmplitudeRate() const { return _amplitudeRate; }
-    /**
-    @brief Set the ampliture rate of the effect.
-    @param amplitudeRate The value of amplitude rate will be set.
-    */
     inline void setAmplitudeRate(float amplitudeRate) { _amplitudeRate = amplitudeRate; }
 
     // Override
 	virtual JumpTiles3D* clone() const override;
+    /**
+     * @param time in seconds
+     */
     virtual void update(float time) override;
     
 CC_CONSTRUCTOR_ACCESS:
     JumpTiles3D() {}
     virtual ~JumpTiles3D() {}
 
-    /** 
-     * @brief Initializes the action with the number of jumps, the sin amplitude, the grid size and the duration.
-     * @param duration Specify the duration of the JumpTiles3D action. It's a value in seconds.
-     * @param gridSize Specify the size of the grid.
-     * @param numberOfJumps Specify the jump tiles count.
-     * @param amplitude Specify the amplitude of the JumpTiles3D action.
-     * @return If the initialization success, return true; otherwise, return false.
-     */
+    /** initializes the action with the number of jumps, the sin amplitude, the grid size and the duration */
     bool initWithDuration(float duration, const Size& gridSize, unsigned int numberOfJumps, float amplitude);
 
 protected:
@@ -515,19 +381,13 @@ private:
     CC_DISALLOW_COPY_AND_ASSIGN(JumpTiles3D);
 };
 
-/**
-@brief SplitRows action.
-@details Split the target node in many rows.
-        Then move out some rows from left, move out the other rows from right.
-*/
+/** @brief SplitRows action */
 class CC_DLL SplitRows : public TiledGrid3DAction
 {
 public :
     /** 
-     * @brief Create the action with the number of rows and the duration.
-     * @param duration Specify the duration of the SplitRows action. It's a value in seconds.
-     * @param rows Specify the rows count should be splited.
-     * @return If the creation success, return a pointer of SplitRows action; otherwise, return nil.
+     * creates the action with the number of rows to split and the duration 
+     * @param duration in seconds
      */
     static SplitRows* create(float duration, unsigned int rows);
 
@@ -540,12 +400,7 @@ CC_CONSTRUCTOR_ACCESS:
     SplitRows() {}
     virtual ~SplitRows() {}
 
-    /** 
-     * @brief Initializes the action with the number rows and the duration.
-     * @param duration Specify the duration of the SplitRows action. It's a value in seconds.
-     * @param rows Specify the rows count should be splited.
-     * @return If the creation success, return true; otherwise, return false.
-     */
+    /** initializes the action with the number of rows to split and the duration */
     bool initWithDuration(float duration, unsigned int rows);
 
 protected:
@@ -556,20 +411,13 @@ private:
     CC_DISALLOW_COPY_AND_ASSIGN(SplitRows);
 };
 
-/**
-@brief SplitCols action.
-@details Split the target node in many columns.
-        Then move out some columns from top, move out the other columns from bottom.
-*/
+/** @brief SplitCols action */
 class CC_DLL SplitCols : public TiledGrid3DAction
 {
 public:
-    
     /** 
-     * @brief Create the action with the number of columns and the duration.
-     * @param duration Specify the duration of the SplitCols action. It's a value in seconds.
-     * @param cols Specify the columns count should be splited.
-     * @return If the creation success, return a pointer of SplitCols action; otherwise, return nil.
+     * creates the action with the number of columns to split and the duration 
+     * @param duration in seconds
      */
     static SplitCols* create(float duration, unsigned int cols);
 
@@ -585,12 +433,7 @@ CC_CONSTRUCTOR_ACCESS:
     SplitCols() {}
     virtual ~SplitCols() {}
 
-    /** 
-     * @brief Initializes the action with the number columns and the duration.
-     * @param duration Specify the duration of the SplitCols action. It's a value in seconds.
-     * @param cols Specify the columns count should be splited.
-     * @return If the creation success, return true; otherwise, return false.
-     */
+    /** initializes the action with the number of columns to split and the duration */
     bool initWithDuration(float duration, unsigned int cols);
 
 protected:

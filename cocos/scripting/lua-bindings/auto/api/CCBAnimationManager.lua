@@ -10,14 +10,12 @@
 -- @param self
 -- @param #cc.Node fromNode
 -- @param #cc.Node toNode
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
 -- @function [parent=#CCBAnimationManager] setAutoPlaySequenceId 
 -- @param self
 -- @param #int autoPlaySequenceId
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -39,7 +37,6 @@
 -- @param #cc.Value value
 -- @param #cc.Node pNode
 -- @param #string propName
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -58,7 +55,6 @@
 -- @function [parent=#CCBAnimationManager] setRootNode 
 -- @param self
 -- @param #cc.Node pRootNode
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -66,14 +62,12 @@
 -- @param self
 -- @param #char pName
 -- @param #float fTweenDuration
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
 -- @function [parent=#CCBAnimationManager] addDocumentOutletName 
 -- @param self
 -- @param #string name
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -92,7 +86,6 @@
 -- @function [parent=#CCBAnimationManager] setDocumentControllerName 
 -- @param self
 -- @param #string name
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -101,7 +94,6 @@
 -- @param #cc.Ref obj
 -- @param #cc.Node pNode
 -- @param #string propName
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -128,7 +120,6 @@
 -- @function [parent=#CCBAnimationManager] addDocumentCallbackControlEvents 
 -- @param self
 -- @param #int eventType
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -153,7 +144,6 @@
 -- @function [parent=#CCBAnimationManager] setRootContainerSize 
 -- @param self
 -- @param #size_table rootContainerSize
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -161,7 +151,6 @@
 -- @param self
 -- @param #int nSeqId
 -- @param #float fTweenDuraiton
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -180,7 +169,6 @@
 -- @function [parent=#CCBAnimationManager] addDocumentCallbackName 
 -- @param self
 -- @param #string name
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -193,7 +181,6 @@
 -- @function [parent=#CCBAnimationManager] addDocumentOutletNode 
 -- @param self
 -- @param #cc.Node node
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -207,14 +194,12 @@
 -- @function [parent=#CCBAnimationManager] addDocumentCallbackNode 
 -- @param self
 -- @param #cc.Node node
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
 -- @function [parent=#CCBAnimationManager] runAnimationsForSequenceNamed 
 -- @param self
 -- @param #char pName
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -234,13 +219,11 @@
 -- @function [parent=#CCBAnimationManager] setSequences 
 -- @param self
 -- @param #array_table seq
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
 -- @function [parent=#CCBAnimationManager] debug 
 -- @param self
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 --------------------------------
 -- 
@@ -252,6 +235,5 @@
 -- js ctor
 -- @function [parent=#CCBAnimationManager] CCBAnimationManager 
 -- @param self
--- @return CCBAnimationManager#CCBAnimationManager self (return value: cc.CCBAnimationManager)
         
 return nil

@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 Copyright (c) 2013-2014 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
@@ -124,6 +124,9 @@ public:
 
     virtual float getCurrentPercent() const { return _currentPercent; }
     virtual int getRawDuration() const { return _rawDuration; }
+
+	virtual float getAnimationInternal() const { return _animationInternal; }
+	virtual void setAnimationInternal( float f ) { _animationInternal = f; }
 
 protected:
 

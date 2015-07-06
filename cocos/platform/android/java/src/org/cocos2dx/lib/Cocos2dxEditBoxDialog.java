@@ -25,297 +25,423 @@ THE SOFTWARE.
 
 package org.cocos2dx.lib;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 public class Cocos2dxEditBoxDialog extends Dialog {
-    // ===========================================================
-    // Constants
-    // ===========================================================
+	// ===========================================================
+	// Constants
+	// ===========================================================
 
-    /**
-     * The user is allowed to enter any text, including line breaks.
-     */
-    private final int kEditBoxInputModeAny = 0;
+	/**
+	 * The user is allowed to enter any text, including line breaks.
+	 */
+	private final int kEditBoxInputModeAny = 0;
 
-    /**
-     * The user is allowed to enter an e-mail address.
-     */
-    private final int kEditBoxInputModeEmailAddr = 1;
+	/**
+	 * The user is allowed to enter an e-mail address.
+	 */
+	private final int kEditBoxInputModeEmailAddr = 1;
 
-    /**
-     * The user is allowed to enter an integer value.
-     */
-    private final int kEditBoxInputModeNumeric = 2;
+	/**
+	 * The user is allowed to enter an integer value.
+	 */
+	private final int kEditBoxInputModeNumeric = 2;
 
-    /**
-     * The user is allowed to enter a phone number.
-     */
-    private final int kEditBoxInputModePhoneNumber = 3;
+	/**
+	 * The user is allowed to enter a phone number.
+	 */
+	private final int kEditBoxInputModePhoneNumber = 3;
 
-    /**
-     * The user is allowed to enter a URL.
-     */
-    private final int kEditBoxInputModeUrl = 4;
+	/**
+	 * The user is allowed to enter a URL.
+	 */
+	private final int kEditBoxInputModeUrl = 4;
 
-    /**
-     * The user is allowed to enter a real number value. This extends kEditBoxInputModeNumeric by allowing a decimal point.
-     */
-    private final int kEditBoxInputModeDecimal = 5;
+	/**
+	 * The user is allowed to enter a real number value. This extends
+	 * kEditBoxInputModeNumeric by allowing a decimal point.
+	 */
+	private final int kEditBoxInputModeDecimal = 5;
 
-    /**
-     * The user is allowed to enter any text, except for line breaks.
-     */
-    private final int kEditBoxInputModeSingleLine = 6;
+	/**
+	 * The user is allowed to enter any text, except for line breaks.
+	 */
+	private final int kEditBoxInputModeSingleLine = 6;
 
-    /**
-     * Indicates that the text entered is confidential data that should be obscured whenever possible. This implies EDIT_BOX_INPUT_FLAG_SENSITIVE.
-     */
-    private final int kEditBoxInputFlagPassword = 0;
+	/**
+	 * Indicates that the text entered is confidential data that should be
+	 * obscured whenever possible. This implies EDIT_BOX_INPUT_FLAG_SENSITIVE.
+	 */
+	private final int kEditBoxInputFlagPassword = 0;
 
-    /**
-     * Indicates that the text entered is sensitive data that the implementation must never store into a dictionary or table for use in predictive, auto-completing, or other accelerated input schemes. A credit card number is an example of sensitive data.
-     */
-    private final int kEditBoxInputFlagSensitive = 1;
+	/**
+	 * Indicates that the text entered is sensitive data that the implementation
+	 * must never store into a dictionary or table for use in predictive,
+	 * auto-completing, or other accelerated input schemes. A credit card number
+	 * is an example of sensitive data.
+	 */
+	private final int kEditBoxInputFlagSensitive = 1;
 
-    /**
-     * This flag is a hint to the implementation that during text editing, the initial letter of each word should be capitalized.
-     */
-    private final int kEditBoxInputFlagInitialCapsWord = 2;
+	/**
+	 * This flag is a hint to the implementation that during text editing, the
+	 * initial letter of each word should be capitalized.
+	 */
+	private final int kEditBoxInputFlagInitialCapsWord = 2;
 
-    /**
-     * This flag is a hint to the implementation that during text editing, the initial letter of each sentence should be capitalized.
-     */
-    private final int kEditBoxInputFlagInitialCapsSentence = 3;
+	/**
+	 * This flag is a hint to the implementation that during text editing, the
+	 * initial letter of each sentence should be capitalized.
+	 */
+	private final int kEditBoxInputFlagInitialCapsSentence = 3;
 
-    /**
-     * Capitalize all characters automatically.
-     */
-    private final int kEditBoxInputFlagInitialCapsAllCharacters = 4;
+	/**
+	 * Capitalize all characters automatically.
+	 */
+	private final int kEditBoxInputFlagInitialCapsAllCharacters = 4;
 
-    private final int kKeyboardReturnTypeDefault = 0;
-    private final int kKeyboardReturnTypeDone = 1;
-    private final int kKeyboardReturnTypeSend = 2;
-    private final int kKeyboardReturnTypeSearch = 3;
-    private final int kKeyboardReturnTypeGo = 4;
+	private final int kKeyboardReturnTypeDefault = 0;
+	private final int kKeyboardReturnTypeDone = 1;
+	private final int kKeyboardReturnTypeSend = 2;
+	private final int kKeyboardReturnTypeSearch = 3;
+	private final int kKeyboardReturnTypeGo = 4;
 
-    // ===========================================================
-    // Fields
-    // ===========================================================
+	// ===========================================================
+	// Fields
+	// ===========================================================
 
-    private EditText mInputEditText;
-    private TextView mTextViewTitle;
+	private EditText mInputEditText;
+	private TextView mTextViewTitle;
 
-    private final String mTitle;
-    private final String mMessage;
-    private final int mInputMode;
-    private final int mInputFlag;
-    private final int mReturnType;
-    private final int mMaxLength;
+	private final String mTitle;
+	private final String mMessage;
+	private final int mInputMode;
+	private final int mInputFlag;
+	private final int mReturnType;
+	private final int mMaxLength;
 
-    private int mInputFlagConstraints;
-    private int mInputModeContraints;
-    private boolean mIsMultiline;
+	private int mInputFlagConstraints;
+	private int mInputModeContraints;
+	private boolean mIsMultiline;
 
-    // ===========================================================
-    // Constructors
-    // ===========================================================
+	public class KeyboardDetectorRelativeLayout extends RelativeLayout {
+		public KeyboardDetectorRelativeLayout(Context context) {
+			super(context);
+		}
 
-    public Cocos2dxEditBoxDialog(final Context pContext, final String pTitle, final String pMessage, final int pInputMode, final int pInputFlag, final int pReturnType, final int pMaxLength) {
-        super(pContext, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
-//      super(context, R.style.Theme_Translucent);
+		@Override
+		protected void onLayout(boolean changed, int l, int t, int r, int b) {
+			super.onLayout(changed, l, t, r, b);
+		}
 
-        this.mTitle = pTitle;
-        this.mMessage = pMessage;
-        this.mInputMode = pInputMode;
-        this.mInputFlag = pInputFlag;
-        this.mReturnType = pReturnType;
-        this.mMaxLength = pMaxLength;
-    }
+		protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+			// TODO Auto-generated method stub
+			super.onSizeChanged(w, h, oldw, oldh);
+			Log.d("mDebug", "onSizeChanged,w=" + w + ",h=" + h + ",oldw="
+					+ oldw + ",oldh=" + oldh);
+			if (oldh != 0) {
+				if (oldh > h) {
+					// /keyboard shown
+				} else {
+					Cocos2dxHelper
+							.setEditTextDialogResult(Cocos2dxEditBoxDialog.this.mInputEditText
+									.getText().toString());
+					Cocos2dxEditBoxDialog.this.closeKeyboard();
+					Cocos2dxEditBoxDialog.this.dismiss();
+				}
+			}
+		}
+		/*
+		 * 
+		 * public boolean dispatchKeyEventPreIme(KeyEvent event) {
+		 * InputMethodManager imm = (InputMethodManager)
+		 * Cocos2dxEditBoxDialog.this .getContext()
+		 * .getSystemService(Context.INPUT_METHOD_SERVICE);
+		 * 
+		 * if (imm.isActive() && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+		 * Cocos2dxHelper
+		 * .setEditTextDialogResult(Cocos2dxEditBoxDialog.this.mInputEditText
+		 * .getText().toString()); Cocos2dxEditBoxDialog.this.closeKeyboard();
+		 * Cocos2dxEditBoxDialog.this.dismiss(); return true; } return
+		 * super.dispatchKeyEventPreIme(event); }
+		 */
+	}
 
-    @Override
-    protected void onCreate(final Bundle pSavedInstanceState) {
-        super.onCreate(pSavedInstanceState);
+	// ===========================================================
+	// Constructors
+	// ===========================================================
 
-        this.getWindow().setBackgroundDrawable(new ColorDrawable(0x80000000));
+	public Cocos2dxEditBoxDialog(final Context pContext, final String pTitle,
+			final String pMessage, final int pInputMode, final int pInputFlag,
+			final int pReturnType, final int pMaxLength) {
+		super(pContext, android.R.style.Theme_Light_NoTitleBar);
+		// super(context, R.style.Theme_Translucent);
 
-        final LinearLayout layout = new LinearLayout(this.getContext());
-        layout.setOrientation(LinearLayout.VERTICAL);
+		this.mTitle = pTitle;
+		this.mMessage = pMessage;
+		this.mInputMode = pInputMode;
+		this.mInputFlag = pInputFlag;
+		this.mReturnType = pReturnType;
+		this.mMaxLength = pMaxLength;
+		this.mIsMultiline = true;
+	}
 
-        final LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+	@SuppressWarnings("deprecation")
+	@Override
+	protected void onCreate(final Bundle pSavedInstanceState) {
+		super.onCreate(pSavedInstanceState);
 
-        this.mTextViewTitle = new TextView(this.getContext());
-        final LinearLayout.LayoutParams textviewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        textviewParams.leftMargin = textviewParams.rightMargin = this.convertDipsToPixels(10);
-        this.mTextViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-        layout.addView(this.mTextViewTitle, textviewParams);
+		this.getWindow().setBackgroundDrawable(new ColorDrawable(0x40000000));
 
-        this.mInputEditText = new EditText(this.getContext());
-        final LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        editTextParams.leftMargin = editTextParams.rightMargin = this.convertDipsToPixels(10);
+		final RelativeLayout layout = new KeyboardDetectorRelativeLayout(
+				this.getContext());
 
-        layout.addView(this.mInputEditText, editTextParams);
+		final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.MATCH_PARENT);
 
-        this.setContentView(layout, layoutParams);
+		this.mTextViewTitle = new TextView(this.getContext());
+		final RelativeLayout.LayoutParams textviewParams = new RelativeLayout.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		textviewParams.leftMargin = textviewParams.rightMargin = this
+				.convertDipsToPixels(10);
+		this.mTextViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+		layout.addView(this.mTextViewTitle, textviewParams);
 
-        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		this.mInputEditText = new EditText(this.getContext());
+		final RelativeLayout.LayoutParams editTextParams = new RelativeLayout.LayoutParams(
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		editTextParams.addRule(RelativeLayout.CENTER_HORIZONTAL,
+				RelativeLayout.TRUE);
 
-        this.mTextViewTitle.setText(this.mTitle);
-        this.mInputEditText.setText(this.mMessage);
+		int strokeWidth = 4; // 3px not dp
+		int roundRadius = 15; // 8px not dp
+		int strokeColor = Color.parseColor("#2E3135");
+		int fillColor = Color.parseColor("#DFDFE0");
 
-        int oldImeOptions = this.mInputEditText.getImeOptions();
-        this.mInputEditText.setImeOptions(oldImeOptions | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
-        oldImeOptions = this.mInputEditText.getImeOptions();
+		GradientDrawable gd = new GradientDrawable();
+		gd.setColor(fillColor);
+		gd.setCornerRadius(roundRadius);
+		gd.setStroke(strokeWidth, strokeColor);
+		this.mInputEditText.setBackgroundDrawable(gd);
 
-        switch (this.mInputMode) {
-            case kEditBoxInputModeAny:
-                this.mInputModeContraints = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
-                break;
-            case kEditBoxInputModeEmailAddr:
-                this.mInputModeContraints = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
-                break;
-            case kEditBoxInputModeNumeric:
-                this.mInputModeContraints = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED;
-                break;
-            case kEditBoxInputModePhoneNumber:
-                this.mInputModeContraints = InputType.TYPE_CLASS_PHONE;
-                break;
-            case kEditBoxInputModeUrl:
-                this.mInputModeContraints = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
-                break;
-            case kEditBoxInputModeDecimal:
-                this.mInputModeContraints = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED;
-                break;
-            case kEditBoxInputModeSingleLine:
-                this.mInputModeContraints = InputType.TYPE_CLASS_TEXT;
-                break;
-            default:
+		layout.addView(this.mInputEditText, editTextParams);
 
-                break;
-        }
+		this.getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+						| WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+		this.setContentView(layout, layoutParams);
+		this.getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+						| WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        if (this.mIsMultiline) {
-            this.mInputModeContraints |= InputType.TYPE_TEXT_FLAG_MULTI_LINE;
-        }
+		// this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        this.mInputEditText.setInputType(this.mInputModeContraints | this.mInputFlagConstraints);
+		this.mTextViewTitle.setText(this.mTitle);
+		this.mInputEditText.setText(this.mMessage);
 
-        switch (this.mInputFlag) {
-            case kEditBoxInputFlagPassword:
-                this.mInputFlagConstraints = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
-                break;
-            case kEditBoxInputFlagSensitive:
-                this.mInputFlagConstraints = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
-                break;
-            case kEditBoxInputFlagInitialCapsWord:
-                this.mInputFlagConstraints = InputType.TYPE_TEXT_FLAG_CAP_WORDS;
-                break;
-            case kEditBoxInputFlagInitialCapsSentence:
-                this.mInputFlagConstraints = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
-                break;
-            case kEditBoxInputFlagInitialCapsAllCharacters:
-                this.mInputFlagConstraints = InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
-                break;
-            default:
-                break;
-        }
+		int oldImeOptions = this.mInputEditText.getImeOptions();
+		this.mInputEditText.setImeOptions(oldImeOptions
+				| EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+		oldImeOptions = this.mInputEditText.getImeOptions();
 
-        this.mInputEditText.setInputType(this.mInputFlagConstraints | this.mInputModeContraints);
+		switch (this.mInputMode) {
+		case kEditBoxInputModeAny:
+			this.mInputModeContraints = InputType.TYPE_CLASS_TEXT
+					| InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+			break;
+		case kEditBoxInputModeEmailAddr:
+			this.mInputModeContraints = InputType.TYPE_CLASS_TEXT
+					| InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+			break;
+		case kEditBoxInputModeNumeric:
+			this.mInputModeContraints = InputType.TYPE_CLASS_NUMBER
+					| InputType.TYPE_NUMBER_FLAG_SIGNED;
+			break;
+		case kEditBoxInputModePhoneNumber:
+			this.mInputModeContraints = InputType.TYPE_CLASS_PHONE;
+			break;
+		case kEditBoxInputModeUrl:
+			this.mInputModeContraints = InputType.TYPE_CLASS_TEXT
+					| InputType.TYPE_TEXT_VARIATION_URI;
+			break;
+		case kEditBoxInputModeDecimal:
+			this.mInputModeContraints = InputType.TYPE_CLASS_NUMBER
+					| InputType.TYPE_NUMBER_FLAG_DECIMAL
+					| InputType.TYPE_NUMBER_FLAG_SIGNED;
+			break;
+		case kEditBoxInputModeSingleLine:
+			this.mInputModeContraints = InputType.TYPE_CLASS_TEXT;
+			break;
+		default:
 
-        switch (this.mReturnType) {
-            case kKeyboardReturnTypeDefault:
-                this.mInputEditText.setImeOptions(oldImeOptions | EditorInfo.IME_ACTION_NONE);
-                break;
-            case kKeyboardReturnTypeDone:
-                this.mInputEditText.setImeOptions(oldImeOptions | EditorInfo.IME_ACTION_DONE);
-                break;
-            case kKeyboardReturnTypeSend:
-                this.mInputEditText.setImeOptions(oldImeOptions | EditorInfo.IME_ACTION_SEND);
-                break;
-            case kKeyboardReturnTypeSearch:
-                this.mInputEditText.setImeOptions(oldImeOptions | EditorInfo.IME_ACTION_SEARCH);
-                break;
-            case kKeyboardReturnTypeGo:
-                this.mInputEditText.setImeOptions(oldImeOptions | EditorInfo.IME_ACTION_GO);
-                break;
-            default:
-                this.mInputEditText.setImeOptions(oldImeOptions | EditorInfo.IME_ACTION_NONE);
-                break;
-        }
+			break;
+		}
 
-        if (this.mMaxLength > 0) {
-            this.mInputEditText.setFilters(new InputFilter[] { new InputFilter.LengthFilter(this.mMaxLength) });
-        }
+		if (this.mIsMultiline) {
+			this.mInputModeContraints |= InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+		}
 
-        final Handler initHandler = new Handler();
-        initHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Cocos2dxEditBoxDialog.this.mInputEditText.requestFocus();
-                Cocos2dxEditBoxDialog.this.mInputEditText.setSelection(Cocos2dxEditBoxDialog.this.mInputEditText.length());
-                Cocos2dxEditBoxDialog.this.openKeyboard();
-            }
-        }, 200);
+		this.mInputEditText.setInputType(this.mInputModeContraints
+				| this.mInputFlagConstraints);
 
-        this.mInputEditText.setOnEditorActionListener(new OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-                // If user didn't set keyboard type, this callback will be invoked twice with 'KeyEvent.ACTION_DOWN' and 'KeyEvent.ACTION_UP'.
-                if (actionId != EditorInfo.IME_NULL || (actionId == EditorInfo.IME_NULL && event != null && event.getAction() == KeyEvent.ACTION_DOWN)) {
-                    Cocos2dxHelper.setEditTextDialogResult(Cocos2dxEditBoxDialog.this.mInputEditText.getText().toString());
-                    Cocos2dxEditBoxDialog.this.closeKeyboard();
-                    Cocos2dxEditBoxDialog.this.dismiss();
-                    return true;
-                }
-                return false;
-            }
-        });
-    }
+		switch (this.mInputFlag) {
+		case kEditBoxInputFlagPassword:
+			this.mInputFlagConstraints = InputType.TYPE_CLASS_TEXT
+					| InputType.TYPE_TEXT_VARIATION_PASSWORD;
+			break;
+		case kEditBoxInputFlagSensitive:
+			this.mInputFlagConstraints = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
+			break;
+		case kEditBoxInputFlagInitialCapsWord:
+			this.mInputFlagConstraints = InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+			break;
+		case kEditBoxInputFlagInitialCapsSentence:
+			this.mInputFlagConstraints = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
+			break;
+		case kEditBoxInputFlagInitialCapsAllCharacters:
+			this.mInputFlagConstraints = InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
+			break;
+		default:
+			break;
+		}
 
+		this.mInputEditText.setInputType(this.mInputFlagConstraints
+				| this.mInputModeContraints);
 
-    // ===========================================================
-    // Getter & Setter
-    // ===========================================================
+		switch (this.mReturnType) {
+		case kKeyboardReturnTypeDefault:
+			this.mInputEditText.setImeOptions(oldImeOptions
+					| EditorInfo.IME_ACTION_NONE);
+			break;
+		case kKeyboardReturnTypeDone:
+			this.mInputEditText.setImeOptions(oldImeOptions
+					| EditorInfo.IME_ACTION_DONE);
+			break;
+		case kKeyboardReturnTypeSend:
+			this.mInputEditText.setImeOptions(oldImeOptions
+					| EditorInfo.IME_ACTION_SEND);
+			break;
+		case kKeyboardReturnTypeSearch:
+			this.mInputEditText.setImeOptions(oldImeOptions
+					| EditorInfo.IME_ACTION_SEARCH);
+			break;
+		case kKeyboardReturnTypeGo:
+			this.mInputEditText.setImeOptions(oldImeOptions
+					| EditorInfo.IME_ACTION_GO);
+			break;
+		default:
+			this.mInputEditText.setImeOptions(oldImeOptions
+					| EditorInfo.IME_ACTION_NONE);
+			break;
+		}
 
-    // ===========================================================
-    // Methods for/from SuperClass/Interfaces
-    // ===========================================================
+		if (this.mMaxLength > 0) {
+			this.mInputEditText
+					.setFilters(new InputFilter[] { new InputFilter.LengthFilter(
+							this.mMaxLength) });
+		}
 
-    // ===========================================================
-    // Methods
-    // ===========================================================
+		final Handler initHandler = new Handler();
+		initHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				Cocos2dxEditBoxDialog.this.mInputEditText.requestFocus();
+				Cocos2dxEditBoxDialog.this.mInputEditText
+						.setSelection(Cocos2dxEditBoxDialog.this.mInputEditText
+								.length());
+				Cocos2dxEditBoxDialog.this.openKeyboard();
+			}
+		}, 200);
 
-    private int convertDipsToPixels(final float pDIPs) {
-        final float scale = this.getContext().getResources().getDisplayMetrics().density;
-        return Math.round(pDIPs * scale);
-    }
+		this.mInputEditText
+				.setOnEditorActionListener(new OnEditorActionListener() {
+					@Override
+					public boolean onEditorAction(final TextView v,
+							final int actionId, final KeyEvent event) {
+						// If user didn't set keyboard type, this callback will
+						// be invoked twice with 'KeyEvent.ACTION_DOWN' and
+						// 'KeyEvent.ACTION_UP'.
+						if (actionId != EditorInfo.IME_NULL
+								|| (actionId == EditorInfo.IME_NULL
+										&& event != null && event.getAction() == KeyEvent.ACTION_DOWN)) {
+							Cocos2dxHelper
+									.setEditTextDialogResult(Cocos2dxEditBoxDialog.this.mInputEditText
+											.getText().toString());
+							Cocos2dxEditBoxDialog.this.closeKeyboard();
+							Cocos2dxEditBoxDialog.this.dismiss();
+							return true;
+						}
+						return false;
+					}
+				});
+		this.mInputEditText.requestLayout();
+	}
 
-    private void openKeyboard() {
-        final InputMethodManager imm = (InputMethodManager) this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(this.mInputEditText, 0);
-    }
+	/*
+ * 
+ * */
 
-    private void closeKeyboard() {
-        final InputMethodManager imm = (InputMethodManager) this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(this.mInputEditText.getWindowToken(), 0);
-    }
+	// ===========================================================
+	// Getter & Setter
+	// ===========================================================
 
-    // ===========================================================
-    // Inner and Anonymous Classes
-    // ===========================================================
+	// ===========================================================
+	// Methods for/from SuperClass/Interfaces
+	// ===========================================================
+
+	// ===========================================================
+	// Methods
+	// ===========================================================
+
+	private int convertDipsToPixels(final float pDIPs) {
+		final float scale = this.getContext().getResources()
+				.getDisplayMetrics().density;
+		return Math.round(pDIPs * scale);
+	}
+
+	private void openKeyboard() {
+		final InputMethodManager imm = (InputMethodManager) this.getContext()
+				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,
+				InputMethodManager.HIDE_IMPLICIT_ONLY);
+		imm.showSoftInput(this.mInputEditText, 0);
+	}
+
+	private void closeKeyboard() {
+		final InputMethodManager imm = (InputMethodManager) this.getContext()
+				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(this.mInputEditText.getWindowToken(), 0);
+	}
+
+	// ===========================================================
+	// Inner and Anonymous Classes
+	// ===========================================================
 }

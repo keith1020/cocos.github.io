@@ -1,25 +1,24 @@
+
+
 #ifndef __TestCpp__CustomImageScene__
 #define __TestCpp__CustomImageScene__
 
 #include "cocos2d.h"
 #include "extensions/cocos-ext.h"
-#include "BaseTest.h"
+#include "../../../../testBasic.h"
 
 class CustomImageLayer : public cocos2d::Layer
 {
 public:
-    CREATE_FUNC(CustomImageLayer);
-
-    virtual bool init() override;
+    virtual void onEnter();
 };
 
-class CustomImageScene : public TestCase
+class CustomImageScene : public TestScene
 {
 public:
-    CREATE_FUNC(CustomImageScene);
-
-    virtual bool init() override;
-    virtual std::string title() const override { return getTestCaseName(); }
+    virtual void onEnter();
+    virtual void runThisTest();
+    void BackCallback(cocos2d::Ref* pSender);
 };
 
 #endif /* defined(__TestCpp__CustomUIScene__) */

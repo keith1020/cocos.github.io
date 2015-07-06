@@ -1,6 +1,5 @@
 /**
  Copyright 2013 BlackBerry Inc.
- Copyright (c) 2014-2015 Chukong Technologies
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -31,11 +30,6 @@
 #include <xmmintrin.h>
 #endif
 
-/**
- * @addtogroup base
- * @{
- */
-
 NS_CC_MATH_BEGIN
 
 //class Plane;
@@ -46,10 +40,10 @@ NS_CC_MATH_BEGIN
  * Vectors are treated as columns, resulting in a matrix that is represented as follows,
  * where x, y and z are the translation components of the matrix:
  *
- *     1  0  0  x
- *     0  1  0  y
- *     0  0  1  z
- *     0  0  0  1
+ * 1  0  0  x
+ * 0  1  0  y
+ * 0  0  1  z
+ * 0  0  0  1
  *
  * This matrix class is directly compatible with OpenGL since its elements are
  * laid out in memory exactly as they are expected by OpenGL.
@@ -98,14 +92,13 @@ public:
     float m[16];
 #endif
 
-    /** 
-     * Default constructor.
+    /**
      * Constructs a matrix initialized to the identity matrix:
      *
-     *     1  0  0  0
-     *     0  1  0  0
-     *     0  0  1  0
-     *     0  0  0  1
+     * 1  0  0  0
+     * 0  1  0  0
+     * 0  0  1  0
+     * 0  0  0  1
      */
     Mat4();
 
@@ -281,9 +274,12 @@ public:
                                 const Vec3& cameraUpVector, const Vec3& cameraForwardVector,
                                 Mat4* dst);
 
-    //Fills in an existing Mat4 so that it reflects the coordinate system about a specified Plane.
-    //plane The Plane about which to create a reflection.
-    //dst A matrix to store the result in.
+    /**
+     * Fills in an existing Mat4 so that it reflects the coordinate system about a specified Plane.
+     *
+     * @param plane The Plane about which to create a reflection.
+     * @param dst A matrix to store the result in.
+     */
     //static void createReflection(const Plane& plane, Mat4* dst);
 
     /**
@@ -488,7 +484,11 @@ public:
     bool inverse();
 
     /**
-     * Get the inversed matrix.
+     * Stores the inverse of this matrix in the specified matrix.
+     *
+     * @param dst A matrix to store the invert of this matrix in.
+     * 
+     * @return true if the the matrix can be inverted, false otherwise.
      */
     Mat4 getInversed() const;
 
@@ -545,7 +545,9 @@ public:
     void negate();
 
     /**
-     Get the Negated matrix.
+     * Negates this matrix and stores the result in dst.
+     *
+     * @param dst A matrix to store the result in.
      */
     Mat4 getNegated() const;
 
@@ -864,7 +866,9 @@ public:
     void transpose();
 
     /**
-     * Get the Transposed matrix.
+     * Transposes this matrix and stores the result in dst.
+     *
+     * @param dst A matrix to store the result in.
      */
     Mat4 getTransposed() const;
 
@@ -988,10 +992,7 @@ inline Vec4& operator*=(Vec4& v, const Mat4& m);
 inline const Vec4 operator*(const Mat4& m, const Vec4& v);
 
 NS_CC_MATH_END
-/**
- end of base group
- @}
- */
+
 #include "math/Mat4.inl"
 
 #endif // MATH_MAT4_H

@@ -27,17 +27,15 @@
 
 #include "../UIScene.h"
 
-DEFINE_TEST_SUITE(UIWidgetAddNodeTests);
-
 class UIWidgetAddNodeTest : public UIScene
 {
 public:
-    CREATE_FUNC(UIWidgetAddNodeTest);
-
     UIWidgetAddNodeTest();
     ~UIWidgetAddNodeTest();
-
-    virtual bool init() override;
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UIWidgetAddNodeTest)
 };
 
 #endif /* defined(__TestCpp__UINodeContainerTest__) */

@@ -67,15 +67,15 @@ public:
 
     //void resize(int width, int height);
 
-    float getFrameZoomFactor() const override;
+    float getFrameZoomFactor() const;
     //void centerWindow();
 
-    virtual void setViewPortInPoints(float x , float y , float w , float h) override;
-    virtual void setScissorInPoints(float x , float y , float w , float h) override;
+    virtual void setViewPortInPoints(float x , float y , float w , float h);
+    virtual void setScissorInPoints(float x , float y , float w , float h);
 
 
-    bool windowShouldClose() override;
-    void pollEvents() override;
+    bool windowShouldClose();
+    void pollEvents();
     GLFWwindow* getWindow() const { return _mainWindow; }
 
     /* override functions */
@@ -88,11 +88,8 @@ public:
     /*
      * Set zoom factor for frame. This method is for debugging big resolution (e.g.new ipad) app on desktop.
      */
-    void setFrameZoomFactor(float zoomFactor) override;
-    /**
-     * Hide or Show the mouse cursor if there is one.
-     */
-    virtual void setCursorVisible(bool isVisible) override;
+    void setFrameZoomFactor(float zoomFactor);
+
     /** Retina support is disabled by default
      *  @note This method is only available on Mac.
      */
@@ -101,7 +98,7 @@ public:
     bool isRetinaEnabled() const { return _isRetinaEnabled; };
     
     /** Get retina factor */
-    int getRetinaFactor() const override { return _retinaFactor; }
+    int getRetinaFactor() const { return _retinaFactor; }
     
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
     HWND getWin32Window() { return glfwGetWin32Window(_mainWindow); }

@@ -15,33 +15,18 @@
 -- @function [parent=#Frame] setNode 
 -- @param self
 -- @param #cc.Node node
--- @return Frame#Frame self (return value: ccs.Frame)
         
 --------------------------------
 -- 
 -- @function [parent=#Frame] setTimeline 
 -- @param self
 -- @param #ccs.Timeline timeline
--- @return Frame#Frame self (return value: ccs.Frame)
         
 --------------------------------
 -- 
 -- @function [parent=#Frame] isEnterWhenPassed 
 -- @param self
 -- @return bool#bool ret (return value: bool)
-        
---------------------------------
--- 
--- @function [parent=#Frame] getEasingParams 
--- @param self
--- @return array_table#array_table ret (return value: array_table)
-        
---------------------------------
--- 
--- @function [parent=#Frame] setEasingParams 
--- @param self
--- @param #array_table easingParams
--- @return Frame#Frame self (return value: ccs.Frame)
         
 --------------------------------
 -- 
@@ -54,7 +39,6 @@
 -- @function [parent=#Frame] apply 
 -- @param self
 -- @param #float percent
--- @return Frame#Frame self (return value: ccs.Frame)
         
 --------------------------------
 -- 
@@ -67,14 +51,12 @@
 -- @function [parent=#Frame] setFrameIndex 
 -- @param self
 -- @param #unsigned int frameIndex
--- @return Frame#Frame self (return value: ccs.Frame)
         
 --------------------------------
 -- 
 -- @function [parent=#Frame] setTween 
 -- @param self
 -- @param #bool tween
--- @return Frame#Frame self (return value: ccs.Frame)
         
 --------------------------------
 -- 

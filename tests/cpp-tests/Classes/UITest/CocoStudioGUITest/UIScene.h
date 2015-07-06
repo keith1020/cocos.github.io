@@ -28,21 +28,54 @@
 #include "cocos2d.h"
 #include "extensions/cocos-ext.h"
 #include "ui/CocosGUI.h"
-#include "BaseTest.h"
 
+USING_NS_CC;
+USING_NS_CC_EXT;
+using namespace cocos2d::ui;
 
-class UIScene : public TestCase
+#define UI_SCENE_CREATE_FUNC(UIScene) \
+public: \
+static Scene* sceneWithTitle(const char * title) \
+{ \
+    Scene* pScene = Scene::create(); \
+    UIScene* uiLayer = new (std::nothrow) UIScene(); \
+    if (uiLayer && uiLayer->init()) \
+    { \
+        uiLayer->autorelease(); \
+        uiLayer->getSceneTitle()->setString(title); \
+        pScene->addChild(uiLayer); \
+    } \
+    else \
+    { \
+        CC_SAFE_DELETE(uiLayer); \
+    } \
+    return pScene; \
+}
+
+class UIScene : public Layer
 {
 public:
     UIScene();
     ~UIScene();
-
-    virtual bool init() override;
-    virtual void onEnter() override;
+    bool init();
+    // Menu Callbacks
+    void toCocosGUITestScene(Ref* sender, Widget::TouchEventType type);
+    virtual void previousCallback(Ref* sender, Widget::TouchEventType type);
+    virtual void restartCallback(Ref* sender, Widget::TouchEventType type);
+    virtual void nextCallback(Ref* sender, Widget::TouchEventType type);
+    
+    /** Title label of the scene. */    
+    CC_SYNTHESIZE_READONLY(Text*, _sceneTitle, SceneTitle)
+    
+    UI_SCENE_CREATE_FUNC(UIScene);
+    
 protected:
-    cocos2d::Layer* _uiLayer;
-    cocos2d::ui::Layout* _widget;
-    cocos2d::ui::Text* _sceneTitle;
+    // a selector callback
+    void menuCloseCallback(Ref* sender, Widget::TouchEventType type);
+    
+protected:
+    Layer* _uiLayer;
+    Layout* _widget;
 };
 
 #endif /* defined(__TestCpp__UIScene__) */

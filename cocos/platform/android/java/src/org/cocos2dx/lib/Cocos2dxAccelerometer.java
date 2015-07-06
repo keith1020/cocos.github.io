@@ -50,7 +50,7 @@ public class Cocos2dxAccelerometer implements SensorEventListener {
     private final SensorManager mSensorManager;
     private final Sensor mAccelerometer;
     private final int mNaturalOrientation;
-
+ 
     // ===========================================================
     // Constructors
     // ===========================================================

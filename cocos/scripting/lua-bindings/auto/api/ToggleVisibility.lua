@@ -5,8 +5,7 @@
 -- @parent_module cc
 
 --------------------------------
---  Allocates and initializes the action.<br>
--- return An autoreleased ToggleVisibility object.
+--  Allocates and initializes the action 
 -- @function [parent=#ToggleVisibility] create 
 -- @param self
 -- @return ToggleVisibility#ToggleVisibility ret (return value: cc.ToggleVisibility)
@@ -18,22 +17,15 @@
 -- @return ToggleVisibility#ToggleVisibility ret (return value: cc.ToggleVisibility)
         
 --------------------------------
--- param time In seconds.
+-- param time in seconds
 -- @function [parent=#ToggleVisibility] update 
 -- @param self
 -- @param #float time
--- @return ToggleVisibility#ToggleVisibility self (return value: cc.ToggleVisibility)
         
 --------------------------------
 -- 
 -- @function [parent=#ToggleVisibility] reverse 
 -- @param self
 -- @return ToggleVisibility#ToggleVisibility ret (return value: cc.ToggleVisibility)
-        
---------------------------------
--- 
--- @function [parent=#ToggleVisibility] ToggleVisibility 
--- @param self
--- @return ToggleVisibility#ToggleVisibility self (return value: cc.ToggleVisibility)
         
 return nil

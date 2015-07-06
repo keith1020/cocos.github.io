@@ -385,15 +385,14 @@ void ListView::setDirection(Direction dir)
 {
     switch (dir)
     {
-        case Direction::NONE:
-        case Direction::BOTH:
-            break;
         case Direction::VERTICAL:
             setLayoutType(Type::VERTICAL);
             break;
         case Direction::HORIZONTAL:
             setLayoutType(Type::HORIZONTAL);
             break;
+        case Direction::BOTH:
+            return;
         default:
             return;
             break;
@@ -461,7 +460,7 @@ void ListView::selectedItemEvent(TouchEventType event)
         {
             if (_listViewEventListener && _listViewEventSelector)
             {
-                (_listViewEventListener->*_listViewEventSelector)(this, LISTVIEW_ONSELECTEDITEM_START);
+                (_listViewEventListener->*_listViewEventSelector)(this, LISTVIEW_ONSELECTEDITEM_START,nullptr);
             }
             if (_eventCallback) {
                 _eventCallback(this,EventType::ON_SELECTED_ITEM_START);
@@ -476,7 +475,7 @@ void ListView::selectedItemEvent(TouchEventType event)
         {
             if (_listViewEventListener && _listViewEventSelector)
             {
-                (_listViewEventListener->*_listViewEventSelector)(this, LISTVIEW_ONSELECTEDITEM_END);
+                (_listViewEventListener->*_listViewEventSelector)(this, LISTVIEW_ONSELECTEDITEM_END,nullptr);
             }
             if (_eventCallback) {
                 _eventCallback(this, EventType::ON_SELECTED_ITEM_END);

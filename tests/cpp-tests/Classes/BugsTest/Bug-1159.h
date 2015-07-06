@@ -3,13 +3,13 @@
 
 #include "BugsTest.h"
 
-class Bug1159Layer : public BugsTestBase
+class Bug1159Layer : public BugsTestBaseLayer
 {
 public:
-    virtual bool init() override;
+    virtual bool init();
     virtual void onExit() override;
-
-    void callBack(cocos2d::Ref* sender);
+    static Scene* scene();
+    void callBack(Ref* sender);
 
     CREATE_FUNC(Bug1159Layer);
 };

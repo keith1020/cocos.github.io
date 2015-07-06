@@ -91,6 +91,7 @@ public:
      */
     virtual bool openURL(const std::string &url);
 
+    virtual std::string getMacAddress();
 	/**
 	@brief  This function will be called when the application screen size is changed.
 	@param new width

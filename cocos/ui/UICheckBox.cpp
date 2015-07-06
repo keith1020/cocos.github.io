@@ -46,9 +46,6 @@ _frontCrossDisabledRenderer(nullptr),
 _isSelected(true),
 _checkBoxEventListener(nullptr),
 _checkBoxEventSelector(nullptr),
-_isBackgroundSelectedTextureLoaded(false),
-_isBackgroundDisabledTextureLoaded(false),
-_isFrontCrossDisabledTextureLoaded(false),
 _backGroundTexType(TextureResType::LOCAL),
 _backGroundSelectedTexType(TextureResType::LOCAL),
 _frontCrossTexType(TextureResType::LOCAL),
@@ -57,6 +54,11 @@ _frontCrossDisabledTexType(TextureResType::LOCAL),
 _zoomScale(0.1f),
 _backgroundTextureScaleX(1.0),
 _backgroundTextureScaleY(1.0),
+_backGroundFileName(""),
+_backGroundSelectedFileName(""),
+_frontCrossFileName(""),
+_backGroundDisabledFileName(""),
+_frontCrossDisabledFileName(""),
 _backGroundBoxRendererAdaptDirty(true),
 _backGroundSelectedBoxRendererAdaptDirty(true),
 _frontCrossRendererAdaptDirty(true),
@@ -187,10 +189,11 @@ void CheckBox::loadTextures(const std::string& backGround,
 
 void CheckBox::loadTextureBackGround(const std::string& backGround,TextureResType texType)
 {
-    if (backGround.empty())
+    if (backGround.empty() || (_backGroundFileName == backGround && _backGroundTexType == texType))
     {
         return;
     }
+    _backGroundFileName = backGround;
     _backGroundTexType = texType;
     switch (_backGroundTexType)
     {
@@ -203,34 +206,23 @@ void CheckBox::loadTextureBackGround(const std::string& backGround,TextureResTyp
         default:
             break;
     }
-
-    this->setupBackgroundTexture();
-}
-
-void CheckBox::setupBackgroundTexture()
-{
-
+   
     this->updateChildrenDisplayedRGBA();
 
     updateContentSizeWithTextureSize(_backGroundBoxRenderer->getContentSize());
     _backGroundBoxRendererAdaptDirty = true;
 }
 
-void CheckBox::loadTextureBackGround(SpriteFrame* spriteFrame)
-{
-    _backGroundBoxRenderer->setSpriteFrame(spriteFrame);
-    this->setupBackgroundTexture();
-}
-
 void CheckBox::loadTextureBackGroundSelected(const std::string& backGroundSelected,TextureResType texType)
 {
-    if (backGroundSelected.empty())
+    if (backGroundSelected.empty() ||
+        (_backGroundSelectedFileName == backGroundSelected && _backGroundSelectedTexType == texType))
     {
         return;
     }
     
+    _backGroundSelectedFileName = backGroundSelected;
     _backGroundSelectedTexType = texType;
-    _isBackgroundSelectedTextureLoaded = true;
     switch (_backGroundSelectedTexType)
     {
         case TextureResType::LOCAL:
@@ -242,27 +234,19 @@ void CheckBox::loadTextureBackGroundSelected(const std::string& backGroundSelect
         default:
             break;
     }
-    this->setupBackgroundSelectedTexture();
-}
-
-void CheckBox::loadTextureBackGroundSelected(SpriteFrame* spriteframe)
-{
-    this->_backGroundSelectedBoxRenderer->setSpriteFrame(spriteframe);
-    this->setupBackgroundSelectedTexture();
-}
-
-void CheckBox::setupBackgroundSelectedTexture()
-{
+  
     this->updateChildrenDisplayedRGBA();
+
     _backGroundSelectedBoxRendererAdaptDirty = true;
 }
 
 void CheckBox::loadTextureFrontCross(const std::string& cross,TextureResType texType)
 {
-    if (cross.empty())
+    if (cross.empty() || (_frontCrossFileName == cross && _frontCrossTexType == texType))
     {
         return;
     }
+    _frontCrossFileName = cross;
     _frontCrossTexType = texType;
     switch (_frontCrossTexType)
     {
@@ -275,29 +259,21 @@ void CheckBox::loadTextureFrontCross(const std::string& cross,TextureResType tex
         default:
             break;
     }
-    this->setupFrontCrossTexture();
-}
-
-void CheckBox::loadTextureFrontCross(SpriteFrame* spriteFrame)
-{
-    this->_frontCrossRenderer->setSpriteFrame(spriteFrame);
-    this->setupFrontCrossTexture();
-}
-
-void CheckBox::setupFrontCrossTexture()
-{
+   
     this->updateChildrenDisplayedRGBA();
+
     _frontCrossRendererAdaptDirty = true;
 }
 
 void CheckBox::loadTextureBackGroundDisabled(const std::string& backGroundDisabled,TextureResType texType)
 {
-    if (backGroundDisabled.empty())
+    if (backGroundDisabled.empty() ||
+        (_backGroundDisabledFileName == backGroundDisabled && _backGroundDisabledTexType == texType))
     {
         return;
     }
+    _backGroundDisabledFileName = backGroundDisabled;
     _backGroundDisabledTexType = texType;
-    _isBackgroundDisabledTextureLoaded = true;
     switch (_backGroundDisabledTexType)
     {
         case TextureResType::LOCAL:
@@ -309,17 +285,7 @@ void CheckBox::loadTextureBackGroundDisabled(const std::string& backGroundDisabl
         default:
             break;
     }
-    this->setupBackgroundDisable();
-}
-
-void CheckBox::loadTextureBackGroundDisabled(SpriteFrame* spriteframe)
-{
-    this->_backGroundBoxDisabledRenderer->setSpriteFrame(spriteframe);
-    this->setupBackgroundDisable();
-}
-
-void CheckBox::setupBackgroundDisable()
-{
+   
     this->updateChildrenDisplayedRGBA();
 
     _backGroundBoxDisabledRendererAdaptDirty = true;
@@ -327,12 +293,13 @@ void CheckBox::setupBackgroundDisable()
 
 void CheckBox::loadTextureFrontCrossDisabled(const std::string& frontCrossDisabled,TextureResType texType)
 {
-    if (frontCrossDisabled.empty())
+    if (frontCrossDisabled.empty() ||
+        (_frontCrossDisabledFileName == frontCrossDisabled && _frontCrossDisabledTexType == texType))
     {
         return;
     }
+    _frontCrossDisabledFileName = frontCrossDisabled;
     _frontCrossDisabledTexType = texType;
-    _isFrontCrossDisabledTextureLoaded = true;
     switch (_frontCrossDisabledTexType)
     {
         case TextureResType::LOCAL:
@@ -344,26 +311,16 @@ void CheckBox::loadTextureFrontCrossDisabled(const std::string& frontCrossDisabl
         default:
             break;
     }
-    this->setupFrontCrossDisableTexture();
   
-}
-
-void CheckBox::loadTextureFrontCrossDisabled(SpriteFrame* spriteframe)
-{
-    this->_frontCrossDisabledRenderer->setSpriteFrame(spriteframe);
-    this->setupFrontCrossDisableTexture();
-}
-
-void CheckBox::setupFrontCrossDisableTexture()
-{
     this->updateChildrenDisplayedRGBA();
+
     _frontCrossDisabledRendererAdaptDirty = true;
 }
 
 
-void CheckBox::releaseUpEvent()
+void CheckBox::releaseUpEvent(Touch *touch)
 {
-    Widget::releaseUpEvent();
+    Widget::releaseUpEvent(touch);
     
     if (_isSelected)
     {
@@ -404,7 +361,7 @@ void CheckBox::onPressStateChangedToPressed()
     _backGroundBoxRenderer->setGLProgramState(this->getNormalGLProgramState());
     _frontCrossRenderer->setGLProgramState(this->getNormalGLProgramState());
     
-    if (!_isBackgroundSelectedTextureLoaded)
+    if (_backGroundSelectedFileName.empty())
     {
         _backGroundBoxRenderer->setScale(_backgroundTextureScaleX + _zoomScale,
                                          _backgroundTextureScaleY + _zoomScale);
@@ -422,8 +379,7 @@ void CheckBox::onPressStateChangedToPressed()
 
 void CheckBox::onPressStateChangedToDisabled()
 {
-    if (!_isBackgroundDisabledTextureLoaded
-        || !_isFrontCrossDisabledTextureLoaded)
+    if (_backGroundDisabledFileName.empty() || _frontCrossDisabledFileName.empty())
     {
         _backGroundBoxRenderer->setGLProgramState(this->getGrayGLProgramState());
         _frontCrossRenderer->setGLProgramState(this->getGrayGLProgramState());
@@ -697,11 +653,11 @@ void CheckBox::copySpecialProperties(Widget *widget)
     CheckBox* checkBox = dynamic_cast<CheckBox*>(widget);
     if (checkBox)
     {
-        loadTextureBackGround(checkBox->_backGroundBoxRenderer->getSpriteFrame());
-        loadTextureBackGroundSelected(checkBox->_backGroundSelectedBoxRenderer->getSpriteFrame());
-        loadTextureFrontCross(checkBox->_frontCrossRenderer->getSpriteFrame());
-        loadTextureBackGroundDisabled(checkBox->_backGroundBoxDisabledRenderer->getSpriteFrame());
-        loadTextureFrontCrossDisabled(checkBox->_frontCrossDisabledRenderer->getSpriteFrame());
+        loadTextureBackGround(checkBox->_backGroundFileName, checkBox->_backGroundTexType);
+        loadTextureBackGroundSelected(checkBox->_backGroundSelectedFileName, checkBox->_backGroundSelectedTexType);
+        loadTextureFrontCross(checkBox->_frontCrossFileName, checkBox->_frontCrossTexType);
+        loadTextureBackGroundDisabled(checkBox->_backGroundDisabledFileName, checkBox->_backGroundDisabledTexType);
+        loadTextureFrontCrossDisabled(checkBox->_frontCrossDisabledFileName, checkBox->_frontCrossDisabledTexType);
         setSelected(checkBox->_isSelected);
         _checkBoxEventListener = checkBox->_checkBoxEventListener;
         _checkBoxEventSelector = checkBox->_checkBoxEventSelector;
@@ -710,9 +666,6 @@ void CheckBox::copySpecialProperties(Widget *widget)
         _zoomScale = checkBox->_zoomScale;
         _backgroundTextureScaleX = checkBox->_backgroundTextureScaleX;
         _backgroundTextureScaleY = checkBox->_backgroundTextureScaleY;
-        _isBackgroundSelectedTextureLoaded = checkBox->_isBackgroundSelectedTextureLoaded;
-        _isBackgroundDisabledTextureLoaded = checkBox->_isBackgroundDisabledTextureLoaded;
-        _isFrontCrossDisabledTextureLoaded = checkBox->_isFrontCrossDisabledTextureLoaded;
     }
 }
 

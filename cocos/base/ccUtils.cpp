@@ -51,7 +51,7 @@ namespace utils
 /**
  * Capture screen implementation, don't use it directly.
  */
-void onCaptureScreen(const std::function<void(bool, const std::string&)>& afterCaptured, const std::string& filename)
+void onCaptureScreen(const std::function<void(bool, const std::string&)>& afterCaptured, const std::string& filename , int maxWidth, int maxHeight )
 {
     auto glView = Director::getInstance()->getOpenGLView();
     auto frameSize = glView->getFrameSize();
@@ -61,9 +61,10 @@ void onCaptureScreen(const std::function<void(bool, const std::string&)>& afterC
     
     int width = static_cast<int>(frameSize.width);
     int height = static_cast<int>(frameSize.height);
-    
+	
     bool succeed = false;
     std::string outputFile = "";
+
     
     do
     {
@@ -74,23 +75,92 @@ void onCaptureScreen(const std::function<void(bool, const std::string&)>& afterC
         }
         
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
+        // The frame buffer is always created with portrait orientation on WP8. 
+        // So if the current device orientation is landscape, we need to rotate the frame buffer.  
+        auto renderTargetSize = glView->getRenerTargetSize();
+        CCASSERT(width * height == static_cast<int>(renderTargetSize.width * renderTargetSize.height), "The frame size is not matched");
+        glReadPixels(0, 0, (int)renderTargetSize.width, (int)renderTargetSize.height, GL_RGBA, GL_UNSIGNED_BYTE, buffer.get());
+#else
         glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer.get());
-        
-        std::shared_ptr<GLubyte> flippedBuffer(new GLubyte[width * height * 4], [](GLubyte* p) { CC_SAFE_DELETE_ARRAY(p); });
+#endif
+		int newWidth = width;
+		int newHeight= height;
+		bool needScale = false;
+		if( maxWidth >= width && maxHeight >= height )
+		{
+			needScale = false;
+		}
+		else
+		{
+			needScale = true;
+			float scaleRateWidth  = maxWidth  / (width * 1.0f);
+			float scaleRateHeight = maxHeight / (height * 1.0f);
+			if( scaleRateWidth < scaleRateHeight )
+			{
+				newWidth  = newWidth * scaleRateWidth;
+				newHeight = newHeight * scaleRateWidth;
+			}
+			else
+			{
+				newWidth  = newWidth * scaleRateHeight;
+				newHeight = newHeight * scaleRateHeight;
+			}
+		}
+        std::shared_ptr<GLubyte> flippedBuffer(new GLubyte[newWidth * newHeight * 4], [](GLubyte* p) { CC_SAFE_DELETE_ARRAY(p); });
         if (!flippedBuffer)
         {
             break;
         }
 
-        for (int row = 0; row < height; ++row)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
+        if (width == static_cast<int>(renderTargetSize.width))
         {
-            memcpy(flippedBuffer.get() + (height - row - 1) * width * 4, buffer.get() + row * width * 4, width * 4);
+            // The current device orientation is portrait.
+            for (int row = 0; row < height; ++row)
+            {
+                memcpy(flippedBuffer.get() + (height - row - 1) * width * 4, buffer.get() + row * width * 4, width * 4);
+            }
         }
+        else
+        {
+            // The current device orientation is landscape.
+            for (int row = 0; row < width; ++row)
+            {
+                for (int col = 0; col < height; ++col)
+                {
+                    *(int*)(flippedBuffer.get() + (height - col - 1) * width * 4 + row * 4) = *(int*)(buffer.get() + row * height * 4 + col * 4);
+                }
+            }     
+        }
+#else
+		if( false == needScale )
+		{
+			for (int row = 0; row < height; ++row)
+			{
+				memcpy(flippedBuffer.get() + (height - row - 1) * width * 4, buffer.get() + row * width * 4, width * 4);
+			}
+		}
+		else
+		{
+			for (int row = 0; row < newHeight; ++row)
+			{
+				for (int col = 0; col < newWidth; ++col)
+				{
+					int oldRow = row * height / newHeight;
+					int oldCol = col * width / newWidth;
+
+					*(int*)(flippedBuffer.get() + (newHeight - row - 1) * newWidth * 4 + col * 4) = *(int*)(buffer.get() + oldRow * width * 4 + oldCol * 4);
+				}
+			}
+		}
+#endif
 
         std::shared_ptr<Image> image(new Image);
         if (image)
         {
-            image->initWithRawData(flippedBuffer.get(), width * height * 4, width, height, 8);
+            image->initWithRawData(flippedBuffer.get(), newWidth * newHeight * 4, newWidth, newHeight, 8);
             if (FileUtils::getInstance()->isAbsolutePath(filename))
             {
                 outputFile = filename;
@@ -112,11 +182,11 @@ void onCaptureScreen(const std::function<void(bool, const std::string&)>& afterC
 /*
  * Capture screen interface
  */
-void captureScreen(const std::function<void(bool, const std::string&)>& afterCaptured, const std::string& filename)
+void captureScreen(const std::function<void(bool, const std::string&)>& afterCaptured, const std::string& filename,int maxWidth, int maxHeight)
 {
     static CustomCommand captureScreenCommand;
     captureScreenCommand.init(std::numeric_limits<float>::max());
-    captureScreenCommand.func = std::bind(onCaptureScreen, afterCaptured, filename);
+    captureScreenCommand.func = std::bind(onCaptureScreen, afterCaptured, filename,maxWidth,maxHeight);
     Director::getInstance()->getRenderer()->addCommand(&captureScreenCommand);
 }
     
@@ -159,13 +229,6 @@ double gettime()
     gettimeofday(&tv, nullptr);
 
     return (double)tv.tv_sec + (double)tv.tv_usec/1000000;
-}
-
-long long getTimeInMilliseconds()
-{
-    struct timeval tv;
-    gettimeofday (&tv, NULL);
-    return tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
 
 Rect getCascadeBoundingBox(Node *node)

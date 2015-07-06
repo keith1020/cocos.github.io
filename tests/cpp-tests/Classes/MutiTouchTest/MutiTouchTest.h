@@ -1,21 +1,25 @@
 #ifndef __MUTITOUCHTEST_H__
 #define __MUTITOUCHTEST_H__
 
-#include "../BaseTest.h"
+#include "../testBasic.h"
 
-DEFINE_TEST_SUITE(MutiTouchTests);
-
-class MutiTouchTest : public TestCase
+class MutiTouchTestLayer : public Layer
 {
 public:
-    CREATE_FUNC(MutiTouchTest);
+    bool init();
 
-    virtual bool init() override;
+    void onTouchesBegan(const std::vector<Touch*>& touches, cocos2d::Event  *event);
+    void onTouchesMoved(const std::vector<Touch*>& touches, cocos2d::Event  *event);
+    void onTouchesEnded(const std::vector<Touch*>& touches, cocos2d::Event  *event);
+    void onTouchesCancelled(const std::vector<Touch*>& touches, cocos2d::Event  *event);
 
-    void onTouchesBegan(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event  *event);
-    void onTouchesMoved(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event  *event);
-    void onTouchesEnded(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event  *event);
-    void onTouchesCancelled(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event  *event);
+    CREATE_FUNC(MutiTouchTestLayer)
+};
+
+class MutiTouchTestScene : public TestScene
+{
+ public:
+  virtual void runThisTest();
 };
 
 #endif /* __MUTITOUCHTEST_H__ */

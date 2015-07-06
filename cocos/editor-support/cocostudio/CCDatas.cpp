@@ -223,7 +223,8 @@ DisplayData *BoneData::getDisplayData(int index)
 
 
 ArmatureData::ArmatureData()
-    : dataVersion(0.1f)
+    : dataVersion(0.1f),
+	  frameRate( 60 )
 {
 }
 

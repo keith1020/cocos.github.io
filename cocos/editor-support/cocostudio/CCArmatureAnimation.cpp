@@ -166,20 +166,10 @@ float ArmatureAnimation::getSpeedScale() const
 
 void ArmatureAnimation::play(const std::string& animationName, int durationTo,  int loop)
 {
-    if (animationName.empty())
-    {
-        CCLOG("_animationData can not be null");
-        return;
-    }
-//    CCASSERT(_animationData, "_animationData can not be null");
+    CCASSERT(_animationData, "_animationData can not be null");
 
     _movementData = _animationData->getMovement(animationName.c_str());
-    if (nullptr == _movementData)
-    {
-        CCLOG("_movementData can not be null");
-        return;
-    }
-//    CCASSERT(_movementData, "_movementData can not be null");
+    CCASSERT(_movementData, "_movementData can not be null");
 
     //! Get key frame count
     _rawDuration = _movementData->duration;
@@ -232,6 +222,12 @@ void ArmatureAnimation::play(const std::string& animationName, int durationTo,  
         {
             _tweenList.pushBack(tween);
             movementBoneData->duration = _movementData->duration;
+
+			ArmatureData* armatureData = _armature->getArmatureData();
+			if( armatureData && armatureData->frameRate > 0 )
+			{
+				tween->setAnimationInternal( 1.0 / armatureData->frameRate );
+			}
             tween->play(movementBoneData, durationTo, durationTween, loop, tweenEasing);
 
             tween->setProcessScale(_processScale);
@@ -460,12 +456,14 @@ void ArmatureAnimation::updateHandler()
     }
 }
 
-std::string ArmatureAnimation::getCurrentMovementID() const
+const std::string& ArmatureAnimation::getCurrentMovementID() const
 {
     if (_isComplete)
-    {
         return "";
-    }
+    return _movementID;
+}
+const std::string& ArmatureAnimation::GetLastMovementID() const
+{
     return _movementID;
 }
 

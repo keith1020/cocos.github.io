@@ -45,7 +45,7 @@ THE SOFTWARE.
 #include "renderer/CCGLProgram.h"
 #include "renderer/ccGLStateCache.h"
 #include "renderer/CCGLProgramCache.h"
-#include "base/CCNinePatchImageParser.h"
+
 #include "deprecated/CCString.h"
 
 
@@ -435,7 +435,12 @@ Texture2D::Texture2D()
 , _hasMipmaps(false)
 , _shaderProgram(nullptr)
 , _antialiasEnabled(true)
-, _ninePatchInfo(nullptr)
+,_idleCount(0)
+,_isCreatedByFile(false)
+,_isPrepared2Draw(false)
+,_isReleasedByOpt(false)
+,_openGLMemory( 0 )
+,_isInOptLogic(false)
 {
 }
 
@@ -448,21 +453,24 @@ Texture2D::~Texture2D()
     CCLOGINFO("deallocing Texture2D: %p - id=%u", this, _name);
     CC_SAFE_RELEASE(_shaderProgram);
 
-    CC_SAFE_DELETE(_ninePatchInfo);
-
     if(_name)
     {
         GL::deleteTexture(_name);
     }
 }
 
-void Texture2D::releaseGLTexture()
+void Texture2D::releaseGLTexture( bool b )
 {
     if(_name)
     {
         GL::deleteTexture(_name);
     }
+	_isReleasedByOpt = b;
     _name = 0;
+	if( true == b )
+	{
+		CCLOG("OPT release texture: %s", _imageFullpath.c_str());
+	}
 }
 
 
@@ -481,10 +489,7 @@ int Texture2D::getPixelsHigh() const
     return _pixelsHigh;
 }
 
-GLuint Texture2D::getName() const
-{
-    return _name;
-}
+
 
 Size Texture2D::getContentSize() const
 {
@@ -550,8 +555,6 @@ bool Texture2D::initWithData(const void *data, ssize_t dataLen, Texture2D::Pixel
 
 bool Texture2D::initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, PixelFormat pixelFormat, int pixelsWide, int pixelsHigh)
 {
-
-
     //the pixelFormat must be a certain value 
     CCASSERT(pixelFormat != PixelFormat::NONE && pixelFormat != PixelFormat::AUTO, "the \"pixelFormat\" param must be a certain value!");
     CCASSERT(pixelsWide>0 && pixelsHigh>0, "Invalid size");
@@ -640,12 +643,7 @@ bool Texture2D::initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, PixelFormat
     }
 #endif
 
-    // clean possible GL error
-    GLenum err = glGetError();
-    if (err != GL_NO_ERROR)
-    {
-        cocos2d::log("OpenGL error 0x%04X in %s %s %d\n", err, __FILE__, __FUNCTION__, __LINE__);
-    }
+    CHECK_GL_ERROR_DEBUG(); // clean possible GL error
     
     // Specify OpenGL texture image
     int width = pixelsWide;
@@ -691,6 +689,8 @@ bool Texture2D::initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, PixelFormat
     _hasPremultipliedAlpha = false;
     _hasMipmaps = mipmapsNum > 1;
 
+	_openGLMemory = _pixelsWide * _pixelsHigh * getBitsPerPixelForFormat() / 4;
+	_isReleasedByOpt = false;
     // shader
     setGLProgram(GLProgramCache::getInstance()->getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE));
     return true;
@@ -1395,61 +1395,74 @@ const Texture2D::PixelFormatInfoMap& Texture2D::getPixelFormatInfoMap()
 {
     return _pixelFormatInfoTables;
 }
-
-void Texture2D::addSpriteFrameCapInset(SpriteFrame* spritframe, const Rect& capInsets)
+bool Texture2D::initWithTexturePath( std::string const& texturePath )
 {
-    if(nullptr == _ninePatchInfo)
-    {
-        _ninePatchInfo = new NinePatchInfo;
-    }
-    if(nullptr == spritframe)
-    {
-        _ninePatchInfo->capInsetSize = capInsets;
-    }
-    else
-    {
-        _ninePatchInfo->capInsetMap[spritframe] = capInsets;
-    }
+	_isCreatedByFile = true;
+	_imageFullpath = texturePath;
+	Image* image = nullptr;
+	image = new (std::nothrow) Image();
+	if(nullptr == image)
+	{
+		return false;
+	}
+	bool ret = image->initWithImageFile(_imageFullpath);
+	if( true == ret )
+	{
+		initWithImage( image );
+	}
+	CC_SAFE_RELEASE(image);
+	return true;
 }
-
-bool Texture2D::isContain9PatchInfo()const
+void Texture2D::prepareDraw()
 {
-    return nullptr != _ninePatchInfo;
+	_isPrepared2Draw = true;
+	_isInOptLogic = true;
+	_idleCount = 0;
+	///由图片创建的贴图
+	///并且由优化而删除的贴图
+	if( 0 == _name && 
+		true == _isCreatedByFile && 
+		true == _isReleasedByOpt )
+	{
+		initWithTexturePath( _imageFullpath );
+		CCLOG("OPT reload texture: %s", _imageFullpath.c_str());
+	}
 }
-
-const Rect& Texture2D::getSpriteFrameCapInset( cocos2d::SpriteFrame *spriteFrame )const
+GLuint Texture2D::getName() const
+{	
+	return _name;
+}
+void Texture2D::begin()
 {
-    CCASSERT(_ninePatchInfo != nullptr,
-             "Can't get the sprite frame capInset when the texture contains no 9-patch info.");
-    if(nullptr == spriteFrame)
-    {
-        return this->_ninePatchInfo->capInsetSize;
-    }
-    else
-    {
-        auto &capInsetMap = this->_ninePatchInfo->capInsetMap;
-        if(capInsetMap.find(spriteFrame) != capInsetMap.end())
-        {
-            return capInsetMap.at(spriteFrame);
-        }
-        else
-        {
-            return this->_ninePatchInfo->capInsetSize;
-        }
-    }
+	if( false == _isInOptLogic )
+	{
+		return;
+	}
+	_isDirty = true;
+	if( _isCreatedByFile )
+	{
+		_idleCount ++;
+	}
 }
-
-
-void Texture2D::removeSpriteFrameCapInset(SpriteFrame* spriteFrame)
+void Texture2D::end()
 {
-    if(nullptr != this->_ninePatchInfo)
-    {
-        auto capInsetMap = this->_ninePatchInfo->capInsetMap;
-        if(capInsetMap.find(spriteFrame) != capInsetMap.end())
-        {
-            capInsetMap.erase(spriteFrame);
-        }
-    }
+	if( false == _isInOptLogic )
+	{
+		return;
+	}
+	_isDirty = false;
+	_isPrepared2Draw = false;
 }
-
+int Texture2D::getIdleCnt() const
+{
+	return _idleCount;
+}
+int Texture2D::getOpenGLMemory() const
+{
+	return _openGLMemory;
+}
+bool Texture2D::isInOptLogic() const
+{
+	return _isInOptLogic;
+}
 NS_CC_END

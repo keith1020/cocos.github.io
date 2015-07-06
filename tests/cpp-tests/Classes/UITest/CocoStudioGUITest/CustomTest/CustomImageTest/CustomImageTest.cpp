@@ -1,3 +1,5 @@
+
+
 #include "CustomImageTest.h"
 #include "../../CustomGUIScene.h"
 #include "../../CustomWidget/CustomImageView.h"
@@ -7,42 +9,57 @@
 
 USING_NS_CC;
 USING_NS_CC_EXT;
-using namespace cocos2d::ui;
-using namespace cocostudio;
+
 
 // CustomImageLayer
-bool CustomImageLayer::init()
+
+
+void CustomImageLayer::onEnter()
 {
-    if (Layer::init())
-    {
-        GUIReader* guiReader = GUIReader::getInstance();
-        guiReader->registerTypeAndCallBack("CustomImageView",
-            &CustomImageView::createInstance,
-            CustomImageViewReader::getInstance(),
-            parseselector(CustomImageViewReader::setProperties));
-
-        Layout* layout = static_cast<Layout*>(cocostudio::GUIReader::getInstance()->widgetFromJsonFile("cocosui/CustomImageViewTest/NewProject_2_1.ExportJson"));
-        addChild(layout);
-
-        return true;
-    }
+    Layer::onEnter();
     
-    return false;
+    GUIReader* guiReader = GUIReader::getInstance();
+    guiReader->registerTypeAndCallBack("CustomImageView",
+                                       &CustomImageView::createInstance,
+                                       CustomImageViewReader::getInstance(),
+                                       parseselector(CustomImageViewReader::setProperties));
+    
+    Layout* layout = static_cast<Layout*>(cocostudio::GUIReader::getInstance()->widgetFromJsonFile("cocosui/CustomImageViewTest/NewProject_2_1.ExportJson"));
+    addChild(layout);        
 }
 
 
 // CustomImageScene
 
 
-bool CustomImageScene::init()
+void CustomImageScene::onEnter()
 {
-    if (TestCase::init())
-    {
-        addChild(CustomImageLayer::create());
-
-        return true;
-    }
-
-    return false;
+    CCScene::onEnter();
+    
+    auto label = Label::createWithTTF("Back", "fonts/arial.ttf", 20);
+    //#endif
+    MenuItemLabel* pMenuItem = MenuItemLabel::create(label, CC_CALLBACK_1(CustomImageScene::BackCallback, this));
+    
+    Menu* pMenu = Menu::create(pMenuItem, nullptr);
+    
+    pMenu->setPosition( Vec2::ZERO );
+    pMenuItem->setPosition(VisibleRect::right().x - 50, VisibleRect::bottom().y + 25);
+    
+    addChild(pMenu, 1);
 }
 
+void CustomImageScene::runThisTest()
+{
+    Layer* pLayer = new (std::nothrow) CustomImageLayer();
+    addChild(pLayer);
+    pLayer->release();
+    
+    CCDirector::getInstance()->replaceScene(this);
+}
+
+void CustomImageScene::BackCallback(Ref* pSender)
+{
+    CustomGUITestScene* pScene = new (std::nothrow) CustomGUITestScene();
+    pScene->runThisTest();
+    pScene->release();
+}

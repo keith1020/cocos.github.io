@@ -21,7 +21,6 @@
 -- @function [parent=#ComController] setEnabled 
 -- @param self
 -- @param #bool b
--- @return ComController#ComController self (return value: ccs.ComController)
         
 --------------------------------
 -- 
@@ -30,18 +29,10 @@
 -- @return bool#bool ret (return value: bool)
         
 --------------------------------
--- js NA<br>
--- lua NA
--- @function [parent=#ComController] onRemove 
--- @param self
--- @return ComController#ComController self (return value: ccs.ComController)
-        
---------------------------------
 -- 
 -- @function [parent=#ComController] update 
 -- @param self
 -- @param #float delta
--- @return ComController#ComController self (return value: ccs.ComController)
         
 --------------------------------
 -- 
@@ -50,16 +41,8 @@
 -- @return bool#bool ret (return value: bool)
         
 --------------------------------
--- js NA<br>
--- lua NA
--- @function [parent=#ComController] onAdd 
--- @param self
--- @return ComController#ComController self (return value: ccs.ComController)
-        
---------------------------------
 -- js ctor
 -- @function [parent=#ComController] ComController 
 -- @param self
--- @return ComController#ComController self (return value: ccs.ComController)
         
 return nil

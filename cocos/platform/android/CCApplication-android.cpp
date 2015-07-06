@@ -184,14 +184,6 @@ LanguageType Application::getCurrentLanguage()
     {
         ret = LanguageType::UKRAINIAN;
     }
-    else if (0 == strcmp("ro", pLanguageName))
-    {
-        ret = LanguageType::ROMANIAN;
-    }
-    else if (0 == strcmp("bg", pLanguageName))
-    {
-        ret = LanguageType::BULGARIAN;
-    }
     return ret;
 }
 
@@ -205,6 +197,11 @@ bool Application::openURL(const std::string &url)
     return openURLJNI(url.c_str());
 }
 
+std::string Application::getMacAddress()
+{
+    CCLOG("Application::getMacAddress()");
+    return getMacAddressJNI();
+}
 void Application::applicationScreenSizeChanged(int newWidth, int newHeight) {
 
 }

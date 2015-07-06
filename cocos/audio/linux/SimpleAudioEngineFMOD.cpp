@@ -46,10 +46,7 @@ SimpleAudioEngine* SimpleAudioEngine::getInstance() {
 }
 
 void SimpleAudioEngine::end() {
-    if(oAudioPlayer)
-    {
-        oAudioPlayer->close();
-    }
+	oAudioPlayer->close();
 }
 
 //////////////////////////////////////////////////////////////////////////

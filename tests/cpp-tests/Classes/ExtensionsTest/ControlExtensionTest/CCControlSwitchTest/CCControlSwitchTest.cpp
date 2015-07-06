@@ -26,9 +26,6 @@
 
 #include "CCControlSwitchTest.h"
 
-USING_NS_CC;
-USING_NS_CC_EXT;
-
 ControlSwitchTest::~ControlSwitchTest()
 {
     CC_SAFE_RELEASE(_displayValueLabel);

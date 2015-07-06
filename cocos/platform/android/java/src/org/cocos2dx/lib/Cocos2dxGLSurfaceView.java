@@ -24,6 +24,7 @@ THE SOFTWARE.
 package org.cocos2dx.lib;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.os.Message;
@@ -55,7 +56,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 
     private Cocos2dxRenderer mCocos2dxRenderer;
     private Cocos2dxEditText mCocos2dxEditText;
-
+    private int mOrientation;
     // ===========================================================
     // Constructors
     // ===========================================================
@@ -150,6 +151,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
             this.requestFocus();
         }
     }
+    
 
     // ===========================================================
     // Methods for/from SuperClass/Interfaces
@@ -163,6 +165,14 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
             @Override
             public void run() {
                 Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleOnResume();
+            }
+        });
+    }
+    public void onUserPresent() {
+        this.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleOnUserPresent();
             }
         });
     }
@@ -284,7 +294,16 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
     @Override
     protected void onSizeChanged(final int pNewSurfaceWidth, final int pNewSurfaceHeight, final int pOldSurfaceWidth, final int pOldSurfaceHeight) {
         if(!this.isInEditMode()) {
-            this.mCocos2dxRenderer.setScreenWidthAndHeight(pNewSurfaceWidth, pNewSurfaceHeight);
+        	int realWidth = pNewSurfaceWidth;
+        	int realHeight= pNewSurfaceHeight;
+        	if( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE == mOrientation ){
+        		if( realWidth < realHeight ){
+        			int t = realHeight;
+        			realHeight= realWidth;
+        			realWidth = t;
+        		}
+        	}
+            this.mCocos2dxRenderer.setScreenWidthAndHeight(realWidth, realHeight);
         }
     }
 
@@ -350,6 +369,9 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
                 Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleDeleteBackward();
             }
         });
+    }
+    public void setOrientation( int o ){
+    	mOrientation = o;
     }
 
     private static void dumpMotionEvent(final MotionEvent event) {

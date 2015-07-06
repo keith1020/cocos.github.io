@@ -6,16 +6,93 @@
 
 --------------------------------
 -- 
--- @function [parent=#ControlSlider] setBackgroundSprite 
+-- @function [parent=#ControlSlider] getSelectedThumbSprite 
+-- @param self
+-- @return Sprite#Sprite ret (return value: cc.Sprite)
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] locationFromTouch 
+-- @param self
+-- @param #cc.Touch touch
+-- @return vec2_table#vec2_table ret (return value: vec2_table)
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] setSelectedThumbSprite 
 -- @param self
 -- @param #cc.Sprite var
--- @return ControlSlider#ControlSlider self (return value: cc.ControlSlider)
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] setProgressSprite 
+-- @param self
+-- @param #cc.Sprite var
         
 --------------------------------
 -- 
 -- @function [parent=#ControlSlider] getMaximumAllowedValue 
 -- @param self
 -- @return float#float ret (return value: float)
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] getMinimumAllowedValue 
+-- @param self
+-- @return float#float ret (return value: float)
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] getMinimumValue 
+-- @param self
+-- @return float#float ret (return value: float)
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] setThumbSprite 
+-- @param self
+-- @param #cc.Sprite var
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] setMinimumValue 
+-- @param self
+-- @param #float val
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] setMinimumAllowedValue 
+-- @param self
+-- @param #float var
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] setEnabled 
+-- @param self
+-- @param #bool enabled
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] setValue 
+-- @param self
+-- @param #float val
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] setMaximumValue 
+-- @param self
+-- @param #float val
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] needsLayout 
+-- @param self
+        
+--------------------------------
+-- 
+-- @function [parent=#ControlSlider] getBackgroundSprite 
+-- @param self
+-- @return Sprite#Sprite ret (return value: cc.Sprite)
         
 --------------------------------
 -- @overload self, cc.Sprite, cc.Sprite, cc.Sprite, cc.Sprite         
@@ -30,48 +107,16 @@
 
 --------------------------------
 -- 
--- @function [parent=#ControlSlider] getMinimumAllowedValue 
--- @param self
--- @return float#float ret (return value: float)
-        
---------------------------------
--- 
 -- @function [parent=#ControlSlider] getMaximumValue 
 -- @param self
 -- @return float#float ret (return value: float)
         
 --------------------------------
 -- 
--- @function [parent=#ControlSlider] getSelectedThumbSprite 
+-- @function [parent=#ControlSlider] isTouchInside 
 -- @param self
--- @return Sprite#Sprite ret (return value: cc.Sprite)
-        
---------------------------------
--- 
--- @function [parent=#ControlSlider] setProgressSprite 
--- @param self
--- @param #cc.Sprite var
--- @return ControlSlider#ControlSlider self (return value: cc.ControlSlider)
-        
---------------------------------
--- 
--- @function [parent=#ControlSlider] setMaximumValue 
--- @param self
--- @param #float val
--- @return ControlSlider#ControlSlider self (return value: cc.ControlSlider)
-        
---------------------------------
--- 
--- @function [parent=#ControlSlider] getMinimumValue 
--- @param self
--- @return float#float ret (return value: float)
-        
---------------------------------
--- 
--- @function [parent=#ControlSlider] setThumbSprite 
--- @param self
--- @param #cc.Sprite var
--- @return ControlSlider#ControlSlider self (return value: cc.ControlSlider)
+-- @param #cc.Touch touch
+-- @return bool#bool ret (return value: bool)
         
 --------------------------------
 -- 
@@ -81,43 +126,9 @@
         
 --------------------------------
 -- 
--- @function [parent=#ControlSlider] getBackgroundSprite 
--- @param self
--- @return Sprite#Sprite ret (return value: cc.Sprite)
-        
---------------------------------
--- 
 -- @function [parent=#ControlSlider] getThumbSprite 
 -- @param self
 -- @return Sprite#Sprite ret (return value: cc.Sprite)
-        
---------------------------------
--- 
--- @function [parent=#ControlSlider] setValue 
--- @param self
--- @param #float val
--- @return ControlSlider#ControlSlider self (return value: cc.ControlSlider)
-        
---------------------------------
--- 
--- @function [parent=#ControlSlider] locationFromTouch 
--- @param self
--- @param #cc.Touch touch
--- @return vec2_table#vec2_table ret (return value: vec2_table)
-        
---------------------------------
--- 
--- @function [parent=#ControlSlider] setMinimumValue 
--- @param self
--- @param #float val
--- @return ControlSlider#ControlSlider self (return value: cc.ControlSlider)
-        
---------------------------------
--- 
--- @function [parent=#ControlSlider] setMinimumAllowedValue 
--- @param self
--- @param #float var
--- @return ControlSlider#ControlSlider self (return value: cc.ControlSlider)
         
 --------------------------------
 -- 
@@ -127,17 +138,15 @@
         
 --------------------------------
 -- 
--- @function [parent=#ControlSlider] setSelectedThumbSprite 
+-- @function [parent=#ControlSlider] setBackgroundSprite 
 -- @param self
 -- @param #cc.Sprite var
--- @return ControlSlider#ControlSlider self (return value: cc.ControlSlider)
         
 --------------------------------
 -- 
 -- @function [parent=#ControlSlider] setMaximumAllowedValue 
 -- @param self
 -- @param #float var
--- @return ControlSlider#ControlSlider self (return value: cc.ControlSlider)
         
 --------------------------------
 -- @overload self, cc.Sprite, cc.Sprite, cc.Sprite         
@@ -153,30 +162,8 @@
 -- @return ControlSlider#ControlSlider ret (return value: cc.ControlSlider)
 
 --------------------------------
--- 
--- @function [parent=#ControlSlider] isTouchInside 
--- @param self
--- @param #cc.Touch touch
--- @return bool#bool ret (return value: bool)
-        
---------------------------------
--- 
--- @function [parent=#ControlSlider] setEnabled 
--- @param self
--- @param #bool enabled
--- @return ControlSlider#ControlSlider self (return value: cc.ControlSlider)
-        
---------------------------------
--- 
--- @function [parent=#ControlSlider] needsLayout 
--- @param self
--- @return ControlSlider#ControlSlider self (return value: cc.ControlSlider)
-        
---------------------------------
--- js ctor<br>
--- lua new
+-- js ctor
 -- @function [parent=#ControlSlider] ControlSlider 
 -- @param self
--- @return ControlSlider#ControlSlider self (return value: cc.ControlSlider)
         
 return nil

@@ -154,6 +154,7 @@ unsigned int SimpleAudioEngine::playEffect(const char* pszFilePath, bool bLoop,
     EffectList::iterator p = sharedList().find(nRet);
     if (p != sharedList().end())
     {
+        p->second->Volume((UINT)(gain * 1000.0));
         p->second->Play((bLoop) ? -1 : 1);
     }
 
@@ -266,6 +267,7 @@ float SimpleAudioEngine::getBackgroundMusicVolume()
 
 void SimpleAudioEngine::setBackgroundMusicVolume(float volume)
 {
+    sharedMusic().Volume((UINT) (volume * 1000.0));
 }
 
 float SimpleAudioEngine::getEffectsVolume()
@@ -275,6 +277,11 @@ float SimpleAudioEngine::getEffectsVolume()
 
 void SimpleAudioEngine::setEffectsVolume(float volume)
 {
+    EffectList::iterator iter;
+    for (iter = sharedList().begin(); iter != sharedList().end(); iter++)
+    {
+        iter->second->Volume((UINT) (volume * 1000.0));
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////

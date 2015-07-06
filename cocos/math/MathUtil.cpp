@@ -95,11 +95,6 @@ void MathUtil::smooth(float* x, float target, float elapsedTime, float riseTime,
     }
 }
 
-float MathUtil::lerp(float from, float to, float alpha)
-{
-    return from * (1.0f - alpha) + to * alpha;
-}
-
 bool MathUtil::isNeon32Enabled()
 {
 #ifdef USE_NEON32
@@ -110,10 +105,11 @@ bool MathUtil::isNeon32Enabled()
     public:
         AnrdoidNeonChecker()
         {
-            if (android_getCpuFamily() == ANDROID_CPU_FAMILY_ARM && (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_NEON) != 0)
-                _isNeonEnabled = true;
-            else
-                _isNeonEnabled = false;
+            //if (android_getCpuFamily() == ANDROID_CPU_FAMILY_ARM && (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_NEON) != 0)
+            //    _isNeonEnabled = true;
+            //else
+            //    _isNeonEnabled = false;
+            _isNeonEnabled = true;
         }
         bool isNeonEnabled() const { return _isNeonEnabled; }
     private:

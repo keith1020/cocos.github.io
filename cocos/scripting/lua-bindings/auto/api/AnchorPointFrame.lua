@@ -9,7 +9,6 @@
 -- @function [parent=#AnchorPointFrame] setAnchorPoint 
 -- @param self
 -- @param #vec2_table point
--- @return AnchorPointFrame#AnchorPointFrame self (return value: ccs.AnchorPointFrame)
         
 --------------------------------
 -- 
@@ -33,6 +32,5 @@
 -- 
 -- @function [parent=#AnchorPointFrame] AnchorPointFrame 
 -- @param self
--- @return AnchorPointFrame#AnchorPointFrame self (return value: ccs.AnchorPointFrame)
         
 return nil

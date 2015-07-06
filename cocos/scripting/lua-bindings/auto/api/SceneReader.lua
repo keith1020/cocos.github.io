@@ -8,7 +8,6 @@
 -- @function [parent=#SceneReader] setTarget 
 -- @param self
 -- @param #function selector
--- @return SceneReader#SceneReader self (return value: ccs.SceneReader)
         
 --------------------------------
 -- 
@@ -36,7 +35,6 @@
 -- lua destroySceneReader
 -- @function [parent=#SceneReader] destroyInstance 
 -- @param self
--- @return SceneReader#SceneReader self (return value: ccs.SceneReader)
         
 --------------------------------
 -- 

@@ -5,9 +5,7 @@
 -- @parent_module cc
 
 --------------------------------
---  Initializes the action with a duration and an array of points.<br>
--- param dt In seconds.<br>
--- param points An PointArray.
+--  initializes the action with a duration and an array of points 
 -- @function [parent=#CatmullRomBy] initWithDuration 
 -- @param self
 -- @param #float dt

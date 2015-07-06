@@ -2,49 +2,29 @@
 #define __MOUSE_TEST_H_
 
 #include "cocos2d.h"
-#include "../BaseTest.h"
+#include "../testBasic.h"
 
-DEFINE_TEST_SUITE(MouseTests);
-
-class BaseMouseTest : public TestCase
+class MouseTest : public Layer
 {
 public:
-    
-};
+    MouseTest();
+    ~MouseTest();
 
-class MouseEventTest : public BaseMouseTest
-{
-public:
-    CREATE_FUNC(MouseEventTest);
-    MouseEventTest();
-    ~MouseEventTest();
-
-    void onMouseDown(cocos2d::Event* event);
-    void onMouseUp(cocos2d::Event* event);
-    void onMouseMove(cocos2d::Event* event);
-    void onMouseScroll(cocos2d::Event* event);
-    
-    virtual std::string title() const override;
-    virtual std::string subtitle() const override;
+    void onMouseDown(Event* event);
+    void onMouseUp(Event* event);
+    void onMouseMove(Event* event);
+    void onMouseScroll(Event* event);
 
 private:
-    cocos2d::Label*   _labelAction;
-    cocos2d::Label*   _labelPosition;
-    cocos2d::EventListenerMouse* _mouseListener;
+    Label*   _labelAction;
+    Label*   _labelPosition;
+    EventListenerMouse* _mouseListener;
 };
 
-class HideMouseTest : public BaseMouseTest
+class MouseTestScene : public TestScene
 {
 public:
-    CREATE_FUNC(HideMouseTest);
-    HideMouseTest();
-    ~HideMouseTest();
-    
-    virtual std::string title() const override;
-    virtual std::string subtitle() const override;
-    
-private:
-    cocos2d::EventListenerMouse* _lis;
+    virtual void runThisTest();
 };
 
 #endif

@@ -26,39 +26,37 @@
 #define __cocos2d_tests__UIScale9SpriteTest__
 #include "UIScene.h"
 
-DEFINE_TEST_SUITE(UIScale9SpriteTests);
-
 class UIScale9SpriteTest : public UIScene
 {
 public:
-    CREATE_FUNC(UIScale9SpriteTest);
-
     UIScale9SpriteTest();
     ~UIScale9SpriteTest();
-
-    virtual bool init() override;
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UIScale9SpriteTest)
 };
 
 class UIScale9SpriteHierarchialTest : public UIScene
 {
 public:
-    CREATE_FUNC(UIScale9SpriteHierarchialTest);
-
     UIScale9SpriteHierarchialTest();
     ~UIScale9SpriteHierarchialTest();
-
-    virtual bool init() override;
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UIScale9SpriteHierarchialTest)
 };
 
 class UIScale9SpriteTouchTest : public UIScene
 {
 public:
-    CREATE_FUNC(UIScale9SpriteTouchTest);
-
     UIScale9SpriteTouchTest();
     ~UIScale9SpriteTouchTest();
-
-    virtual bool init() override;
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UIScale9SpriteTouchTest)
 };
 
 // S9BatchNodeBasic
@@ -68,7 +66,9 @@ class UIS9BatchNodeBasic : public UIScene
 public:
     CREATE_FUNC(UIS9BatchNodeBasic);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9BatchNodeBasic)
 };
 
 // S9FrameNameSpriteSheet
@@ -78,7 +78,10 @@ class UIS9FrameNameSpriteSheet : public UIScene
 public:
     CREATE_FUNC(UIS9FrameNameSpriteSheet);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9FrameNameSpriteSheet)
+
 };
 
 // S9FrameNameSpriteSheetRotated
@@ -88,7 +91,9 @@ class UIS9FrameNameSpriteSheetRotated : public UIScene
 public:
     CREATE_FUNC(UIS9FrameNameSpriteSheetRotated);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9FrameNameSpriteSheetRotated)
 };
 
 // S9FrameNameSpriteSheetCropped
@@ -98,7 +103,9 @@ class UIS9FrameNameSpriteSheetCropped : public UIScene
 public:
     CREATE_FUNC(UIS9FrameNameSpriteSheetCropped);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9FrameNameSpriteSheetCropped)
 };
 
 // S9FrameNameSpriteSheetCroppedRotated
@@ -108,7 +115,9 @@ class UIS9FrameNameSpriteSheetCroppedRotated : public UIScene
 public:
     CREATE_FUNC(UIS9FrameNameSpriteSheetCroppedRotated);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9FrameNameSpriteSheetCroppedRotated)
 };
 
 // S9BatchNodeScaledNoInsets
@@ -118,7 +127,9 @@ class UIS9BatchNodeScaledNoInsets : public UIScene
 public:
     CREATE_FUNC(UIS9BatchNodeScaledNoInsets);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9BatchNodeScaledNoInsets)
 };
 
 // S9FrameNameSpriteSheetScaledNoInsets
@@ -128,7 +139,9 @@ class UIS9FrameNameSpriteSheetScaledNoInsets : public UIScene
 public:
     CREATE_FUNC(UIS9FrameNameSpriteSheetScaledNoInsets);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9FrameNameSpriteSheetScaledNoInsets)
 };
 
 // S9FrameNameSpriteSheetRotatedScaledNoInsets
@@ -138,7 +151,9 @@ class UIS9FrameNameSpriteSheetRotatedScaledNoInsets : public UIScene
 public:
     CREATE_FUNC(UIS9FrameNameSpriteSheetRotatedScaledNoInsets);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9FrameNameSpriteSheetRotatedScaledNoInsets)
 };
 
 
@@ -149,7 +164,9 @@ class UIS9BatchNodeScaleWithCapInsets : public UIScene
 public:
     CREATE_FUNC(UIS9BatchNodeScaleWithCapInsets);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9BatchNodeScaleWithCapInsets)
 };
 
 // S9FrameNameSpriteSheetInsets
@@ -159,7 +176,9 @@ class UIS9FrameNameSpriteSheetInsets : public UIScene
 public:
     CREATE_FUNC(UIS9FrameNameSpriteSheetInsets);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9FrameNameSpriteSheetInsets)
 };
 
 // S9FrameNameSpriteSheetInsetsScaled
@@ -169,7 +188,9 @@ class UIS9FrameNameSpriteSheetInsetsScaled : public UIScene
 public:
     CREATE_FUNC(UIS9FrameNameSpriteSheetInsetsScaled);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9FrameNameSpriteSheetInsetsScaled)
 };
 
 // S9FrameNameSpriteSheetRotatedInsets
@@ -179,7 +200,9 @@ class UIS9FrameNameSpriteSheetRotatedInsets : public UIScene
 public:
     CREATE_FUNC(UIS9FrameNameSpriteSheetRotatedInsets);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9FrameNameSpriteSheetRotatedInsets)
 };
 
 // S9_TexturePacker
@@ -189,7 +212,10 @@ class UIS9_TexturePacker : public UIScene
 public:
     CREATE_FUNC(UIS9_TexturePacker);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9_TexturePacker)
+
 };
 
 // S9FrameNameSpriteSheetRotatedInsetsScaled
@@ -199,7 +225,9 @@ class UIS9FrameNameSpriteSheetRotatedInsetsScaled : public UIScene
 public:
     CREATE_FUNC(UIS9FrameNameSpriteSheetRotatedInsetsScaled);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9FrameNameSpriteSheetRotatedInsetsScaled)
 };
 
 // S9FrameNameSpriteSheetRotatedInsetsScaled
@@ -209,7 +237,9 @@ class UIS9FrameNameSpriteSheetRotatedSetCapInsetLater : public UIScene
 public:
     CREATE_FUNC(UIS9FrameNameSpriteSheetRotatedSetCapInsetLater);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9FrameNameSpriteSheetRotatedSetCapInsetLater)
 };
 
 // S9CascadeOpacityAndColor
@@ -219,7 +249,9 @@ class UIS9CascadeOpacityAndColor : public UIScene
 public:
     CREATE_FUNC(UIS9CascadeOpacityAndColor);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9CascadeOpacityAndColor)
 };
 
 // Scale9Sprite ZOrder
@@ -229,7 +261,10 @@ class UIS9ZOrder : public UIScene
 public:
     CREATE_FUNC(UIS9ZOrder);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9ZOrder)
+
 };
 
 // Scale9Sprite Flip
@@ -239,7 +274,9 @@ class UIS9Flip : public UIScene
 public:
     CREATE_FUNC(UIS9Flip);
     
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9Flip)
 };
 
 class UIS9ChangeAnchorPoint : public UIScene
@@ -247,15 +284,9 @@ class UIS9ChangeAnchorPoint : public UIScene
 public:
     CREATE_FUNC(UIS9ChangeAnchorPoint);
     
-    virtual bool init() override;
-};
-
-class UIS9NinePatchTest : public UIScene
-{
-public:
-    CREATE_FUNC(UIS9NinePatchTest);
-
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UIS9ChangeAnchorPoint)
 };
 
 #endif /* defined(__cocos2d_tests__UIScale9SpriteTest__) */

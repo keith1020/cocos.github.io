@@ -41,19 +41,8 @@
 
 NS_CC_BEGIN
 
-/**
- * @addtogroup _3d
- * @{
- */
-
 class MeshVertexData;
 
-/**
- * the MeshIndexData class.
- * @brief the MeshIndexData contain all of the indices data which mesh need.
- * @js NA
- * @lua NA
- */
 class MeshIndexData : public Ref
 {
 public:
@@ -86,7 +75,7 @@ CC_CONSTRUCTOR_ACCESS:
     
 protected:
     IndexBuffer*    _indexBuffer; //index buffer
-    MeshVertexData* _vertexData; //vertex buffer, weak ref
+    MeshVertexData* _vertexData; //vertex buffer
     AABB           _aabb; // original aabb of the submesh
     std::string    _id; //id
     GLenum         _primitiveType;
@@ -95,10 +84,6 @@ protected:
     friend class Sprite3D;
 };
 
-/**
- * the MeshVertexData class.
- * @brief the MeshIndexData contain all of the vertices data which mesh need.
- */
 class MeshVertexData : public Ref
 {
     friend class Sprite3D;
@@ -138,9 +123,6 @@ protected:
     
     int                  _vertexCount; //vertex count
 };
-
-// end of 3d group
-/// @}
 
 NS_CC_END
 

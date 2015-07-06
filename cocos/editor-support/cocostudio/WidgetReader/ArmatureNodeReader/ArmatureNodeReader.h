@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 Copyright (c) 2014 cocos2d-x.org
 
 http://www.cocos2d-x.org
@@ -26,6 +26,7 @@ THE SOFTWARE.
 #define __ARMATURENODEREADER_H_
 
 #include "cocos2d.h"
+#include "cocostudio/FlatBuffersSerialize.h"
 #include "cocostudio/WidgetReader/NodeReaderProtocol.h"
 #include "cocostudio/WidgetReader/NodeReaderDefine.h"
 
@@ -49,13 +50,11 @@ public:
 	~ArmatureNodeReader();
 
 	static ArmatureNodeReader* getInstance();
-    /** @deprecated Use method destroyInstance() instead */
-    CC_DEPRECATED_ATTRIBUTE static void purge();
-	static void destroyInstance();
+	static void purge();
 
 	flatbuffers::Offset<flatbuffers::Table> createOptionsWithFlatBuffers(const tinyxml2::XMLElement* objectData,
-		flatbuffers::FlatBufferBuilder* builder) override;
-	void setPropsWithFlatBuffers(cocos2d::Node* node, const flatbuffers::Table* textBMFontOptions) override;
+		flatbuffers::FlatBufferBuilder* builder);
+	void setPropsWithFlatBuffers(cocos2d::Node* node, const flatbuffers::Table* textBMFontOptions);
 
 	//CSArmatureNode
 	cocos2d::Node* createNodeWithFlatBuffers(const flatbuffers::Table* nodeOptions) override;

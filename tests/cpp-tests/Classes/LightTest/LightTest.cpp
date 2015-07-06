@@ -1,10 +1,39 @@
 #include "LightTest.h"
 
-USING_NS_CC;
+static int sceneIdx = -1;
 
-LightTests::LightTests()
+
+static std::function<Layer*()> createFunctions[] =
 {
-    ADD_TEST_CASE(LightTest);
+    CL(LightTest)
+};
+
+#define MAX_LAYER    (sizeof(createFunctions) / sizeof(createFunctions[0]))
+
+static Layer* nextSpriteTestAction()
+{
+    sceneIdx++;
+    sceneIdx = sceneIdx % MAX_LAYER;
+
+    auto layer = (createFunctions[sceneIdx])();
+    return layer;
+}
+
+static Layer* backSpriteTestAction()
+{
+    sceneIdx--;
+    int total = MAX_LAYER;
+    if( sceneIdx < 0 )
+        sceneIdx += total;
+
+    auto layer = (createFunctions[sceneIdx])();
+    return layer;
+}
+
+static Layer* restartSpriteTestAction()
+{
+    auto layer = (createFunctions[sceneIdx])();
+    return layer;
 }
 
 LightTest::LightTest()
@@ -77,6 +106,45 @@ LightTest::~LightTest()
 std::string LightTest::title() const
 {
     return "Light Test";
+}
+
+std::string LightTest::subtitle() const
+{
+    return "";
+}
+
+void LightTest::restartCallback( Ref* sender )
+{
+    auto s = new LightTestScene();
+    s->addChild(restartSpriteTestAction());
+    Director::getInstance()->replaceScene(s);
+    s->release();
+}
+
+void LightTest::nextCallback( Ref* sender )
+{
+    auto s = new LightTestScene();
+    s->addChild( nextSpriteTestAction() );
+    Director::getInstance()->replaceScene(s);
+    s->release();
+}
+
+void LightTest::backCallback( Ref* sender )
+{
+    auto s = new LightTestScene();
+    s->addChild( backSpriteTestAction() );
+    Director::getInstance()->replaceScene(s);
+    s->release();
+}
+
+void LightTest::onEnter()
+{
+    BaseTest::onEnter();
+}
+
+void LightTest::onExit()
+{
+    BaseTest::onExit();
 }
 
 void LightTest::addSprite()
@@ -229,7 +297,7 @@ void LightTest::update( float delta )
 
     angleDelta += delta;
 
-    TestCase::update(delta);
+    BaseTest::update(delta);
 }
 
 void LightTest::SwitchLight( Ref* sender, LightType lightType )
@@ -279,4 +347,16 @@ void LightTest::SwitchLight( Ref* sender, LightType lightType )
     default:
         break;
     }
+}
+
+void LightTestScene::runThisTest()
+{
+    auto layer = nextSpriteTestAction();
+    addChild(layer);
+
+    Director::getInstance()->replaceScene(this);
+}
+
+LightTestScene::LightTestScene()
+{
 }

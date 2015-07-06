@@ -2,8 +2,6 @@
 #include "Paddle.h"
 #include "../VisibleRect.h"
 
-USING_NS_CC;
-
 Ball::Ball(void)
 {
 }

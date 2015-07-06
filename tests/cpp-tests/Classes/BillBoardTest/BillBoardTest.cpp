@@ -29,15 +29,48 @@
 #include <algorithm>
 #include "../testResource.h"
 
-USING_NS_CC;
-USING_NS_CC_EXT;
-using namespace cocos2d::ui;
-
-
-BillBoardTests::BillBoardTests()
+enum
 {
-    ADD_TEST_CASE(BillBoardRotationTest);
-    ADD_TEST_CASE(BillBoardTest);
+    IDC_NEXT = 100,
+    IDC_BACK,
+    IDC_RESTART
+};
+
+static int sceneIdx = -1;
+
+
+static std::function<Layer*()> createFunctions[] =
+{
+    CL(BillBoardRotationTest),
+    CL(BillBoardTest)
+};
+
+#define MAX_LAYER    (sizeof(createFunctions) / sizeof(createFunctions[0]))
+
+static Layer* nextTest()
+{
+    sceneIdx++;
+    sceneIdx = sceneIdx % MAX_LAYER;
+    
+    auto layer = (createFunctions[sceneIdx])();
+    return layer;
+}
+
+static Layer* backTest()
+{
+    sceneIdx--;
+    int total = MAX_LAYER;
+    if( sceneIdx < 0 )
+        sceneIdx += total;
+    
+    auto layer = (createFunctions[sceneIdx])();
+    return layer;
+}
+
+static Layer* restartTest()
+{
+    auto layer = (createFunctions[sceneIdx])();
+    return layer;
 }
 
 //------------------------------------------------------------------
@@ -74,7 +107,7 @@ BillBoardRotationTest::BillBoardRotationTest()
     root->runAction(rp);
     
     auto jump = JumpBy::create(1, Vec2(0, 0), 30, 1);
-    auto scale = ScaleBy::create(2.f, 2.f, 2.f, 0.1f);
+    auto scale = ScaleBy::create(2, 2, 2, 0.1);
     auto seq = Sequence::create(jump,scale, NULL);
     
     auto rot = RotateBy::create(2, Vec3(-90, 0, 0));
@@ -102,6 +135,31 @@ std::string BillBoardRotationTest::title() const
 std::string BillBoardRotationTest::subtitle() const
 {
     return "All the sprites should still facing camera";
+}
+
+void BillBoardRotationTest::restartCallback(Ref* sender)
+{
+    auto s = new (std::nothrow) BillBoardTestScene();
+    s->addChild(restartTest());
+    
+    Director::getInstance()->replaceScene(s);
+    s->release();
+}
+
+void BillBoardRotationTest::nextCallback(Ref* sender)
+{
+    auto s = new (std::nothrow) BillBoardTestScene();
+    s->addChild(nextTest());
+    Director::getInstance()->replaceScene(s);
+    s->release();
+}
+
+void BillBoardRotationTest::backCallback(Ref* sender)
+{
+    auto s = new (std::nothrow) BillBoardTestScene();
+    s->addChild(backTest());
+    Director::getInstance()->replaceScene(s);
+    s->release();
 }
 
 //------------------------------------------------------------------
@@ -275,7 +333,6 @@ void BillBoardTest::addNewAniBillBoradWithCoords(Vec3 p)
 void BillBoardTest::update(float dt)
 {
 }
-
 void BillBoardTest::onTouchesMoved(const std::vector<Touch*>& touches, Event* event)
 {
     if(touches.size()==1)
@@ -299,10 +356,42 @@ void BillBoardTest::onTouchesMoved(const std::vector<Touch*>& touches, Event* ev
         _camera->setPosition3D(cameraPos);      
     }
 }
-
 void BillBoardTest::rotateCameraCallback(Ref* sender,float value)
 {
     Vec3  rotation3D= _camera->getRotation3D();
     rotation3D.y+= value;
     _camera->setRotation3D(rotation3D);
+}
+
+
+void BillBoardTest::restartCallback(Ref* sender)
+{
+    auto s = new (std::nothrow) BillBoardTestScene();
+    s->addChild(restartTest());
+    
+    Director::getInstance()->replaceScene(s);
+    s->release();
+}
+
+void BillBoardTest::nextCallback(Ref* sender)
+{
+    auto s = new (std::nothrow) BillBoardTestScene();
+    s->addChild(nextTest());
+    Director::getInstance()->replaceScene(s);
+    s->release();
+}
+
+void BillBoardTest::backCallback(Ref* sender)
+{
+    auto s = new (std::nothrow) BillBoardTestScene();
+    s->addChild(backTest());
+    Director::getInstance()->replaceScene(s);
+    s->release();
+}
+
+void BillBoardTestScene::runThisTest()
+{
+    auto layer = nextTest();
+    addChild(layer);
+    Director::getInstance()->replaceScene(this);
 }

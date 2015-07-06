@@ -93,6 +93,25 @@ void SpriteFrameCacheHelper::removeSpriteFrameFromFile(const std::string &plistP
     releaseSpriteFrames(plistPath);
 }
 
+void SpriteFrameCacheHelper::removeAllSpriteFrames()
+{
+	SpriteFrameCache::getInstance()->removeSpriteFrames();
+	std::map<std::string, std::vector<cocos2d::SpriteFrame*> >::iterator it = _usingSpriteFrames.begin();
+	std::map<std::string, std::vector<cocos2d::SpriteFrame*> >::iterator itEnd = _usingSpriteFrames.end();
+	for (; it != itEnd; ++it)
+	{
+		auto& vec = it->second;
+		auto itFrame = vec.begin();
+		while (itFrame != vec.end())
+		{
+			CC_SAFE_RELEASE(*itFrame);
+			++itFrame;
+		}
+		vec.clear();
+	}
+	_usingSpriteFrames.clear();
+}
+
 void SpriteFrameCacheHelper::addSpriteFrameFromFile(const std::string& plistPath, const std::string& imagePath)
 {
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile(plistPath, imagePath);

@@ -273,15 +273,6 @@ void InitMaterial(ObjLoader::material_t& material)
     material.unknown_parameter.clear();
 }
 
-static std::string& replacePathSeperator(std::string& path)
-{
-    for (int i = 0; i < path.size(); i++) {
-        if (path[i] == '\\')
-            path[i] = '/';
-    }
-    return path;
-}
-
 std::string LoadMtl ( std::map<std::string, ObjLoader::material_t>& material_map, const char* filename, const char* mtl_basepath)
 {
     material_map.clear();
@@ -460,7 +451,6 @@ std::string LoadMtl ( std::map<std::string, ObjLoader::material_t>& material_map
         {
             token += 7;
             material.ambient_texname = trim(token);
-            replacePathSeperator(material.ambient_texname);
             continue;
         }
         
@@ -469,7 +459,6 @@ std::string LoadMtl ( std::map<std::string, ObjLoader::material_t>& material_map
         {
             token += 7;
             material.diffuse_texname = trim(token);
-            replacePathSeperator(material.diffuse_texname);
             continue;
         }
         
@@ -478,7 +467,6 @@ std::string LoadMtl ( std::map<std::string, ObjLoader::material_t>& material_map
         {
             token += 7;
             material.specular_texname = trim(token);
-            replacePathSeperator(material.specular_texname);
             continue;
         }
         
@@ -487,7 +475,6 @@ std::string LoadMtl ( std::map<std::string, ObjLoader::material_t>& material_map
         {
             token += 7;
             material.normal_texname = trim(token);
-            replacePathSeperator(material.normal_texname);
             continue;
         }
         
@@ -626,8 +613,6 @@ std::string ObjLoader::LoadObj(shapes_t& shapes, const char* filename, const cha
         // use mtl
         if ((0 == strncmp(token, "usemtl", 6)) && isSpace((token[6])))
         {
-            exportFaceGroupToShape(vertexCache, shapes, v, vn, vt, faceGroup, material, name);
-            faceGroup.clear();
             
             char namebuf[4096];
             token += 7;

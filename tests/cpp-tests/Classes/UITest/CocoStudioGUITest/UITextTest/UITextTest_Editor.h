@@ -27,14 +27,14 @@
 
 #include "../UIScene_Editor.h"
 
-DEFINE_TEST_SUITE(UITextEditorTests);
 class UITextTest_Editor : public UIScene_Editor
 {
 public:
-    CREATE_FUNC(UITextTest_Editor);
-
-    virtual bool init() override;
+    bool init();
+    virtual void switchLoadMethod(Ref* pSender);
+    void configureGUIScene();
 protected:
+    UI_SCENE_EDITOR_CREATE_FUNC(UITextTest_Editor)
 };
 
 #endif /* defined(__TestCpp__UILabelTest_Editor__) */

@@ -1,23 +1,7 @@
+
+
 #include "UILayoutTest.h"
 
-USING_NS_CC;
-using namespace cocos2d::ui;
-
-UILayoutTests::UILayoutTests()
-{
-    ADD_TEST_CASE(UILayoutTest);
-    ADD_TEST_CASE(UILayoutTest_Color);
-    ADD_TEST_CASE(UILayoutTest_Gradient);
-    ADD_TEST_CASE(UILayoutTest_BackGroundImage);
-    ADD_TEST_CASE(UILayoutTest_BackGroundImage_Scale9);
-    ADD_TEST_CASE(UILayoutTest_Layout_Linear_Vertical);
-    ADD_TEST_CASE(UILayoutTest_Layout_Linear_Horizontal);
-    ADD_TEST_CASE(UILayoutTest_Layout_Relative_Align_Parent);
-    ADD_TEST_CASE(UILayoutTest_Layout_Relative_Location);
-    ADD_TEST_CASE(UILayoutComponentTest);
-    ADD_TEST_CASE(UILayoutComponent_Berth_Test);
-    ADD_TEST_CASE(UILayoutComponent_Berth_Stretch_Test);
-}
 
 // UILayoutTest
 
@@ -754,7 +738,7 @@ void UILayoutComponentTest::touchEvent(Ref *pSender, Widget::TouchEventType type
                 _baseLayer->setContentSize(Size(200, 200));
             else
                 _baseLayer->setContentSize(widgetSize);
-            Helper::doLayout(_baseLayer);
+            ui:Helper::doLayout(_baseLayer);
          }
         break;
 
@@ -859,3 +843,4 @@ bool UILayoutComponent_Berth_Stretch_Test::init()
     }
     return false;
 }
+

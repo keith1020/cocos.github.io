@@ -27,48 +27,50 @@
 
 #include "../UIScene.h"
 
-DEFINE_TEST_SUITE(UITextTests);
-
 class UITextTest : public UIScene
 {
 public:
-    CREATE_FUNC(UITextTest);
-
-    virtual bool init() override;
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UITextTest)
 };
 
 class UITextTest_LineWrap : public UIScene
 {
 public:
-    CREATE_FUNC(UITextTest_LineWrap);
-
-    virtual bool init() override;
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UITextTest_LineWrap)
 };
 
 
 class UILabelTest_Effect : public UIScene
 {
 public:
-    CREATE_FUNC(UILabelTest_Effect);
-
-    virtual bool init() override;
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UILabelTest_Effect)
 };
  
 
 class UITextTest_TTF : public UIScene
 {
 public:
-    CREATE_FUNC(UITextTest_TTF);
-
-    virtual bool init() override;
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UITextTest_TTF)
 };
 
 class UITextTest_IgnoreConentSize : public UIScene
 {
 public:
-    CREATE_FUNC(UITextTest_IgnoreConentSize);
-
-    virtual bool init() override;
+    bool init();
+protected:
+    UI_SCENE_CREATE_FUNC(UITextTest_IgnoreConentSize)
 };
 
 #endif /* defined(__TestCpp__UITextTest__) */

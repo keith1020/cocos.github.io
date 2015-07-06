@@ -33,13 +33,14 @@ using namespace cocos2d;
 
 extern "C"
 {
+    #include "luaconf.h"
     int cocos2dx_lua_loader(lua_State *L)
     {
-        static const std::string BYTECODE_FILE_EXT    = ".luac";
+        static const std::string BYTECODE_FILE_EXT    = LUA_EXTENSION;
         static const std::string NOT_BYTECODE_FILE_EXT = ".lua";
         
         std::string filename(luaL_checkstring(L, 1));
-        size_t pos = filename.rfind(BYTECODE_FILE_EXT);
+        size_t pos = filename.rfind(LUA_EXTENSION);
         if (pos != std::string::npos)
         {
             filename = filename.substr(0, pos);
@@ -59,56 +60,66 @@ extern "C"
             filename.replace(pos, 1, "/");
             pos = filename.find_first_of(".");
         }
+#ifdef LUA_ENCRYPT
+		std::string luaFile = filename;
+		std::string md5 = CCCrypto::MD5String((void*)filename.c_str(), filename.length());
+		filename = md5.substr(0,1) + "/" + md5;
+#endif
+		filename.append(LUA_EXTENSION);
+		Data data = FileUtils::getInstance()->getDataFromFile(filename);
+        unsigned char* chunk = data.getBytes();
+        ssize_t chunkSize = data.getSize();
+        std::string chunkName = filename;
         
-        // search file in package.path
-        unsigned char* chunk = nullptr;
-        ssize_t chunkSize = 0;
-        std::string chunkName;
-        FileUtils* utils = FileUtils::getInstance();
-        
-        lua_getglobal(L, "package");
-        lua_getfield(L, -1, "path");
-        std::string searchpath(lua_tostring(L, -1));
-        lua_pop(L, 1);
-        size_t begin = 0;
-        size_t next = searchpath.find_first_of(";", 0);
-        
-        do
-        {
-            if (next == std::string::npos)
-                next = searchpath.length();
-            std::string prefix = searchpath.substr(begin, next);
-            if (prefix[0] == '.' && prefix[1] == '/')
-            {
-                prefix = prefix.substr(2);
-            }
-            
-            pos = prefix.find("?.lua");
-            chunkName = prefix.substr(0, pos) + filename + BYTECODE_FILE_EXT;
-            if (utils->isFileExist(chunkName))
-            {
-                chunk = utils->getFileData(chunkName.c_str(), "rb", &chunkSize);
-                break;
-            }
-            else
-            {
-                chunkName = prefix.substr(0, pos) + filename + NOT_BYTECODE_FILE_EXT;
-                if (utils->isFileExist(chunkName))
-                {
-                    chunk = utils->getFileData(chunkName.c_str(), "rb", &chunkSize);
-                    break;
-                }
-            }
-            
-            begin = next + 1;
-            next = searchpath.find_first_of(";", begin);
-        } while (begin < (int)searchpath.length());
+//        // search file in package.path
+//        unsigned char* chunk = nullptr;
+//        ssize_t chunkSize = 0;
+//        std::string chunkName;
+//        FileUtils* utils = FileUtils::getInstance();
+//        
+//        lua_getglobal(L, "package");
+//        lua_getfield(L, -1, "path");
+//        std::string searchpath(lua_tostring(L, -1));
+//        lua_pop(L, 1);
+//        size_t begin = 0;
+//        size_t next = searchpath.find_first_of(";", 0);
+//        
+//        do
+//        {
+//            if (next == std::string::npos)
+//                next = searchpath.length();
+//            std::string prefix = searchpath.substr(begin, next);
+//            if (prefix[0] == '.' && prefix[1] == '/')
+//            {
+//                prefix = prefix.substr(2);
+//            }
+//            
+//            pos = prefix.find("?.lua");
+//            chunkName = prefix.substr(0, pos) + filename + BYTECODE_FILE_EXT;
+//            if (utils->isFileExist(chunkName))
+//            {
+//                chunk = utils->getFileData(chunkName.c_str(), "rb", &chunkSize);
+//                break;
+//            }
+//            else
+//            {
+//                chunkName = prefix.substr(0, pos) + filename + NOT_BYTECODE_FILE_EXT;
+//                if (utils->isFileExist(chunkName))
+//                {
+//                    chunk = utils->getFileData(chunkName.c_str(), "rb", &chunkSize);
+//                    break;
+//                }
+//            }
+//            
+//            begin = next + 1;
+//            next = searchpath.find_first_of(";", begin);
+//        } while (begin < (int)searchpath.length());
         
         if (chunk)
         {
             LuaStack* stack = LuaEngine::getInstance()->getLuaStack();
             stack->luaLoadBuffer(L, (char*)chunk, (int)chunkSize, chunkName.c_str());
-            free(chunk);
+            //free(chunk);
         }
         else
         {

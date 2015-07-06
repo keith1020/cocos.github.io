@@ -23,23 +23,34 @@
  ****************************************************************************/
 
 #include "platform/CCPlatformConfig.h"
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WINRT || CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 
 #ifndef __NEWAUDIOENGINE_TEST_H_
 #define __NEWAUDIOENGINE_TEST_H_
 
 #include "cocos2d.h"
+#include "../testBasic.h"
 #include "../BaseTest.h"
 
 #include "audio/include/AudioEngine.h"
 
-DEFINE_TEST_SUITE(AudioEngineTests);
+using namespace cocos2d;
 
-class AudioEngineTestDemo : public TestCase
+class AudioEngineTestScene : public TestScene
+{
+public:
+    virtual void runThisTest();
+};
+
+class AudioEngineTestDemo : public BaseTest
 {
 public:
     virtual std::string title() const override;
     virtual void onExit() override;
+
+    void backCallback(Ref* sender);
+    void nextCallback(Ref* sender);
+    void restartCallback(Ref* sender);
     
 };
 
@@ -50,9 +61,9 @@ public:
     
     virtual ~AudioControlTest();
     
-    virtual bool init() override;
+    virtual bool init();
     
-    virtual void update(float dt) override;
+    virtual void update(float dt);
     
     virtual std::string title() const override;
     
@@ -75,7 +86,7 @@ public:
     
     virtual ~PlaySimultaneouslyTest();
     
-    virtual bool init() override;
+    virtual bool init();
     
     virtual std::string title() const override;
 private:
@@ -93,12 +104,12 @@ public:
     
     virtual ~AudioProfileTest();
     
-    virtual bool init() override;
+    virtual bool init();
     
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
     
-    virtual void update(float dt) override;
+    virtual void update(float dt);
     
 private:
     static const int FILE_COUNT = 2;
@@ -106,7 +117,7 @@ private:
     cocos2d::experimental::AudioProfile _audioProfile;
     
     int _audioCount;
-    cocos2d::Label* _showLabel;
+    Label* _showLabel;
     float _time;
     float _minDelay;
     void* _timeSlider;
@@ -119,7 +130,7 @@ public:
     
     virtual ~InvalidAudioFileTest();
     
-    virtual bool init() override;
+    virtual bool init();
     
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -135,7 +146,7 @@ public:
     
     virtual ~LargeAudioFileTest();
     
-    virtual bool init() override;
+    virtual bool init();
     
     virtual std::string title() const override;
     

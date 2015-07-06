@@ -32,7 +32,6 @@
 #include "jni/JniHelper.h"
 #include "base/CCDirector.h"
 #include "base/CCEventListenerKeyboard.h"
-#include "platform/CCFileUtils.h"
 
 //-----------------------------------------------------------------------------------------------------------
 #define  CLASS_NAME "org/cocos2dx/lib/Cocos2dxVideoHelper"
@@ -194,7 +193,7 @@ VideoPlayer::~VideoPlayer()
 
 void VideoPlayer::setFileName(const std::string& fileName)
 {
-    _videoURL = FileUtils::getInstance()->fullPathForFilename(fileName);
+    _videoURL = fileName;
     _videoSource = VideoPlayer::Source::FILENAME;
     setVideoURLJNI(_videoPlayerIndex, (int)Source::FILENAME,_videoURL);
 }

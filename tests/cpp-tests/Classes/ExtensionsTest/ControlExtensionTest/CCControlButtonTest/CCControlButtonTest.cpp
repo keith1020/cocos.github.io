@@ -25,9 +25,6 @@
 
 #include "CCControlButtonTest.h"
 
-USING_NS_CC;
-USING_NS_CC_EXT;
-
 bool ControlButtonTest_HelloVariableSize::init()
 {
     if (ControlScene::init())

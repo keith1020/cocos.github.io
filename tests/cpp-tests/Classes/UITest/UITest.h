@@ -1,17 +1,13 @@
 #ifndef __cocos2d_tests__UITest__
 #define __cocos2d_tests__UITest__
 
+#include "../testBasic.h"
 #include "../BaseTest.h"
 
-class UITests : public TestList
+class UITestScene : public TestScene
 {
 public:
-    UITests();
-    ~UITests();
-
-private:
-
+    virtual void runThisTest() override;
 };
-
 
 #endif /* defined(__cocos2d_tests__UITest__) */

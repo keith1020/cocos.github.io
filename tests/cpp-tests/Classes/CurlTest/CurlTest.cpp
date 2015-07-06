@@ -3,13 +3,6 @@
 #include "stdlib.h"
 #include "curl/curl.h"
 
-USING_NS_CC;
-
-CurlTests::CurlTests()
-{
-    ADD_TEST_CASE(CurlTest);
-}
-
 CurlTest::CurlTest()
 {
     auto label = Label::createWithTTF("Curl Test", "fonts/arial.ttf", 28);
@@ -99,4 +92,13 @@ void CurlTest::onTouchesEnded(const std::vector<Touch*>& touches, Event  *event)
 CurlTest::~CurlTest()
 {
     _label->release();
+}
+
+void CurlTestScene::runThisTest()
+{
+    auto layer = new (std::nothrow) CurlTest();
+    addChild(layer);
+
+    Director::getInstance()->replaceScene(this);
+    layer->release();
 }

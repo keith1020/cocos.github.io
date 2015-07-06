@@ -14,9 +14,7 @@ extern "C" {
 
 #include "lauxlib.h"
 
-/// @cond
 void LUA_EXTENSIONS_DLL luaopen_lua_extensions(lua_State *L);
-/// @endcond
     
 #if __cplusplus
 }

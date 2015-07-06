@@ -40,7 +40,6 @@
 -- Release all actions.
 -- @function [parent=#ActionManagerEx] releaseActions 
 -- @param self
--- @return ActionManagerEx#ActionManagerEx self (return value: ccs.ActionManagerEx)
         
 --------------------------------
 -- Purges ActionManager point.<br>
@@ -48,7 +47,6 @@
 -- lua destroyActionManager
 -- @function [parent=#ActionManagerEx] destroyInstance 
 -- @param self
--- @return ActionManagerEx#ActionManagerEx self (return value: ccs.ActionManagerEx)
         
 --------------------------------
 -- Gets the static instance of ActionManager.<br>

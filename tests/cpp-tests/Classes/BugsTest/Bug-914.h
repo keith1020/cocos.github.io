@@ -3,14 +3,15 @@
 
 #include "BugsTest.h"
 
-class Bug914Layer : public BugsTestBase
+class Bug914Layer : public BugsTestBaseLayer
 {
 public:
-    virtual bool init() override;
+    static Scene* scene();
+    virtual bool init();
 
-    void onTouchesMoved(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event);
-    void onTouchesBegan(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event);
-    void restart(cocos2d::Ref* sender);
+    void onTouchesMoved(const std::vector<Touch*>& touches, Event * event);
+    void onTouchesBegan(const std::vector<Touch*>& touches, Event * event);
+    void restart(Ref* sender);
 
     CREATE_FUNC(Bug914Layer);
 };

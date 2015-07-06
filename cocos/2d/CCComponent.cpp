@@ -74,7 +74,8 @@ void Component::onEnter()
 #if CC_ENABLE_SCRIPT_BINDING
     if (_scriptType == kScriptTypeJavascript)
     {
-        sendComponentEventToJS(this, kComponentOnEnter);
+        if (sendComponentEventToJS(this, kComponentOnEnter))
+            return;
     }
 #endif
 }
@@ -84,27 +85,8 @@ void Component::onExit()
 #if CC_ENABLE_SCRIPT_BINDING
     if (_scriptType == kScriptTypeJavascript)
     {
-        sendComponentEventToJS(this, kComponentOnExit);
-    }
-#endif
-}
-
-void Component::onAdd()
-{
-#if CC_ENABLE_SCRIPT_BINDING
-    if (_scriptType == kScriptTypeJavascript)
-    {
-        sendComponentEventToJS(this, kComponentOnAdd);
-    }
-#endif
-}
-
-void Component::onRemove()
-{
-#if CC_ENABLE_SCRIPT_BINDING
-    if (_scriptType == kScriptTypeJavascript)
-    {
-        sendComponentEventToJS(this, kComponentOnRemove);
+        if (sendComponentEventToJS(this, kComponentOnExit))
+            return;
     }
 #endif
 }
@@ -114,7 +96,8 @@ void Component::update(float delta)
 #if CC_ENABLE_SCRIPT_BINDING
     if (_scriptType == kScriptTypeJavascript)
     {
-        sendComponentEventToJS(this, kComponentOnUpdate);
+        if (sendComponentEventToJS(this, kComponentOnUpdate))
+            return;
     }
 #endif
 }

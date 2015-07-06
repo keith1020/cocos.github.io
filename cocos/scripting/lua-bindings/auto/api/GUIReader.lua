@@ -9,7 +9,6 @@
 -- @function [parent=#GUIReader] setFilePath 
 -- @param self
 -- @param #string strFilePath
--- @return GUIReader#GUIReader self (return value: ccs.GUIReader)
         
 --------------------------------
 -- 
@@ -42,7 +41,6 @@
 -- 
 -- @function [parent=#GUIReader] destroyInstance 
 -- @param self
--- @return GUIReader#GUIReader self (return value: ccs.GUIReader)
         
 --------------------------------
 -- 

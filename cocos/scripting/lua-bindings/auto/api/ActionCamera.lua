@@ -12,7 +12,6 @@
 -- @param #float x
 -- @param #float y
 -- @param #float z
--- @return ActionCamera#ActionCamera self (return value: cc.ActionCamera)
 
 --------------------------------
 -- 
@@ -25,7 +24,6 @@
 -- @function [parent=#ActionCamera] setUp 
 -- @param self
 -- @param #vec3_table up
--- @return ActionCamera#ActionCamera self (return value: cc.ActionCamera)
         
 --------------------------------
 -- 
@@ -38,7 +36,6 @@
 -- @function [parent=#ActionCamera] setCenter 
 -- @param self
 -- @param #vec3_table center
--- @return ActionCamera#ActionCamera self (return value: cc.ActionCamera)
         
 --------------------------------
 -- 
@@ -51,7 +48,6 @@
 -- @function [parent=#ActionCamera] startWithTarget 
 -- @param self
 -- @param #cc.Node target
--- @return ActionCamera#ActionCamera self (return value: cc.ActionCamera)
         
 --------------------------------
 -- 
@@ -66,10 +62,8 @@
 -- @return ActionCamera#ActionCamera ret (return value: cc.ActionCamera)
         
 --------------------------------
--- js ctor<br>
--- lua new
+-- js ctor
 -- @function [parent=#ActionCamera] ActionCamera 
 -- @param self
--- @return ActionCamera#ActionCamera self (return value: cc.ActionCamera)
         
 return nil

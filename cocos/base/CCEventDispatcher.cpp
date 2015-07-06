@@ -439,16 +439,14 @@ void EventDispatcher::dissociateNodeAndEventListener(Node* node, EventListener* 
 
 void EventDispatcher::addEventListener(EventListener* listener)
 {
-    if (_inDispatch == 0)
-    {
-        forceAddEventListener(listener);
-    }
-    else
-    {
-        _toAddedListeners.push_back(listener);
-    }
-
-    listener->retain();
+//     if (_inDispatch == 0)
+//         forceAddEventListener(listener);
+//     else
+//         _toAddedListeners.push_back(listener);
+// 	listener->retain();
+	// Lynn 注册listener无论何时都立即注册
+	forceAddEventListener(listener);
+	listener->retain();
 }
 
 void EventDispatcher::forceAddEventListener(EventListener* listener)
@@ -752,8 +750,10 @@ void EventDispatcher::dispatchEventToListeners(EventListenerVector* listeners, c
         if (!shouldStopPropagation)
         {
             // priority == 0, scene graph priority
-            for (auto& l : *sceneGraphPriorityListeners)
+            //for (auto& l : *sceneGraphPriorityListeners)
+			for ( int k = 0; k < sceneGraphPriorityListeners->size(); k ++ )
             {
+				EventListener* l = sceneGraphPriorityListeners->at(k);
                 if (l->isEnabled() && !l->isPaused() && l->isRegistered() && onEvent(l))
                 {
                     shouldStopPropagation = true;
@@ -849,7 +849,8 @@ void EventDispatcher::dispatchTouchEvent(EventTouch* event)
     //
     // process the target handlers 1st
     //
-    if (oneByOneListeners)
+	//(!isNeedsMutableSet || mutableTouches.size() == 1) 不加此判断，在单点触发的情况下，多点不会触发。added by tokentong at 2015/03/24
+    if ( (!isNeedsMutableSet || mutableTouches.size() == 1) && oneByOneListeners )
     {
         auto mutableTouchesIter = mutableTouches.begin();
         auto touchesIter = originalTouches.begin();

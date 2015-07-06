@@ -27,46 +27,49 @@
 
 #include "../UIScene.h"
 
-DEFINE_TEST_SUITE(UIImageViewTests);
-
 class UIImageViewTest : public UIScene
 {
 public:
-    CREATE_FUNC(UIImageViewTest);
-
-    virtual bool init() override;
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UIImageViewTest)
 };
 
 class UIImageViewTest_Scale9 : public UIScene
 {
-public:
-    CREATE_FUNC(UIImageViewTest_Scale9);
-
-    virtual bool init() override;
+public:    
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UIImageViewTest_Scale9)
 };
 
 class UIImageViewTest_Scale9_State_Change : public UIScene
 {
 public:
-    CREATE_FUNC(UIImageViewTest_Scale9_State_Change);
+    bool init();
 
-    virtual bool init() override;
+protected:
+    UI_SCENE_CREATE_FUNC(UIImageViewTest_Scale9_State_Change)
 };
 
 class UIImageViewTest_ContentSize : public UIScene
 {
 public:
-    CREATE_FUNC(UIImageViewTest_ContentSize);
-
-    virtual bool init() override;
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UIImageViewTest_ContentSize)
 };
 
 class UIImageViewFlipTest : public UIScene
 {
 public:
-    CREATE_FUNC(UIImageViewFlipTest);
-
-    virtual bool init() override;
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UIImageViewFlipTest)
 };
 
 #endif /* defined(__TestCpp__UIImageViewTest__) */

@@ -1,23 +1,11 @@
 #include "MouseTest.h"
 
-USING_NS_CC;
-
-template <typename T> std::string tostr(const T& t) { std::ostringstream os; os<<t; return os.str(); }
-
-MouseTests::MouseTests()
-{
-    ADD_TEST_CASE(MouseEventTest);
-    ADD_TEST_CASE(HideMouseTest);
-}
-
-//------------------------------------------------------------------
-//
-// MouseEventTest
-//
-//------------------------------------------------------------------
-MouseEventTest::MouseEventTest()
+MouseTest::MouseTest()
 {
     auto s = Director::getInstance()->getWinSize();
+    auto title = Label::createWithTTF("Mouse Test", "fonts/arial.ttf", 28);
+    addChild(title, 0);
+    title->setPosition( Vec2(s.width/2, s.height-50) );
 
     //Create a label to display the mouse action
     _labelAction = Label::createWithTTF("Click mouse button and see this change", "fonts/arial.ttf", 22);
@@ -31,20 +19,28 @@ MouseEventTest::MouseEventTest()
 
 
     _mouseListener = EventListenerMouse::create();
-    _mouseListener->onMouseMove = CC_CALLBACK_1(MouseEventTest::onMouseMove, this);
-    _mouseListener->onMouseUp = CC_CALLBACK_1(MouseEventTest::onMouseUp, this);
-    _mouseListener->onMouseDown = CC_CALLBACK_1(MouseEventTest::onMouseDown, this);
-    _mouseListener->onMouseScroll = CC_CALLBACK_1(MouseEventTest::onMouseScroll, this);
+    _mouseListener->onMouseMove = CC_CALLBACK_1(MouseTest::onMouseMove, this);
+    _mouseListener->onMouseUp = CC_CALLBACK_1(MouseTest::onMouseUp, this);
+    _mouseListener->onMouseDown = CC_CALLBACK_1(MouseTest::onMouseDown, this);
+    _mouseListener->onMouseScroll = CC_CALLBACK_1(MouseTest::onMouseScroll, this);
 
     _eventDispatcher->addEventListenerWithSceneGraphPriority(_mouseListener, this);
+
+    _labelAction->retain();
+    _labelPosition->retain();
 }
 
-MouseEventTest::~MouseEventTest()
+MouseTest::~MouseTest()
 {
     _eventDispatcher->removeEventListener(_mouseListener);
+
+    _labelAction->release();
+    _labelPosition->release();
 }
 
-void MouseEventTest::onMouseDown(Event *event)
+template <typename T> std::string tostr(const T& t) { std::ostringstream os; os<<t; return os.str(); }
+
+void MouseTest::onMouseDown(Event *event)
 {
     EventMouse* e = (EventMouse*)event;
     std::string str = "Mouse Down detected, Key: ";
@@ -52,7 +48,7 @@ void MouseEventTest::onMouseDown(Event *event)
     _labelAction->setString(str.c_str());
 }
 
-void MouseEventTest::onMouseUp(Event *event)
+void MouseTest::onMouseUp(Event *event)
 {
     EventMouse* e = (EventMouse*)event;
     std::string str = "Mouse Up detected, Key: ";
@@ -60,7 +56,7 @@ void MouseEventTest::onMouseUp(Event *event)
     _labelAction->setString(str.c_str());
 }
 
-void MouseEventTest::onMouseMove(Event *event)
+void MouseTest::onMouseMove(Event *event)
 {
     EventMouse* e = (EventMouse*)event;
     std::string str = "MousePosition X:";
@@ -68,7 +64,7 @@ void MouseEventTest::onMouseMove(Event *event)
     _labelPosition->setString(str.c_str());
 }
 
-void MouseEventTest::onMouseScroll(Event *event)
+void MouseTest::onMouseScroll(Event *event)
 {
     EventMouse* e = (EventMouse*)event;
     std::string str = "Mouse Scroll detected, X: ";
@@ -76,49 +72,11 @@ void MouseEventTest::onMouseScroll(Event *event)
     _labelAction->setString(str.c_str());
 }
 
-std::string MouseEventTest::title() const
+void MouseTestScene::runThisTest()
 {
-    return "Mouse Event Test";
+    auto layer = new (std::nothrow) MouseTest();
+    addChild(layer);
+
+    Director::getInstance()->replaceScene(this);
+    layer->release();
 }
-
-std::string MouseEventTest::subtitle() const
-{
-    return "This tests the mouse events";
-}
-
-//------------------------------------------------------------------
-//
-// HideMouseTest
-//
-//------------------------------------------------------------------
-
-HideMouseTest::HideMouseTest()
-{
-    
-    _lis = EventListenerMouse::create();
-    _lis->onMouseDown = [](Event* e){
-        Director::getInstance()->getOpenGLView()->setCursorVisible(false);
-    };
-    
-    _lis->onMouseUp = [](Event* e){
-        Director::getInstance()->getOpenGLView()->setCursorVisible(true);
-    };
-    
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(_lis, this);
-}
-
-HideMouseTest::~HideMouseTest()
-{
-    _eventDispatcher->removeEventListener(_lis);
-}
-
-std::string HideMouseTest::title() const
-{
-    return "Hide/Show Mouse";
-}
-
-std::string HideMouseTest::subtitle() const
-{
-    return "Click to hide mouse";
-}
-

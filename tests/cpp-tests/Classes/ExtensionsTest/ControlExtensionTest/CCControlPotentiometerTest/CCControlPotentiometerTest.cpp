@@ -24,9 +24,6 @@
 
 #include "CCControlPotentiometerTest.h"
 
-USING_NS_CC;
-USING_NS_CC_EXT;
-
 ControlPotentiometerTest::ControlPotentiometerTest()
 : _displayValueLabel(nullptr)
 {

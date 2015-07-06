@@ -55,7 +55,6 @@ public:
     static ControlSwitch* create(Sprite *maskSprite, Sprite * onSprite, Sprite * offSprite, Sprite * thumbSprite);
     /**
      * @js ctor
-     * @lua new
      */
     ControlSwitch();
     /**
@@ -81,7 +80,7 @@ public:
     void setOn(bool isOn);
     bool isOn(void) const { return _on; }
     bool hasMoved() const { return _moved; }
-    virtual void setEnabled(bool enabled) override;
+    virtual void setEnabled(bool enabled);
 
     Vec2 locationFromTouch(Touch* touch);
 

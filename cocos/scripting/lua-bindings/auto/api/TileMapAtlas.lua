@@ -19,10 +19,9 @@
 --  dealloc the map from memory 
 -- @function [parent=#TileMapAtlas] releaseMap 
 -- @param self
--- @return TileMapAtlas#TileMapAtlas self (return value: cc.TileMapAtlas)
         
 --------------------------------
--- Returns a tile from position x,y.<br>
+--  returns a tile from position x,y.<br>
 -- For the moment only channel R is used
 -- @function [parent=#TileMapAtlas] getTileAt 
 -- @param self
@@ -36,7 +35,6 @@
 -- @param self
 -- @param #color3b_table tile
 -- @param #vec2_table position
--- @return TileMapAtlas#TileMapAtlas self (return value: cc.TileMapAtlas)
         
 --------------------------------
 --  creates a TileMap with a tile file (atlas) with a map file and the width and height of each tile in points.<br>
@@ -53,6 +51,5 @@
 -- js ctor
 -- @function [parent=#TileMapAtlas] TileMapAtlas 
 -- @param self
--- @return TileMapAtlas#TileMapAtlas self (return value: cc.TileMapAtlas)
         
 return nil

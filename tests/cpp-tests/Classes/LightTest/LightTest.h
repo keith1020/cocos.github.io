@@ -25,22 +25,29 @@
 #ifndef _LIGHT_TEST_H_
 #define _LIGHT_TEST_H_
 
+#include "../testBasic.h"
 #include "../BaseTest.h"
 
-DEFINE_TEST_SUITE(LightTests);
-
-class LightTest : public TestCase
+class LightTest : public BaseTest
 {
 public:
     CREATE_FUNC(LightTest);
     LightTest();
     virtual ~LightTest();
 
-    virtual std::string title() const override;
+    virtual std::string title() const;
+    virtual std::string subtitle() const;
 
-    virtual void update(float delta) override;
+    virtual void restartCallback(Ref* sender);
+    virtual void nextCallback(Ref* sender);
+    virtual void backCallback(Ref* sender);
 
-    void SwitchLight(cocos2d::Ref* sender, cocos2d::LightType lightType);
+    virtual void onEnter() override;
+    virtual void onExit() override;
+
+    virtual void update(float delta);
+
+    void SwitchLight(Ref* sender, LightType lightType);
 
 private:
 
@@ -49,15 +56,22 @@ private:
 
 private:
 
-    cocos2d::AmbientLight* _ambientLight;
-    cocos2d::DirectionLight* _directionalLight;
-    cocos2d::PointLight* _pointLight;
-    cocos2d::SpotLight* _spotLight;
+    AmbientLight *_ambientLight;
+    DirectionLight *_directionalLight;
+    PointLight *_pointLight;
+    SpotLight *_spotLight;
 
-    cocos2d::Label* _ambientLightLabel;
-    cocos2d::Label* _directionalLightLabel;
-    cocos2d::Label* _pointLightLabel;
-    cocos2d::Label* _spotLightLabel;
+    Label *_ambientLightLabel;
+    Label *_directionalLightLabel;
+    Label *_pointLightLabel;
+    Label *_spotLightLabel;
+};
+
+class LightTestScene : public TestScene
+{
+public:
+    LightTestScene();
+    virtual void runThisTest();
 };
 
 #endif

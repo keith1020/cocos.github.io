@@ -42,16 +42,26 @@
 
 @end
 
+@interface CCCustomUITextView : UITextView
+{
+}
 
-@interface UIEditBoxImplIOS_objc : NSObject <UITextFieldDelegate>
+@end
+
+@interface UIEditBoxImplIOS_objc : NSObject <UITextFieldDelegate,UITextViewDelegate>
 {
     UICustomUITextField* textField_;
+    CCCustomUITextView* textView_;
     void* editBox_;
     BOOL editState_;
+    bool multilineEnable_;
+    CGRect editBoxFrame_;
 }
 
 @property(nonatomic, retain) UITextField* textField;
+@property(nonatomic, retain) UITextView* textView;
 @property(nonatomic, readonly, getter = isEditState) BOOL editState;
+@property(nonatomic, readonly) bool multilineEnable;
 @property(nonatomic, assign) void* editBox;
 
 -(id) initWithFrame: (CGRect) frameRect editBox: (void*) editBox;
@@ -61,6 +71,7 @@
 -(void) visit;
 -(void) openKeyboard;
 -(void) closeKeyboard;
+-(void) setMultilineEnable:(bool)enable;
 
 @end
 
@@ -85,9 +96,9 @@ public:
     
     virtual bool initWithSize(const Size& size);
     virtual void setFont(const char* pFontName, int fontSize);
-    virtual void setFontColor(const Color4B& color);
+    virtual void setFontColor(const Color3B& color);
     virtual void setPlaceholderFont(const char* pFontName, int fontSize);
-    virtual void setPlaceholderFontColor(const Color4B& color);
+    virtual void setPlaceholderFontColor(const Color3B& color);
     virtual void setInputMode(EditBox::InputMode inputMode);
     virtual void setInputFlag(EditBox::InputFlag inputFlag);
     virtual void setMaxLength(int maxLength);
@@ -118,7 +129,11 @@ public:
     virtual void openKeyboard();
     virtual void closeKeyboard();
 	
+    virtual void finishEdit();
 	virtual void onEndEditing();
+    
+    virtual void enableMultiline( bool enable );
+    virtual bool isMultilineEnabled() const;
 private:
 	void			initInactiveLabels(const Size& size);
 	void			setInactiveText(const char* pText);
@@ -132,6 +147,7 @@ private:
     Vec2         _anchorPoint;
     UIEditBoxImplIOS_objc* _systemControl;
     int             _maxTextLength;
+    bool            _enableMultiline;
 };
 
 

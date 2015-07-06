@@ -27,87 +27,68 @@
 
 #include "../UIScene.h"
 
-DEFINE_TEST_SUITE(UISliderTests);
-
 class UISliderTest : public UIScene
 {
 public:
-    CREATE_FUNC(UISliderTest);
-
     UISliderTest();
     ~UISliderTest();
-    virtual bool init() override;
-    void sliderEvent(cocos2d::Ref* sender, cocos2d::ui::Slider::EventType type);
+    bool init();
+    void sliderEvent(Ref* pSender, Slider::EventType type);
     
 protected:
-    cocos2d::ui::TextBMFont* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UISliderTest)
+    Text* _displayValueLabel;
 };
 
 class UISliderTest_Scale9 : public UIScene
 {
 public:
-    CREATE_FUNC(UISliderTest_Scale9);
-
     UISliderTest_Scale9();
     ~UISliderTest_Scale9();
-    virtual bool init() override;
-    void sliderEvent(cocos2d::Ref* sender, cocos2d::ui::Slider::EventType type);
+    bool init();
+    void sliderEvent(Ref* pSender, Slider::EventType type);
     
 protected:
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UISliderTest_Scale9)
+    Text* _displayValueLabel;
 };
 
 class UISliderTest_Scale9_State_Change : public UIScene
 {
 public:
-    CREATE_FUNC(UISliderTest_Scale9_State_Change);
-
     UISliderTest_Scale9_State_Change();
     ~UISliderTest_Scale9_State_Change();
-    virtual bool init() override;
-    void sliderEvent(cocos2d::Ref* sender, cocos2d::ui::Slider::EventType type);
+    bool init();
+    void sliderEvent(Ref* pSender, Slider::EventType type);
 
 protected:
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UISliderTest_Scale9_State_Change)
+        Text* _displayValueLabel;
 };
 
 
 class UISliderNormalDefaultTest : public UIScene
 {
 public:
-    CREATE_FUNC(UISliderNormalDefaultTest);
-
     UISliderNormalDefaultTest();
     ~UISliderNormalDefaultTest();
-    virtual bool init() override;
+    bool init();
     
 protected:
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UISliderNormalDefaultTest)
+    Text* _displayValueLabel;
 };
 
 class UISliderDisabledDefaultTest : public UIScene
 {
 public:
-    CREATE_FUNC(UISliderDisabledDefaultTest);
-
     UISliderDisabledDefaultTest();
     ~UISliderDisabledDefaultTest();
-    virtual bool init() override;
+    bool init();
     
 protected:
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UISliderDisabledDefaultTest)
+    Text* _displayValueLabel;
 };
 
-class UISliderNewEventCallbackTest : public UIScene
-{
-public:
-    CREATE_FUNC(UISliderNewEventCallbackTest);
-
-    UISliderNewEventCallbackTest();
-    ~UISliderNewEventCallbackTest();
-    virtual bool init() override;
-
-protected:
-    cocos2d::ui::Text* _displayValueLabel;
-};
 #endif /* defined(__TestCpp__UISliderTest__) */

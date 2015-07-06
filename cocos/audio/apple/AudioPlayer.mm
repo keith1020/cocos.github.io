@@ -116,9 +116,7 @@ void AudioPlayer::rotateBufferThread(int offsetFrame)
     ALint bufferProcessed = 0;
     ExtAudioFileRef extRef = nullptr;
     
-    NSString *fileFullPath = [[NSString alloc] initWithCString:_audioCache->_fileFullPath.c_str() encoding:[NSString defaultCStringEncoding]];
-    auto fileURL = (CFURLRef)[[NSURL alloc] initFileURLWithPath:fileFullPath];
-    [fileFullPath release];
+    auto fileURL = (CFURLRef)[[NSURL fileURLWithPath:[NSString stringWithCString:_audioCache->_fileFullPath.c_str() encoding:[NSString defaultCStringEncoding]]] retain];
     char* tmpBuffer = (char*)malloc(_audioCache->_queBufferBytes);
     auto frames = _audioCache->_queBufferFrames;
     

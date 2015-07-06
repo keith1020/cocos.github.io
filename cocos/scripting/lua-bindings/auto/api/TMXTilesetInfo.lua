@@ -15,6 +15,5 @@
 -- js ctor
 -- @function [parent=#TMXTilesetInfo] TMXTilesetInfo 
 -- @param self
--- @return TMXTilesetInfo#TMXTilesetInfo self (return value: cc.TMXTilesetInfo)
         
 return nil

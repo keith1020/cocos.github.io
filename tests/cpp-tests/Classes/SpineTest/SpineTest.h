@@ -27,15 +27,39 @@
 #define _SPINETEST_H_
 
 #include "cocos2d.h"
+#include "../testBasic.h"
 #include "../BaseTest.h"
 #include <spine/spine-cocos2dx.h>
 
-DEFINE_TEST_SUITE(SpineTests);
+class SpineTestScene : public TestScene
+{
+public:
+    virtual void runThisTest();
+};
 
-class SpineTestLayer : public TestCase
+class SpineTestSceneFFD : public TestScene
+{
+public:
+    virtual void runThisTest();
+};
+
+class SpineTestLayer : public BaseTest
 {
 protected:
     std::string    _title;
+    
+public:
+    SpineTestLayer(void);
+    virtual ~SpineTestLayer(void);
+    
+    void restartCallback(Ref* sender);
+    void nextCallback(Ref* sender);
+    void backCallback(Ref* sender);
+    
+    // overrides
+    virtual std::string title() const override;
+    virtual std::string subtitle() const override;
+    virtual void onEnter() override;
 };
 
 class SpineTestLayerNormal: public SpineTestLayer {
@@ -51,8 +75,8 @@ public:
     {
         return "Normal Spine";
     }
-	virtual bool init () override;
-	virtual void update (float deltaTime) override;
+	virtual bool init ();
+	virtual void update (float deltaTime);
     //    void animationStateEvent (spine::SkeletonAnimation* node, int trackIndex, spEventType type, spEvent* event, int loopCount);
     
 	CREATE_FUNC (SpineTestLayerNormal);
@@ -71,30 +95,11 @@ public:
     {
         return "FFD Spine";
     }
-	virtual bool init () override;
-	virtual void update (float deltaTime) override;
+	virtual bool init ();
+	virtual void update (float deltaTime);
     //    void animationStateEvent (spine::SkeletonAnimation* node, int trackIndex, spEventType type, spEvent* event, int loopCount);
     
 	CREATE_FUNC (SpineTestLayerFFD);
-};
-
-class SpineTestLayerRapor: public SpineTestLayer
-{
-public:
-    virtual std::string title() const override
-    {
-        return "Spine Test";
-    }
-    virtual std::string subtitle() const override
-    {
-        return "Raptor Test";
-    }
-    virtual bool init () override;
-    
-    CREATE_FUNC (SpineTestLayerRapor);
-    
-private:
-    spine::SkeletonAnimation* skeletonNode;
 };
 
 class SpineTestPerformanceLayer: public SpineTestLayer
@@ -108,8 +113,8 @@ public:
     {
         return "Performance Test for Spine";
     }
-	virtual bool init () override;
-	virtual void update (float deltaTime) override;
+	virtual bool init ();
+	virtual void update (float deltaTime);
     //    void animationStateEvent (spine::SkeletonAnimation* node, int trackIndex, spEventType type, spEvent* event, int loopCount);
     
 	CREATE_FUNC (SpineTestPerformanceLayer);

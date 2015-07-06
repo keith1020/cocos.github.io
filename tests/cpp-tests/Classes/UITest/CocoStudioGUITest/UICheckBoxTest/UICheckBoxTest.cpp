@@ -1,14 +1,7 @@
+
+
 #include "UICheckBoxTest.h"
 
-USING_NS_CC;
-using namespace cocos2d::ui;
-
-UICheckBoxTests::UICheckBoxTests()
-{
-    ADD_TEST_CASE(UICheckBoxTest);
-    ADD_TEST_CASE(UICheckBoxDefaultBehaviorTest);
-    ADD_TEST_CASE(UICheckBoxCopyTest);
-}
 
 // UICheckBoxTest
 UICheckBoxTest::UICheckBoxTest()
@@ -142,50 +135,3 @@ bool UICheckBoxDefaultBehaviorTest::init()
     return false;
 }
 
-
-// UICheckBoxCopyTest
-UICheckBoxCopyTest::UICheckBoxCopyTest()
-: _displayValueLabel(nullptr)
-{
-
-}
-
-UICheckBoxCopyTest::~UICheckBoxCopyTest()
-{
-}
-
-bool UICheckBoxCopyTest::init()
-{
-    if (UIScene::init())
-    {
-        Size widgetSize = _widget->getContentSize();;
-
-        // Add a label in which the checkbox events will be displayed
-        _displayValueLabel = Text::create("No Event", "fonts/Marker Felt.ttf", 32);
-        _displayValueLabel->setAnchorPoint(Vec2(0.5f, -1));
-        _displayValueLabel->setPosition(Vec2(widgetSize.width / 2.0f, widgetSize.height / 2.0f));
-        _uiLayer->addChild(_displayValueLabel);
-
-        // Add the alert
-        Text* alert = Text::create("Two checkbox are identical.","fonts/Marker Felt.ttf",20 );
-        alert->setColor(Color3B(159, 168, 176));
-        alert->setPosition(Vec2(widgetSize.width / 2.0f,
-                                widgetSize.height / 2.0f - alert->getContentSize().height * 1.75f));
-        _uiLayer->addChild(alert);
-
-        // Create the checkbox
-        CheckBox* checkBox = CheckBox::create("cocosui/check_box_normal.png",
-                                              "cocosui/check_box_active.png");
-        checkBox->setPosition(Vec2(widgetSize.width / 2.0f - 50, widgetSize.height / 2.0f));
-
-        _uiLayer->addChild(checkBox);
-
-        auto checkboxCopy = checkBox->clone();
-        checkboxCopy->setPosition(checkBox->getPosition() + Vec2(50,0));
-        _uiLayer->addChild(checkboxCopy);
-
-
-        return true;
-    }
-    return false;
-}

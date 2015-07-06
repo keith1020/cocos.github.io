@@ -26,7 +26,6 @@
 -- @param self
 -- @param #string key
 -- @param #float value
--- @return ComAttribute#ComAttribute self (return value: ccs.ComAttribute)
         
 --------------------------------
 -- 
@@ -34,7 +33,6 @@
 -- @param self
 -- @param #string key
 -- @param #string value
--- @return ComAttribute#ComAttribute self (return value: ccs.ComAttribute)
         
 --------------------------------
 -- 
@@ -50,7 +48,6 @@
 -- @param self
 -- @param #string key
 -- @param #int value
--- @return ComAttribute#ComAttribute self (return value: ccs.ComAttribute)
         
 --------------------------------
 -- 
@@ -73,7 +70,6 @@
 -- @param self
 -- @param #string key
 -- @param #bool value
--- @return ComAttribute#ComAttribute self (return value: ccs.ComAttribute)
         
 --------------------------------
 -- 

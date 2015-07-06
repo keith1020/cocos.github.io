@@ -5,20 +5,18 @@
 
 #include "../UIScene_Editor.h"
 
-DEFINE_TEST_SUITE(UILoadingBarEditorTests);
-
 class UILoadingBarTest_Editor : public UIScene_Editor
 {
 public:
-    CREATE_FUNC(UILoadingBarTest_Editor);
-
     UILoadingBarTest_Editor();
     ~UILoadingBarTest_Editor();
-    virtual bool init() override;
+    bool init();
     void update(float delta);
-
-    virtual void configureGUIScene() override;
+    void toCocosGUITestScene(Ref* sender, Widget::TouchEventType event);
+    virtual void switchLoadMethod(Ref* pSender);
+    void configureGUIScene();
 protected:
+    UI_SCENE_EDITOR_CREATE_FUNC(UILoadingBarTest_Editor)
     int _count;
 };
 

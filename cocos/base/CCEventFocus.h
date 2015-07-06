@@ -28,10 +28,6 @@
 
 #include "base/CCEvent.h"
 
-/**
- * @addtogroup base
- * @{
- */
 
 NS_CC_BEGIN
 
@@ -39,18 +35,9 @@ namespace ui {
     class Widget;
 }
 
-/** @class EventFocus
- * @brief Focus event.
- */
 class CC_DLL EventFocus : public Event
 {
 public:
-    /** Constructor.
-     *
-     * @param widgetLoseFocus The widget which lose focus.
-     * @param widgetGetFocus The widget which get focus.
-     * @js ctor
-     */
     EventFocus(ui::Widget* widgetLoseFocus, ui::Widget* widgetGetFocus);
     
 private:
@@ -62,8 +49,5 @@ private:
 
 
 NS_CC_END
-
-// end of base group
-/// @}
 
 #endif /* defined(__cocos2d_libs__CCEventFocus__) */

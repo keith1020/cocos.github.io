@@ -5,21 +5,19 @@
 
 #include "../UIScene.h"
 
-DEFINE_TEST_SUITE(UIRichTextTests);
-
 class UIRichTextTest : public UIScene
 {
 public:
-    CREATE_FUNC(UIRichTextTest);
-
     UIRichTextTest();
     ~UIRichTextTest();
-
-    virtual bool init() override;
-    void touchEvent(cocos2d::Ref* sender, cocos2d::ui::Widget::TouchEventType type);
+    bool init();
+    void touchEvent(Ref *pSender, Widget::TouchEventType type);
     
 protected:
-    cocos2d::ui::RichText* _richText;
+    UI_SCENE_CREATE_FUNC(UIRichTextTest)
+    
+protected:
+    RichText* _richText;
 };
 
 #endif /* defined(__TestCpp__UIRichTextTest__) */

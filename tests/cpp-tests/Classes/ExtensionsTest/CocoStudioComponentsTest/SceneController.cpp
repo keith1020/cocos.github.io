@@ -24,16 +24,16 @@ bool SceneController::init()
     return true;
 }
 
-void SceneController::onAdd()
+void SceneController::onEnter()
 {
-	ComController::onAdd();
+    ComController::onEnter();
     _fAddTargetTime = 1.0f;
    
     static_cast<ComAudio*>(_owner->getComponent("Audio"))->playBackgroundMusic("background.wav", true);
     static_cast<ComAttribute*>(_owner->getComponent("CCComAttribute"))->setInt("KillCount", 0);
 }
 
-void SceneController::onRemove()
+void SceneController::onExit()
 {
 }
 
@@ -79,12 +79,9 @@ void SceneController::spriteMoveFinished(Node* sender)
 	if (sprite->getTag() == 2)  // target
 	{
         _targets.eraseObject(sprite);
-
-        auto director = Director::getInstance();
 		auto gameOverScene = GameOverScene::create();
 		gameOverScene->getLayer()->getLabel()->setString("You Lose :[");
-
-        director->replaceScene(gameOverScene);
+		Director::getInstance()->replaceScene(gameOverScene);
 	}
 	else if (sprite->getTag() == 3) 
 	{
@@ -102,9 +99,8 @@ void SceneController::increaseKillCount()
 
     if (nProjectilesDestroyed >= 5)
     {
-        auto director = Director::getInstance();
         auto gameOverScene = GameOverScene::create();
         gameOverScene->getLayer()->getLabel()->setString("You Win!");
-        director->replaceScene(gameOverScene);
+        Director::getInstance()->replaceScene(gameOverScene);
     }
 }

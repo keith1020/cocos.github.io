@@ -5,14 +5,13 @@
 
 #include "../UIScene.h"
 
-DEFINE_TEST_SUITE(UITextAtlasTests);
-
 class UITextAtlasTest : public UIScene
 {
-public:
-    CREATE_FUNC(UITextAtlasTest);
-
-    virtual bool init() override;
+public:    
+    bool init();
+    
+protected:
+    UI_SCENE_CREATE_FUNC(UITextAtlasTest)
 };
 
 #endif /* defined(__TestCpp__UITextAtlasTest__) */

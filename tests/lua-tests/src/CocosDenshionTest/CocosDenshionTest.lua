@@ -22,7 +22,7 @@ local function CocosDenshionTest()
         "pause background music",
         "resume background music",
         "rewind background music",
-        "is background music playing(output on the console)",
+        "is background music playing",
         "play effect",
         "play effect repeatly",
         "stop effect",

@@ -1,36 +1,35 @@
 #ifndef _EFFECTS_TEST_H_
 #define _EFFECTS_TEST_H_
 
+#include "../testBasic.h"
 #include "../BaseTest.h"
 
-DEFINE_TEST_SUITE(EffectTests);
+class EffectTestScene : public TestScene
+{
+public:
+    virtual void runThisTest();
+};
 
-class EffectBaseTest : public TestCase
+class TextLayer : public BaseTest
 {
 protected:
     //UxString    _title;
-    cocos2d::NodeGrid* _gridNodeTarget;
+    NodeGrid* _gridNodeTarget;
 public:
-    static EffectBaseTest* create(int index)
-    {
-        auto ret = new (std::nothrow) EffectBaseTest(index);
-        if (ret && ret->init())
-        {
-            ret->autorelease();
-        }
-        else
-        {
-            delete ret;
-            ret = nullptr;
-        }
-
-        return ret;
-    }
-
-    EffectBaseTest(int index);
-    ~EffectBaseTest();
+    TextLayer(void);
+    ~TextLayer(void);
 
     void checkAnim(float dt);
+
+    virtual void onEnter() override;
+
+    void restartCallback(Ref* sender);
+    void nextCallback(Ref* sender);
+    void backCallback(Ref* sender);
+
+    void newScene();
+
+    static TextLayer* create();
 };
 
 #endif

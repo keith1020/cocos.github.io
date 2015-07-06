@@ -9,7 +9,6 @@
 -- @function [parent=#TMXLayerInfo] setProperties 
 -- @param self
 -- @param #map_table properties
--- @return TMXLayerInfo#TMXLayerInfo self (return value: cc.TMXLayerInfo)
         
 --------------------------------
 -- 
@@ -21,6 +20,5 @@
 -- js ctor
 -- @function [parent=#TMXLayerInfo] TMXLayerInfo 
 -- @param self
--- @return TMXLayerInfo#TMXLayerInfo self (return value: cc.TMXLayerInfo)
         
 return nil

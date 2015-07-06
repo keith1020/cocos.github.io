@@ -5,33 +5,37 @@
 -- @parent_module ccui
 
 --------------------------------
---  init a bitmap font atlas with an initial string and the FNT file 
--- @function [parent=#TextBMFont] setFntFile 
--- @param self
--- @param #string fileName
--- @return TextBMFont#TextBMFont self (return value: ccui.TextBMFont)
-        
---------------------------------
 -- Gets the string length of the label.<br>
 -- Note: This length will be larger than the raw string length,<br>
 -- if you want to get the raw string length, you should call this->getString().size() instead<br>
 -- return  string length.
 -- @function [parent=#TextBMFont] getStringLength 
 -- @param self
--- @return long#long ret (return value: long)
-        
---------------------------------
--- 
--- @function [parent=#TextBMFont] setString 
--- @param self
--- @param #string value
--- @return TextBMFont#TextBMFont self (return value: ccui.TextBMFont)
+-- @return int#int ret (return value: int)
         
 --------------------------------
 -- 
 -- @function [parent=#TextBMFont] getString 
 -- @param self
 -- @return string#string ret (return value: string)
+        
+--------------------------------
+-- 
+-- @function [parent=#TextBMFont] setString 
+-- @param self
+-- @param #string value
+        
+--------------------------------
+-- Returns the "class name" of widget.
+-- @function [parent=#TextBMFont] getDescription 
+-- @param self
+-- @return string#string ret (return value: string)
+        
+--------------------------------
+--  init a bitmap font atlas with an initial string and the FNT file 
+-- @function [parent=#TextBMFont] setFntFile 
+-- @param self
+-- @param #string fileName
         
 --------------------------------
 -- @overload self, string, string         
@@ -55,23 +59,14 @@
 -- @return Node#Node ret (return value: cc.Node)
         
 --------------------------------
--- Returns the "class name" of widget.
--- @function [parent=#TextBMFont] getDescription 
--- @param self
--- @return string#string ret (return value: string)
-        
---------------------------------
 -- 
 -- @function [parent=#TextBMFont] getVirtualRendererSize 
 -- @param self
 -- @return size_table#size_table ret (return value: size_table)
         
 --------------------------------
--- Default constructor<br>
--- js ctor<br>
--- lua new
+-- Default constructor
 -- @function [parent=#TextBMFont] TextBMFont 
 -- @param self
--- @return TextBMFont#TextBMFont self (return value: ccui.TextBMFont)
         
 return nil

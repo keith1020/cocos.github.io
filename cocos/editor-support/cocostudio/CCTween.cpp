@@ -57,7 +57,7 @@ Tween::Tween()
     , _to(nullptr)
     , _between(nullptr)
     , _bone(nullptr)
-
+	, _tweenScale( 1.0f )
     , _frameTweenEasing(Linear)
     , _fromIndex(0)
     , _toIndex(0)
@@ -95,8 +95,6 @@ bool Tween::init(Bone *bone)
 
     return bRet;
 }
-
-
 void Tween::play(MovementBoneData *movementBoneData, int durationTo, int durationTween,  int loop, int tweenEasing)
 {
     ProcessBase::play(durationTo, durationTween, loop, tweenEasing);

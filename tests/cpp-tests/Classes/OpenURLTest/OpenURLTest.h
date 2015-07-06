@@ -2,20 +2,23 @@
 #define _OPEN_URL_TEST_H_
 
 #include "cocos2d.h"
-#include "../BaseTest.h"
+#include "../testBasic.h"
 
-DEFINE_TEST_SUITE(OpenURLTests);
-
-class OpenURLTest : public TestCase
+class OpenURLTest : public Layer
 {
 public:
-    CREATE_FUNC(OpenURLTest);
     OpenURLTest();
     ~OpenURLTest();
 
-    void onTouchesEnded(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event  *event);
+    void onTouchesEnded(const std::vector<Touch*>& touches, cocos2d::Event  *event);
 private:
     cocos2d::Label* _label;
+};
+
+class OpenURLTestScene : public TestScene
+{
+public:
+    virtual void runThisTest();
 };
 
 #endif // _OPEN_URL_TEST_H_

@@ -1,16 +1,13 @@
 #ifndef __DATAVISITOR_TEST_H__
 #define __DATAVISITOR_TEST_H__
 
-#include "../BaseTest.h"
+#include "../testBasic.h"
 
 #include <string>
 
-DEFINE_TEST_SUITE(DataVisitorTests);
-
-class PrettyPrinterDemo : public TestCase
+class PrettyPrinterDemo : public Layer
 {
 public:
-    CREATE_FUNC(PrettyPrinterDemo);
     virtual std::string title() const;
     virtual std::string subtitle() const;
     virtual void onEnter() override;
@@ -19,5 +16,12 @@ protected:
     std::string    _title;
 };
 
+class DataVisitorTestScene : public TestScene
+{
+public:
+    virtual void runThisTest();
+
+    CREATE_FUNC(DataVisitorTestScene);
+};
 
 #endif // __DATAVISITOR_TEST_H__

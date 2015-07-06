@@ -37,7 +37,6 @@ extern "C" {
 
 #include "network/HttpClient.h"
 
-///@cond
 class LuaMinXmlHttpRequest : public cocos2d::Ref
 {
 public:
@@ -59,6 +58,9 @@ public:
     
     LuaMinXmlHttpRequest();
     ~LuaMinXmlHttpRequest();
+    
+    void handle_requestResponse(cocos2d::network::HttpClient *sender, cocos2d::network::HttpResponse *response);
+	void handle_requestProgressCallback( double totalToDownload, double nowDownloaded, double totalToUpLoad, double nowUpLoaded );
 
     inline void setResponseType(ResponseType type) { _responseType = type; }
     inline ResponseType getResponseType() {return _responseType; }
@@ -105,6 +107,17 @@ public:
     inline void setAborted(bool isAborted) { _isAborted = isAborted; }
     inline bool getAborted() { return _isAborted; }
     
+	//add by jonyu
+	void saveResponseData(const char *filename);
+	void setFilepath(const char *filename);
+	void setCheckMD5(bool bMD5);
+	std::string& getDataMD5();
+
+	//下载相关
+	inline double getTotalToDownload() const { return _totalToDownload; }
+	inline double getNowDownloaded() const   { return _nowDownloaded; }
+	inline double getTotalToUpLoad() const   { return _totalToUpLoad; }
+	inline double getNowUpLoaded() const     { return _nowUpLoaded; }
 private:
     void _gotHeader(std::string header);
     
@@ -116,7 +129,8 @@ private:
     size_t                               _dataSize;
     int                                  _readyState;
     int                                  _status;
-    std::string                          _statusText;
+	std::string                          _statusText;
+	std::string                          _sMD5;
     ResponseType                         _responseType;
     unsigned                             _timeout;
     bool                                 _isAsync;
@@ -127,8 +141,13 @@ private:
     std::map<std::string, std::string>   _requestHeader;
     bool                                 _errorFlag;
     bool                                 _isAborted;
+	///进度相关
+	double                               _totalToDownload;
+	double                               _nowDownloaded;
+	double                               _totalToUpLoad;
+	double                               _nowUpLoaded;
 };
 
 TOLUA_API int register_xml_http_request(lua_State* L);
-///@endcond
+
 #endif //#ifndef __COCOS_SCRIPTING_LUA_BINDINGS_LUA_XML_HTTP_REQUEST_H__

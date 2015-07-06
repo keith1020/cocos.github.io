@@ -28,15 +28,47 @@
 
 #include "cocos2d.h"
 #include "extensions/cocos-ext.h"
-#include "BaseTest.h"
 
 
-class ControlScene : public TestCase
+USING_NS_CC;
+USING_NS_CC_EXT;
+
+#define CONTROL_SCENE_CREATE_FUNC(controlScene) \
+public: \
+static Scene* sceneWithTitle(const char * title) \
+{ \
+    Scene* scene = Scene::create(); \
+    controlScene* controlLayer = new controlScene(); \
+    if (controlLayer && controlLayer->init()) \
+    { \
+        controlLayer->autorelease(); \
+        controlLayer->getSceneTitleLabel()->setString(title); \
+        scene->addChild(controlLayer); \
+    } \
+    else \
+    { \
+        CC_SAFE_DELETE(controlLayer); \
+    } \
+    return scene; \
+}
+
+
+class ControlScene : public Layer
 {
 public:
-    virtual bool init() override;
+    ControlScene();
+    ~ControlScene();
+    bool init();
+    // Menu Callbacks
+    void toExtensionsMainLayer(Ref* sender);
+    void previousCallback(Ref* sender);
+    void restartCallback(Ref* sender);
+    void nextCallback(Ref* sender);
 
-    virtual std::string title() const override { return getTestCaseName(); }
+    /** Title label of the scene. */
+    CC_SYNTHESIZE_RETAIN(Label*, _sceneTitleLabel, SceneTitleLabel)
+
+    CONTROL_SCENE_CREATE_FUNC(ControlScene);
 };
 
 #endif /* __CCCONTROLSCENE_H__ */

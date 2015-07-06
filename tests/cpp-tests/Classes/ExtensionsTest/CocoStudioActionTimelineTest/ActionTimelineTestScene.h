@@ -2,118 +2,110 @@
 #define __ANIMATION_TEST_SCENE_H__
 
 #include "cocos2d.h"
-#include "../../BaseTest.h"
+#include "../../VisibleRect.h"
+#include "../../testBasic.h"
 #include "cocostudio/CocoStudio.h"
 
-class CocoStudioActionTimelineTests : public TestSuite
+using namespace cocostudio::timeline;
+
+
+class ActionTimelineTestScene : public TestScene
 {
-public:
-    CocoStudioActionTimelineTests();
-    ~CocoStudioActionTimelineTests();
+public: 
+    ActionTimelineTestScene(bool bPortrait = false);
+
+    virtual void runThisTest();
+
+    // The CallBack for back to the main menu scene
+    virtual void MainMenuCallback(Ref* pSender);
 };
 
-class ActionTimelineBaseTest : public TestCase
+enum {
+    TEST_ANIMATIONELEMENT = 0,
+    TEST_CHANGE_PLAY_SECTION,
+//    TEST_TIMELINE_FRAME_EVENT,
+    TEST_TIMELINE_PERFORMACE,
+    TEST_TIMELINEACTION_ANIMATIONLIST,
+    TEST_TIMELINEPROJECTNODE,
+    TEST_PROJECTNODEFORSIMALATOR,
+    
+    TEST_ANIMATION_LAYER_COUNT
+};
+
+class ActionTimelineTestLayer : public Layer
 {
 public:
     virtual std::string title() const;
+    virtual std::string subtitle() const;
 
-    virtual bool init() override;
+    virtual void restartCallback(Ref* pSender);
+    virtual void nextCallback(Ref* pSender);
+    virtual void backCallback(Ref* pSender);
 
     // overrides
+    virtual void onEnter() override;
     virtual void onExit() override;
 
 protected:
+    MenuItemImage *restartItem;
+    MenuItemImage *nextItem;
+    MenuItemImage *backItem;
 };
 
 
-class TestActionTimeline : public ActionTimelineBaseTest
+class TestActionTimeline : public ActionTimelineTestLayer
 {
 public:
-    CREATE_FUNC(TestActionTimeline);
-
-    virtual void onEnter() override;
+    virtual void onEnter();
     virtual std::string title() const override;
 };
 
-class TestChangePlaySection : public ActionTimelineBaseTest
+class TestChangePlaySection : public ActionTimelineTestLayer
 {
 public:
-    CREATE_FUNC(TestChangePlaySection);
-
-    virtual void onEnter() override;
+    virtual void onEnter();
     virtual std::string title() const override;
 
-	void onTouchesEnded(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event);
+	void onTouchesEnded(const std::vector<Touch*>& touches, Event* event);
 
 protected:
-    cocostudio::timeline::ActionTimeline* action;
+    ActionTimeline* action;
 };
 
-class TestTimelineFrameEvent : public ActionTimelineBaseTest
+class TestTimelineFrameEvent : public ActionTimelineTestLayer
 {
 public:
-    CREATE_FUNC(TestTimelineFrameEvent);
-
-    virtual void onEnter() override;
+    virtual void onEnter();
     virtual std::string title() const override;
 
-    void onFrameEvent(cocostudio::timeline::Frame* frame);
+    void onFrameEvent(Frame* frame);
 };
 
-class TestTimelinePerformance : public ActionTimelineBaseTest
+class TestTimelinePerformance : public ActionTimelineTestLayer
 {
 public:
-    CREATE_FUNC(TestTimelinePerformance);
-
-    virtual void onEnter() override;
+    virtual void onEnter();
     virtual std::string title() const override;
 };
 
-class TestTimelineAnimationList : public ActionTimelineBaseTest
+class TestTimelineAnimationList : public ActionTimelineTestLayer
 {
 public:
-    CREATE_FUNC(TestTimelineAnimationList);
-
-    virtual void onEnter() override;
+    virtual void onEnter();
     virtual std::string title() const override;
 };
 
-class TestTimelineProjectNode : public ActionTimelineBaseTest
+class TestTimelineProjectNode : public ActionTimelineTestLayer
 {
 public:
-    CREATE_FUNC(TestTimelineProjectNode);
-
-    virtual void onEnter() override;
+    virtual void onEnter();
     virtual std::string title() const override;
 };
 
-class TestProjectNodeForSimulator : public ActionTimelineBaseTest
+class TestProjectNodeForSimulator : public ActionTimelineTestLayer
 {
 public:
-    CREATE_FUNC(TestProjectNodeForSimulator);
-
-    virtual void onEnter() override;
-    virtual std::string title() const override;
-};
-
-class TestTimelineNodeLoadedCallback : public ActionTimelineBaseTest
-{
-public:
-    CREATE_FUNC(TestTimelineNodeLoadedCallback);
-
-    virtual void onEnter() override;
-    virtual std::string title() const override;
-    
-    void nodeLoadedCallback(cocos2d::Ref* sender);
-
-};
-
-class TestActionTimelineEase : public ActionTimelineBaseTest
-{
-public:
-    CREATE_FUNC(TestActionTimelineEase);
-    
-    virtual void onEnter() override;
+    virtual void onEnter();
     virtual std::string title() const override;
 };
 

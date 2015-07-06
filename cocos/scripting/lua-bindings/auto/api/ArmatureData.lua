@@ -9,7 +9,6 @@
 -- @function [parent=#ArmatureData] addBoneData 
 -- @param self
 -- @param #ccs.BoneData boneData
--- @return ArmatureData#ArmatureData self (return value: ccs.ArmatureData)
         
 --------------------------------
 -- 
@@ -34,6 +33,5 @@
 -- js ctor
 -- @function [parent=#ArmatureData] ArmatureData 
 -- @param self
--- @return ArmatureData#ArmatureData self (return value: ccs.ArmatureData)
         
 return nil

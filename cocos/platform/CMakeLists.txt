@@ -7,7 +7,6 @@ set(COCOS_PLATFORM_SPECIFIC_SRC
   platform/win32/CCCommon-win32.cpp
   platform/win32/CCApplication-win32.cpp
   platform/win32/CCDevice-win32.cpp
-  platform/win32/inet_pton_mingw.cpp
   platform/desktop/CCGLViewImpl-desktop.cpp
 )
 
@@ -68,9 +67,6 @@ include_directories(
   platform
   ../external/ConvertUTF
   ../external/edtaa3func
-  ../external/poly2tri
-  ../external/poly2tri/common
-  ../external/poly2tri/sweep
 )
 
 set(COCOS_PLATFORM_SRC
@@ -83,11 +79,6 @@ set(COCOS_PLATFORM_SRC
   ../external/edtaa3func/edtaa3func.cpp
   ../external/ConvertUTF/ConvertUTFWrapper.cpp
   ../external/ConvertUTF/ConvertUTF.c
-  ../external/poly2tri/common/shapes.cc
-  ../external/poly2tri/sweep/advancing_front.cc
-  ../external/poly2tri/sweep/cdt.cc
-  ../external/poly2tri/sweep/sweep_context.cc
-  ../external/poly2tri/sweep/sweep.cc
   ${COCOS_PLATFORM_SPECIFIC_SRC}
 
 )

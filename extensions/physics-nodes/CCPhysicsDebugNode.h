@@ -32,13 +32,13 @@ struct cpSpace;
 NS_CC_EXT_BEGIN
 
 /**
- * A BaseData that draws the components of a physics engine.
+ A BaseData that draws the components of a physics engine.
  
- * Supported physics engines:
- * - Chipmunk
- * - Objective-Chipmunk
- * @since v2.1
- * @lua NA
+ Supported physics engines:
+ - Chipmunk
+ - Objective-Chipmunk
+ 
+ @since v2.1
  */
 
 class CC_EX_DLL PhysicsDebugNode : public DrawNode
@@ -53,6 +53,7 @@ public:
     PhysicsDebugNode();
     /**
      * @js NA
+     * @lua NA
      */
     virtual ~PhysicsDebugNode();
     

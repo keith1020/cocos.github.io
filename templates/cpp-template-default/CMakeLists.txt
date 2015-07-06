@@ -35,8 +35,7 @@ include(CocosBuildHelpers)
 
 # libcocos2d
 set(BUILD_CPP_TESTS OFF CACHE BOOL "turn off build cpp-tests")
-set(BUILD_LUA_LIBS OFF CACHE BOOL "turn off build lua related targets")
-set(BUILD_JS_LIBS OFF CACHE BOOL "turn off build js related targets")
+set(BUILD_LUA_LIBS OFF CACHE BOOL "turn off build lua-tests")
 add_subdirectory(${COCOS2D_ROOT})
 
 # Some macro definitions
@@ -111,16 +110,8 @@ include_directories(
   /usr/local/include/GLFW
   /usr/include/GLFW
   ${COCOS2D_ROOT}/cocos
-  ${COCOS2D_ROOT}/cocos/platform
-  ${COCOS2D_ROOT}/cocos/audio/include/
   Classes
 )
-if ( WIN32 )
-  include_directories(
-  ${COCOS2D_ROOT}/external/glfw3/include/win32
-  ${COCOS2D_ROOT}/external/win32-specific/gles/include/OGLES
-)
-endif( WIN32 )
 
 set(GAME_SRC
   Classes/AppDelegate.cpp
@@ -135,17 +126,9 @@ set(GAME_HEADERS
 )
 
 if(GAME_HEADERS)
-  if ( WIN32 )
-    add_executable(${APP_NAME} WIN32 ${GAME_SRC} ${GAME_HEADERS})
-  else()
-    add_executable(${APP_NAME} ${GAME_SRC} ${GAME_HEADERS})
-  endif ( WIN32 )
+add_executable(${APP_NAME} ${GAME_SRC} ${GAME_HEADERS})
 else()
-  if ( WIN32 )
-    add_executable(${APP_NAME} WIN32 ${GAME_SRC})
-  else()
-    add_executable(${APP_NAME} ${GAME_SRC})
-  endif ( WIN32 )
+add_executable(${APP_NAME} ${GAME_SRC})
 endif()
 
 target_link_libraries(${APP_NAME} cocos2d)

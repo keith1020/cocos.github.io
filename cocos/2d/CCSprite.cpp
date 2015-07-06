@@ -86,18 +86,6 @@ Sprite* Sprite::create(const std::string& filename)
     return nullptr;
 }
 
-Sprite* Sprite::create(const PolygonInfo& info)
-{
-    Sprite *sprite = new (std::nothrow) Sprite();
-    if(sprite && sprite->initWithPolygon(info))
-    {
-        sprite->autorelease();
-        return sprite;
-    }
-    CC_SAFE_DELETE(sprite);
-    return nullptr;
-}
-
 Sprite* Sprite::create(const std::string& filename, const Rect& rect)
 {
     Sprite *sprite = new (std::nothrow) Sprite();
@@ -219,19 +207,6 @@ bool Sprite::initWithSpriteFrame(SpriteFrame *spriteFrame)
     return bRet;
 }
 
-bool Sprite::initWithPolygon(const cocos2d::PolygonInfo &info)
-{
-    Texture2D *texture = Director::getInstance()->getTextureCache()->addImage(info.filename);
-    bool res = false;
-    if(initWithTexture(texture));
-    {
-        _polyInfo = info;
-        setContentSize(_polyInfo.rect.size/Director::getInstance()->getContentScaleFactor());
-        res = true;
-    }
-    return res;
-}
-
 // designated initializer
 bool Sprite::initWithTexture(Texture2D *texture, const Rect& rect, bool rotated)
 {
@@ -253,7 +228,7 @@ bool Sprite::initWithTexture(Texture2D *texture, const Rect& rect, bool rotated)
         setAnchorPoint(Vec2(0.5f, 0.5f));
         
         // zwoptex default values
-        _offsetPosition.setZero();
+        _offsetPosition = Vec2::ZERO;
 
         // clean the Quad
         memset(&_quad, 0, sizeof(_quad));
@@ -271,7 +246,6 @@ bool Sprite::initWithTexture(Texture2D *texture, const Rect& rect, bool rotated)
         setTexture(texture);
         setTextureRect(rect, rotated, rect.size);
         
-        _polyInfo.setQuad(&_quad);
         // by default use "Self Render".
         // if the sprite is added to a batchnode, then it will automatically switch to "batchnode Render"
         setBatchNode(nullptr);
@@ -294,7 +268,8 @@ Sprite::Sprite(void)
 , _insideBounds(true)
 {
 #if CC_SPRITE_DEBUG_DRAW
-    debugDraw(true)
+    _debugDrawNode = DrawNode::create();
+    addChild(_debugDrawNode);
 #endif //CC_SPRITE_DEBUG_DRAW
 }
 
@@ -320,10 +295,10 @@ Sprite::~Sprite(void)
  */
 static unsigned char cc_2x2_white_image[] = {
     // RGBA8888
-    0xFF, 0xFF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF
+    0xFF, 0xFF, 0xFF, 0x00,
+    0xFF, 0xFF, 0xFF, 0x00,
+    0xFF, 0xFF, 0xFF, 0x00,
+    0xFF, 0xFF, 0xFF, 0x00
 };
 
 #define CC_2x2_WHITE_IMAGE_KEY  "/cc_2x2_white_image"
@@ -332,8 +307,13 @@ static unsigned char cc_2x2_white_image[] = {
 void Sprite::setTexture(const std::string &filename)
 {
     Texture2D *texture = Director::getInstance()->getTextureCache()->addImage(filename);
-    setTexture(texture);
 
+	if (texture == nullptr)
+	{
+		// Gets the texture by key firstly.
+		texture = Director::getInstance()->getTextureCache()->getTextureForKey(CC_2x2_WHITE_IMAGE_KEY);
+	}
+	setTexture(texture);
     Rect rect = Rect::ZERO;
     if (texture)
         rect.size = texture->getContentSize();
@@ -392,21 +372,20 @@ void Sprite::setTextureRect(const Rect& rect, bool rotated, const Size& untrimme
     setVertexRect(rect);
     setTextureCoords(rect);
 
-    float relativeOffsetX = _unflippedOffsetPositionFromCenter.x;
-    float relativeOffsetY = _unflippedOffsetPositionFromCenter.y;
+    Vec2 relativeOffset = _unflippedOffsetPositionFromCenter;
 
     // issue #732
     if (_flippedX)
     {
-        relativeOffsetX = -relativeOffsetX;
+        relativeOffset.x = -relativeOffset.x;
     }
     if (_flippedY)
     {
-        relativeOffsetY = -relativeOffsetY;
+        relativeOffset.y = -relativeOffset.y;
     }
 
-    _offsetPosition.x = relativeOffsetX + (_contentSize.width - _rect.size.width) / 2;
-    _offsetPosition.y = relativeOffsetY + (_contentSize.height - _rect.size.height) / 2;
+    _offsetPosition.x = relativeOffset.x + (_contentSize.width - _rect.size.width) / 2;
+    _offsetPosition.y = relativeOffset.y + (_contentSize.height - _rect.size.height) / 2;
 
     // rendering using batch node
     if (_batchNode)
@@ -419,59 +398,18 @@ void Sprite::setTextureRect(const Rect& rect, bool rotated, const Size& untrimme
         // self rendering
         
         // Atlas: Vertex
-        float x1 = 0.0f + _offsetPosition.x;
-        float y1 = 0.0f + _offsetPosition.y;
+        float x1 = 0 + _offsetPosition.x;
+        float y1 = 0 + _offsetPosition.y;
         float x2 = x1 + _rect.size.width;
         float y2 = y1 + _rect.size.height;
 
         // Don't update Z.
-        _quad.bl.vertices.set(x1, y1, 0.0f);
-        _quad.br.vertices.set(x2, y1, 0.0f);
-        _quad.tl.vertices.set(x1, y2, 0.0f);
-        _quad.tr.vertices.set(x2, y2, 0.0f);
+        _quad.bl.vertices = Vec3(x1, y1, 0);
+        _quad.br.vertices = Vec3(x2, y1, 0);
+        _quad.tl.vertices = Vec3(x1, y2, 0);
+        _quad.tr.vertices = Vec3(x2, y2, 0);
     }
 }
-
-void Sprite::debugDraw(bool on)
-{
-    DrawNode* draw = getChildByName<DrawNode*>("debugDraw");
-    if(on)
-    {
-        if(!draw)
-        {
-            draw = DrawNode::create();
-            draw->setName("debugDraw");
-            addChild(draw);
-        }
-        draw->setVisible(true);
-        draw->clear();
-        //draw lines
-        auto last = _polyInfo.triangles.indexCount/3;
-        auto _indices = _polyInfo.triangles.indices;
-        auto _verts = _polyInfo.triangles.verts;
-        for(unsigned int i = 0; i < last; i++)
-        {
-            //draw 3 lines
-            Vec3 from =_verts[_indices[i*3]].vertices;
-            Vec3 to = _verts[_indices[i*3+1]].vertices;
-            draw->drawLine(Vec2(from.x, from.y), Vec2(to.x,to.y), Color4F::GREEN);
-            
-            from =_verts[_indices[i*3+1]].vertices;
-            to = _verts[_indices[i*3+2]].vertices;
-            draw->drawLine(Vec2(from.x, from.y), Vec2(to.x,to.y), Color4F::GREEN);
-            
-            from =_verts[_indices[i*3+2]].vertices;
-            to = _verts[_indices[i*3]].vertices;
-            draw->drawLine(Vec2(from.x, from.y), Vec2(to.x,to.y), Color4F::GREEN);
-        }
-    }
-    else
-    {
-        if(draw)
-            draw->setVisible(false);
-    }
-}
-
 
 // override this method to generate "double scale" sprites
 void Sprite::setVertexRect(const Rect& rect)
@@ -574,10 +512,7 @@ void Sprite::updateTransform(void)
         // If it is not visible, or one of its ancestors is not visible, then do nothing:
         if( !_visible || ( _parent && _parent != _batchNode && static_cast<Sprite*>(_parent)->_shouldBeHidden) )
         {
-            _quad.br.vertices.setZero();
-            _quad.tl.vertices.setZero();
-            _quad.tr.vertices.setZero();
-            _quad.bl.vertices.setZero();
+            _quad.br.vertices = _quad.tl.vertices = _quad.tr.vertices = _quad.bl.vertices = Vec3(0,0,0);
             _shouldBeHidden = true;
         }
         else
@@ -626,10 +561,10 @@ void Sprite::updateTransform(void)
             float dx = x1 * cr - y2 * sr2 + x;
             float dy = x1 * sr + y2 * cr2 + y;
 
-            _quad.bl.vertices.set(RENDER_IN_SUBPIXEL(ax), RENDER_IN_SUBPIXEL(ay), _positionZ);
-            _quad.br.vertices.set(RENDER_IN_SUBPIXEL(bx), RENDER_IN_SUBPIXEL(by), _positionZ);
-            _quad.tl.vertices.set(RENDER_IN_SUBPIXEL(dx), RENDER_IN_SUBPIXEL(dy), _positionZ);
-            _quad.tr.vertices.set(RENDER_IN_SUBPIXEL(cx), RENDER_IN_SUBPIXEL(cy), _positionZ);
+            _quad.bl.vertices = Vec3( RENDER_IN_SUBPIXEL(ax), RENDER_IN_SUBPIXEL(ay), _positionZ );
+            _quad.br.vertices = Vec3( RENDER_IN_SUBPIXEL(bx), RENDER_IN_SUBPIXEL(by), _positionZ );
+            _quad.tl.vertices = Vec3( RENDER_IN_SUBPIXEL(dx), RENDER_IN_SUBPIXEL(dy), _positionZ );
+            _quad.tr.vertices = Vec3( RENDER_IN_SUBPIXEL(cx), RENDER_IN_SUBPIXEL(cy), _positionZ );
         }
 
         // MARMALADE CHANGE: ADDED CHECK FOR nullptr, TO PERMIT SPRITES WITH NO BATCH NODE / TEXTURE ATLAS
@@ -664,8 +599,20 @@ void Sprite::draw(Renderer *renderer, const Mat4 &transform, uint32_t flags)
     if(_insideBounds)
 #endif
     {
-        _trianglesCommand.init(_globalZOrder, _texture->getName(), getGLProgramState(), _blendFunc, _polyInfo.triangles, transform, flags);
-        renderer->addCommand(&_trianglesCommand);
+		_texture->prepareDraw();
+        _quadCommand.init(_globalZOrder, _texture->getName(), getGLProgramState(), _blendFunc, &_quad, 1, transform, flags);
+        renderer->addCommand(&_quadCommand);
+        
+#if CC_SPRITE_DEBUG_DRAW
+        _debugDrawNode->clear();
+        Vec2 vertices[4] = {
+            Vec2( _quad.bl.vertices.x, _quad.bl.vertices.y ),
+            Vec2( _quad.br.vertices.x, _quad.br.vertices.y ),
+            Vec2( _quad.tr.vertices.x, _quad.tr.vertices.y ),
+            Vec2( _quad.tl.vertices.x, _quad.tl.vertices.y ),
+        };
+        _debugDrawNode->drawPoly(vertices, 4, true, Color4F(1.0, 1.0, 1.0, 1.0));
+#endif //CC_SPRITE_DEBUG_DRAW
     }
 }
 
@@ -1048,10 +995,6 @@ bool Sprite::isFrameDisplayed(SpriteFrame *frame) const
 
 SpriteFrame* Sprite::getSpriteFrame() const
 {
-    if(nullptr != this->_spriteFrame)
-    {
-        return this->_spriteFrame;
-    }
     return SpriteFrame::createWithTexture(_texture,
                                            CC_RECT_POINTS_TO_PIXELS(_rect),
                                            _rectRotated,
@@ -1079,10 +1022,10 @@ void Sprite::setBatchNode(SpriteBatchNode *spriteBatchNode)
         float y1 = _offsetPosition.y;
         float x2 = x1 + _rect.size.width;
         float y2 = y1 + _rect.size.height;
-        _quad.bl.vertices.set( x1, y1, 0 );
-        _quad.br.vertices.set(x2, y1, 0);
-        _quad.tl.vertices.set(x1, y2, 0);
-        _quad.tr.vertices.set(x2, y2, 0);
+        _quad.bl.vertices = Vec3( x1, y1, 0 );
+        _quad.br.vertices = Vec3( x2, y1, 0 );
+        _quad.tl.vertices = Vec3( x1, y2, 0 );
+        _quad.tr.vertices = Vec3( x2, y2, 0 );
 
     } else {
 
@@ -1098,7 +1041,7 @@ void Sprite::updateBlendFunc(void)
 {
     CCASSERT(! _batchNode, "CCSprite: updateBlendFunc doesn't work when the sprite is rendered using a SpriteBatchNode");
 
-    // it is possible to have an untextured spritec
+    // it is possible to have an untextured sprite
     if (! _texture || ! _texture->hasPremultipliedAlpha())
     {
         _blendFunc = BlendFunc::ALPHA_NON_PREMULTIPLIED;
@@ -1119,16 +1062,6 @@ std::string Sprite::getDescription() const
     else
         texture_id = _texture->getName();
     return StringUtils::format("<Sprite | Tag = %d, TextureID = %d>", _tag, texture_id );
-}
-
-PolygonInfo Sprite::getPolygonInfo() const
-{
-    return _polyInfo;
-}
-
-void Sprite::setPolygonInfo(const PolygonInfo& info)
-{
-    _polyInfo = info;
 }
 
 NS_CC_END

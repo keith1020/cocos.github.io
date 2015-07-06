@@ -32,6 +32,12 @@
         
 --------------------------------
 -- 
+-- @function [parent=#ControlSaturationBrightnessPicker] setEnabled 
+-- @param self
+-- @param #bool enabled
+        
+--------------------------------
+-- 
 -- @function [parent=#ControlSaturationBrightnessPicker] getSlider 
 -- @param self
 -- @return Sprite#Sprite ret (return value: cc.Sprite)
@@ -63,16 +69,8 @@
 -- @return ControlSaturationBrightnessPicker#ControlSaturationBrightnessPicker ret (return value: cc.ControlSaturationBrightnessPicker)
         
 --------------------------------
--- 
--- @function [parent=#ControlSaturationBrightnessPicker] setEnabled 
--- @param self
--- @param #bool enabled
--- @return ControlSaturationBrightnessPicker#ControlSaturationBrightnessPicker self (return value: cc.ControlSaturationBrightnessPicker)
-        
---------------------------------
 -- js ctor
 -- @function [parent=#ControlSaturationBrightnessPicker] ControlSaturationBrightnessPicker 
 -- @param self
--- @return ControlSaturationBrightnessPicker#ControlSaturationBrightnessPicker self (return value: cc.ControlSaturationBrightnessPicker)
         
 return nil

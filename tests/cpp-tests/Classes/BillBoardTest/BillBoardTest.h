@@ -25,6 +25,7 @@
 #ifndef _BILLBOARD_TEST_H_
 #define _BILLBOARD_TEST_H_
 
+#include "../testBasic.h"
 #include "../BaseTest.h"
 #include <string>
 
@@ -33,7 +34,7 @@ namespace cocos2d {
     class Camera;
 }
 
-class BillBoardRotationTest : public TestCase
+class BillBoardRotationTest : public BaseTest
 {
 public:
     CREATE_FUNC(BillBoardRotationTest);
@@ -42,10 +43,14 @@ public:
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
     
+    virtual void restartCallback(Ref* sender) override;
+    virtual void nextCallback(Ref* sender) override;
+    virtual void backCallback(Ref* sender) override;
+    
 protected:
 };
 
-class BillBoardTest : public TestCase
+class BillBoardTest : public BaseTest
 {
 public:
     virtual ~BillBoardTest(void);
@@ -54,21 +59,29 @@ public:
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
     virtual void update(float dt) override;
-    void addNewBillBoradWithCoords(cocos2d::Vec3 p);
-    void addNewAniBillBoradWithCoords(cocos2d::Vec3 p);
-    void rotateCameraCallback(cocos2d::Ref* sender,float value);
-    void onTouchesMoved(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event);
+    void addNewBillBoradWithCoords(Vec3 p);
+    void addNewAniBillBoradWithCoords(Vec3 p);
+    void rotateCameraCallback(Ref* sender,float value);
+    void onTouchesMoved(const std::vector<Touch*>& touches, Event* event);
     
-    void menuCallback_orientedPoint(cocos2d::Ref* sender);
-    void menuCallback_orientedPlane(cocos2d::Ref* sender);
+    void menuCallback_orientedPoint(Ref* sender);
+    void menuCallback_orientedPlane(Ref* sender);
+
+    virtual void restartCallback(Ref* sender) override;
+    virtual void nextCallback(Ref* sender) override;
+    virtual void backCallback(Ref* sender) override;
     
 protected:
-    cocos2d::Camera*           _camera;
-    cocos2d::Layer*            _layerBillBorad;
+    Camera*           _camera;
+    Layer*            _layerBillBorad;
 
-    std::vector<cocos2d::BillBoard*> _billboards;
+    std::vector<BillBoard*> _billboards;
 };
 
-DEFINE_TEST_SUITE(BillBoardTests);
+class BillBoardTestScene : public TestScene
+{
+public:
+    virtual void runThisTest();
+};
 
 #endif

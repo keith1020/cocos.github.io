@@ -41,7 +41,7 @@ THE SOFTWARE.
 #endif
 #include <sys/stat.h>
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT || CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
 #include <regex>
 #endif
 
@@ -49,7 +49,7 @@ THE SOFTWARE.
 #include <ftw.h>
 #endif
 
-#if (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32) && (CC_TARGET_PLATFORM != CC_PLATFORM_WINRT)
+#if (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32) && (CC_TARGET_PLATFORM != CC_PLATFORM_WP8) && (CC_TARGET_PLATFORM != CC_PLATFORM_WINRT)
 #include <sys/types.h>
 #include <errno.h>
 #include <dirent.h>
@@ -403,7 +403,7 @@ bool FileUtils::writeToFile(ValueMap& dict, const std::string &fullPath)
     }
     rootEle->LinkEndChild(innerDict);
     
-    bool ret = tinyxml2::XML_SUCCESS == doc->SaveFile(getSuitableFOpen(fullPath).c_str());
+    bool ret = tinyxml2::XML_SUCCESS == doc->SaveFile(fullPath.c_str());
     
     delete doc;
     return ret;
@@ -544,6 +544,14 @@ void FileUtils::purgeCachedEntries()
     _fullPathCache.clear();
 }
 
+void FileUtils::removeCachedEntries(const std::string& filename)
+{
+	auto cacheIter = _fullPathCache.find(filename);
+	if( cacheIter != _fullPathCache.end() )
+	{
+		_fullPathCache.erase(cacheIter);
+	}
+}
 static Data getData(const std::string& filename, bool forString)
 {
     if (filename.empty())
@@ -561,13 +569,12 @@ static Data getData(const std::string& filename, bool forString)
         mode = "rt";
     else
         mode = "rb";
-
-    auto fileutils = FileUtils::getInstance();
+    
     do
     {
         // Read the file from hardware
-        std::string fullPath = fileutils->fullPathForFilename(filename);
-        FILE *fp = fopen(fileutils->getSuitableFOpen(fullPath).c_str(), mode);
+        std::string fullPath = FileUtils::getInstance()->fullPathForFilename(filename);
+        FILE *fp = fopen(fullPath.c_str(), mode);
         CC_BREAK_IF(!fp);
         fseek(fp,0,SEEK_END);
         size = ftell(fp);
@@ -594,11 +601,17 @@ static Data getData(const std::string& filename, bool forString)
     
     if (nullptr == buffer || 0 == readsize)
     {
-        CCLOG("Get data from file %s failed", filename.c_str());
+        std::string msg = "Get data from file(";
+        msg.append(filename).append(") failed!");
+        CCLOG("%s", msg.c_str());
     }
     else
     {
         ret.fastSet(buffer, readsize);
+		if( ret.isEncryed() )
+		{
+			ret.decryptData();
+		}
     }
     
     return ret;
@@ -628,7 +641,7 @@ unsigned char* FileUtils::getFileData(const std::string& filename, const char* m
     {
         // read the file from hardware
         const std::string fullPath = fullPathForFilename(filename);
-        FILE *fp = fopen(getSuitableFOpen(fullPath).c_str(), mode);
+        FILE *fp = fopen(fullPath.c_str(), mode);
         CC_BREAK_IF(!fp);
         
         fseek(fp,0,SEEK_END);
@@ -694,6 +707,255 @@ unsigned char* FileUtils::getFileDataFromZip(const std::string& zipFilePath, con
     return buffer;
 }
 
+#define BUFFER_SIZE    8192
+#define MAX_FILENAME   512
+bool FileUtils::unZipFile(const std::string& zipFilePath, const std::string& unZipDir)
+{
+	do 
+	{
+		CC_BREAK_IF(zipFilePath.empty());
+		createDirectory(unZipDir.c_str());
+		// Open the zip file
+		std::string outFileName = std::string(zipFilePath);
+		unzFile zipfile = unzOpen(outFileName.c_str());
+		if (! zipfile)
+		{
+			CCLOG("can not open downloaded zip file %s", outFileName.c_str());
+			return false;
+		}
+
+		// Get info about the zip file
+		unz_global_info global_info;
+		if (unzGetGlobalInfo(zipfile, &global_info) != UNZ_OK)
+		{
+			CCLOG("can not read file global info of %s", outFileName.c_str());
+			unzClose(zipfile);
+			return false;
+		}
+
+		// Buffer to hold data read from the zip file
+		char readBuffer[BUFFER_SIZE];
+
+		CCLOG("start uncompressing");
+
+		// Loop to extract all files.
+		uLong i;
+		for (i = 0; i < global_info.number_entry; ++i)
+		{
+			// Get info about current file.
+			unz_file_info fileInfo;
+			char fileName[MAX_FILENAME];
+			if (unzGetCurrentFileInfo(zipfile,
+				&fileInfo,
+				fileName,
+				MAX_FILENAME,
+				NULL,
+				0,
+				NULL,
+				0) != UNZ_OK)
+			{
+				CCLOG("can not read file info");
+				unzClose(zipfile);
+				return false;
+			}
+            
+			//CCLOG("fullName:%s", fileName);
+			std::string fullPath = std::string(unZipDir) + fileName;
+            int pos = fullPath.find_first_of("\\");
+            while (pos != std::string::npos)
+            {
+                fullPath.replace(pos, 1, "/");
+                pos = fullPath.find_first_of("\\");
+            }
+
+			//CCLOG("fullPath:%s", fullPath.c_str());
+			// Check if this entry is a directory or a file.
+			const size_t filenameLength = strlen(fileName);
+			if (fileName[filenameLength-1] == '/')
+			{
+				// get all dir
+				std::string fileNameStr = std::string(fileName);
+				size_t position = 0;
+				while((position=fileNameStr.find_first_of("/",position))!=std::string::npos)
+				{
+					std::string dirPath =unZipDir + fileNameStr.substr(0, position);
+					// Entry is a direcotry, so create it.
+					// If the directory exists, it will failed scilently.
+					if (!createDirectory(dirPath.c_str()))
+					{
+						CCLOG("can not create directory %s", dirPath.c_str());
+						//unzClose(zipfile);
+						//return false;
+					}
+					position++;
+				}
+			}
+			else
+			{
+
+				//There are not directory entry in some case.
+				//So we need to test whether the file directory exists when uncompressing file entry
+				//, if does not exist then create directory
+				std::string fileNameStr(fileName);
+
+				int pos = fileNameStr.find_first_of("\\");
+				while (pos != std::string::npos)
+				{
+					fileNameStr.replace(pos, 1, "/");
+					pos = fileNameStr.find_first_of("\\");
+				}
+
+				std::string dirPath =unZipDir + fileNameStr;
+				if (!createDirectory(dirPath.c_str()))
+				{
+					CCLOG("can not create directory %s", fileNameStr.c_str());
+					unzClose(zipfile);
+					return false;
+				}
+				else
+				{
+					CCLOG("create directory %s",fileNameStr.c_str());
+				}
+				
+				// Entry is a file, so extract it.
+
+				// Open current file.
+				if (unzOpenCurrentFile(zipfile) != UNZ_OK)
+				{
+					CCLOG("can not open file %s", fileName);
+					unzClose(zipfile);
+					return false;
+				}
+
+				// Create a file to store current file.
+				FILE *out = fopen(fullPath.c_str(), "wb");
+				if (! out)
+				{
+					CCLOG("can not open destination file %s", fullPath.c_str());
+					unzCloseCurrentFile(zipfile);
+					unzClose(zipfile);
+					return false;
+				}
+
+				// Write current file content to destinate file.
+				int error = UNZ_OK;
+				do
+				{
+					error = unzReadCurrentFile(zipfile, readBuffer, BUFFER_SIZE);
+					if (error < 0)
+					{
+						CCLOG("can not read zip file %s, error code is %d", fileName, error);
+						unzCloseCurrentFile(zipfile);
+						unzClose(zipfile);
+						return false;
+					}
+
+					if (error > 0)
+					{
+						fwrite(readBuffer, error, 1, out);
+					}
+				} while(error > 0);
+
+				fclose(out);
+			}
+
+			unzCloseCurrentFile(zipfile);
+
+			// Goto next entry listed in the zip file.
+			if ((i+1) < global_info.number_entry)
+			{
+				if (unzGoToNextFile(zipfile) != UNZ_OK)
+				{
+					CCLOG("can not read next file");
+					unzClose(zipfile);
+					return false;
+				}
+			}
+		}
+		unzClose(zipfile);
+	} while (0);
+	return true;
+}
+/*
+ * Create a direcotry is platform depended.
+ */
+bool FileUtils::createDirectory(const char *fileName)
+{
+	const size_t filenameLength = strlen(fileName);
+	//if (fileName[filenameLength-1] == '/')
+	//{
+	//	// Entry is a direcotry, so create it.
+	//	// If the directory exists, it will failed scilently.
+	//	if (!mkDir(fileName))
+	//	{
+	//		CCLOG("can not create directory %s", fileName);
+	//		return false;
+	//	}
+	//}
+	//else
+	{
+		//There are not directory entry in some case.
+		//So we need to test whether the file directory exists when uncompressing file entry
+		//, if does not exist then create directory
+		const std::string fileNameStr(fileName);
+
+		size_t startIndex=0;
+
+		size_t index=fileNameStr.find("/",startIndex);
+
+		while(index != std::string::npos)
+		{
+			const std::string dir=fileNameStr.substr(0,index);
+
+			FILE *out = fopen(dir.c_str(), "r");
+
+			if(!out && dir != "")
+			{
+				if (!mkDir(dir.c_str()))
+				{
+					CCLOG("can not create directory %s", dir.c_str());
+					return false;
+				}
+				else
+				{
+					CCLOG("create directory %s",dir.c_str());
+				}
+			}
+			else if(out != NULL)
+			{
+				fclose(out);
+			}
+
+			startIndex=index+1;
+
+			index=fileNameStr.find("/",startIndex);
+
+		}
+	}
+	return true;
+}
+
+bool FileUtils::mkDir(const char *path)
+{
+#if (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32)
+	mode_t processMask = umask(0);
+	int ret = mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO);
+	umask(processMask);
+	if (ret != 0 && (errno != EEXIST))
+	{
+		return false;
+	}
+
+	return true;
+#else
+	BOOL ret = CreateDirectoryA(path, NULL);
+	if (!ret && ERROR_ALREADY_EXISTS != GetLastError())
+	{
+		return false;
+	}
+	return true;
+#endif
+}
 std::string FileUtils::getNewFilename(const std::string &filename) const
 {
     std::string newFileName;
@@ -712,7 +974,7 @@ std::string FileUtils::getNewFilename(const std::string &filename) const
     return newFileName;
 }
 
-std::string FileUtils::getPathForFilename(const std::string& filename, const std::string& resolutionDirectory, const std::string& searchPath) const
+std::string FileUtils::getPathForFilename(const std::string& filename, const std::string& resolutionDirectory, const std::string& searchPath)
 {
     std::string file = filename;
     std::string file_path = "";
@@ -734,7 +996,7 @@ std::string FileUtils::getPathForFilename(const std::string& filename, const std
     return path;
 }
 
-std::string FileUtils::fullPathForFilename(const std::string &filename) const
+std::string FileUtils::fullPathForFilename(const std::string &filename)
 {
     if (filename.empty())
     {
@@ -925,7 +1187,7 @@ void FileUtils::loadFilenameLookupDictionaryFromFile(const std::string &filename
     }
 }
 
-std::string FileUtils::getFullPathForDirectoryAndFilename(const std::string& directory, const std::string& filename) const
+std::string FileUtils::getFullPathForDirectoryAndFilename(const std::string& directory, const std::string& filename)
 {
     // get directory+filename, safely adding '/' as necessary 
     std::string ret = directory;
@@ -941,6 +1203,23 @@ std::string FileUtils::getFullPathForDirectoryAndFilename(const std::string& dir
     return ret;
 }
 
+std::string FileUtils::searchFullPathForFilename(const std::string& filename) const
+{
+    if (isAbsolutePath(filename))
+    {
+        return filename;
+    }
+    std::string path = const_cast<FileUtils*>(this)->fullPathForFilename(filename);
+    if (0 == path.compare(filename))
+    {
+        return "";
+    }
+    else
+    {
+        return path;
+    }
+}
+
 bool FileUtils::isFileExist(const std::string& filename) const
 {
     if (isAbsolutePath(filename))
@@ -949,7 +1228,7 @@ bool FileUtils::isFileExist(const std::string& filename) const
     }
     else
     {
-        std::string fullpath = fullPathForFilename(filename);
+        std::string fullpath = searchFullPathForFilename(filename);
         if (fullpath.empty())
             return false;
         else
@@ -964,7 +1243,7 @@ bool FileUtils::isAbsolutePath(const std::string& path) const
 
 bool FileUtils::isDirectoryExistInternal(const std::string& dirPath) const
 {
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) ||  (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
     WIN32_FILE_ATTRIBUTE_DATA wfad;
     std::wstring wdirPath(dirPath.begin(), dirPath.end());
     if (GetFileAttributesEx(wdirPath.c_str(), GetFileExInfoStandard, &wfad))
@@ -992,7 +1271,7 @@ bool FileUtils::isDirectoryExistInternal(const std::string& dirPath) const
 
 }
 
-bool FileUtils::isDirectoryExist(const std::string& dirPath) const
+bool FileUtils::isDirectoryExist(const std::string& dirPath)
 {
     CCASSERT(!dirPath.empty(), "Invalid path");
     
@@ -1017,7 +1296,7 @@ bool FileUtils::isDirectoryExist(const std::string& dirPath) const
             fullpath = searchIt + dirPath + resolutionIt;
             if (isDirectoryExistInternal(fullpath))
             {
-                _fullPathCache.insert(std::make_pair(dirPath, fullpath));
+                const_cast<FileUtils*>(this)->_fullPathCache.insert(std::make_pair(dirPath, fullpath));
                 return true;
             }
         }
@@ -1060,7 +1339,7 @@ bool FileUtils::createDirectory(const std::string& path)
     }
 
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
 	WIN32_FILE_ATTRIBUTE_DATA wfad;
     std::wstring wpath(path.begin(), path.end());
     if (!(GetFileAttributesEx(wpath.c_str(), GetFileExInfoStandard, &wfad)))
@@ -1154,7 +1433,7 @@ bool FileUtils::removeDirectory(const std::string& path)
     
     // Remove downloaded files
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
     std::wstring wpath = std::wstring(path.begin(), path.end());
     std::wstring files = wpath +  L"*.*";
 	WIN32_FIND_DATA wfd;
@@ -1218,7 +1497,7 @@ bool FileUtils::removeFile(const std::string &path)
 {
     // Remove downloaded file
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
     std::wstring wpath(path.begin(), path.end());
     if (DeleteFile(wpath.c_str()))
 	{
@@ -1258,7 +1537,7 @@ bool FileUtils::renameFile(const std::string &path, const std::string &oldname, 
     std::string newPath = path + name;
  
     // Rename a file
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT || CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
     std::regex pat("\\/");
     std::string _old = std::regex_replace(oldPath, pat, "\\");
     std::string _new = std::regex_replace(newPath, pat, "\\");
@@ -1276,21 +1555,15 @@ bool FileUtils::renameFile(const std::string &path, const std::string &oldname, 
 
     if(FileUtils::getInstance()->isFileExist(_new))
     {
-        if (!DeleteFileA(_new.c_str()))
-        {
-            CCLOGERROR("Fail to delete file %s !Error code is 0x%x", newPath.c_str(), GetLastError());
-        }
+        DeleteFileA(_new.c_str());
     }
 
-    if (MoveFileA(_old.c_str(), _new.c_str()))
-    {
+    MoveFileA(_old.c_str(), _new.c_str());
+
+    if (0 == GetLastError())
         return true;
-    }
     else
-    {
-        CCLOGERROR("Fail to rename file %s to %s !Error code is 0x%x", oldPath.c_str(), newPath.c_str(), GetLastError());
         return false;
-    }
 #else
     int errorCode = rename(oldPath.c_str(), newPath.c_str());
 
@@ -1310,7 +1583,7 @@ long FileUtils::getFileSize(const std::string &filepath)
     std::string fullpath = filepath;
     if (!isAbsolutePath(filepath))
     {
-        fullpath = fullPathForFilename(filepath);
+        fullpath = searchFullPathForFilename(filepath);
         if (fullpath.empty())
             return 0;
     }
@@ -1341,72 +1614,10 @@ void FileUtils::setPopupNotify(bool notify)
     s_popupNotify = notify;
 }
 
-bool FileUtils::isPopupNotify() const
+bool FileUtils::isPopupNotify()
 {
     return s_popupNotify;
 }
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
-static std::wstring StringUtf8ToWideChar(const std::string& strUtf8)
-{
-    std::wstring ret;
-    if (!strUtf8.empty())
-    {
-        int nNum = MultiByteToWideChar(CP_UTF8, 0, strUtf8.c_str(), -1, nullptr, 0);
-        if (nNum)
-        {
-            WCHAR* wideCharString = new WCHAR[nNum + 1];
-            wideCharString[0] = 0;
-
-            nNum = MultiByteToWideChar(CP_UTF8, 0, strUtf8.c_str(), -1, wideCharString, nNum + 1);
-
-            ret = wideCharString;
-            delete[] wideCharString;
-        }
-        else
-        {
-            CCLOG("Wrong convert to WideChar code:0x%x", GetLastError());
-        }
-    }
-    return ret;
-}
-
-static std::string UTF8StringToMultiByte(const std::string& strUtf8)
-{
-    std::string ret;
-    if (!strUtf8.empty())
-    {
-        std::wstring strWideChar = StringUtf8ToWideChar(strUtf8);
-        int nNum = WideCharToMultiByte(CP_ACP, 0, strWideChar.c_str(), -1, nullptr, 0, nullptr, FALSE);
-        if (nNum)
-        {
-            char* ansiString = new char[nNum + 1];
-            ansiString[0] = 0;
-
-            nNum = WideCharToMultiByte(CP_ACP, 0, strWideChar.c_str(), -1, ansiString, nNum + 1, nullptr, FALSE);
-
-            ret = ansiString;
-            delete[] ansiString;
-        }
-        else
-        {
-            CCLOG("Wrong convert to Ansi code:0x%x", GetLastError());
-        }
-    }
-
-    return ret;
-}
-
-std::string FileUtils::getSuitableFOpen(const std::string& filenameUtf8) const
-{
-    return UTF8StringToMultiByte(filenameUtf8);
-}
-#else
-std::string FileUtils::getSuitableFOpen(const std::string& filenameUtf8) const
-{
-    return filenameUtf8;
-}
-#endif
 
 NS_CC_END
 

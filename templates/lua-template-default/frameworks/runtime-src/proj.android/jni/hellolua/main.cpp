@@ -11,7 +11,7 @@
 
 using namespace cocos2d;
 
-void cocos_android_app_init (JNIEnv* env) {
+void cocos_android_app_init (JNIEnv* env, jobject thiz) {
     LOGD("cocos_android_app_init");
     AppDelegate *pAppDelegate = new AppDelegate();
 }
@@ -28,7 +28,7 @@ extern "C"
 #if (COCOS2D_DEBUG > 0) && (CC_CODE_IDE_DEBUG_SUPPORT > 0)
         return true;
 #else
-        return false;
+        return false;    
 #endif
 	}
 }

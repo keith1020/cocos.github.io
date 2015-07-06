@@ -36,6 +36,7 @@
 #include "platform/CCGLView.h"
 #include "base/CCDirector.h"
 #include "platform/CCFileUtils.h"
+#include "base/CCEventDispatcher.h"
 
 #define CLASS_NAME "org/cocos2dx/lib/Cocos2dxWebViewHelper"
 
@@ -84,6 +85,11 @@ extern "C" {
         auto charUrl = env->GetStringUTFChars(jurl, NULL);
         std::string url = charUrl;
         env->ReleaseStringUTFChars(jurl, charUrl);
+        
+        auto eventDispatcher = cocos2d::Director::getInstance()->getEventDispatcher();
+        std::string eventName = std::string("shouldStartLoadWithRequest_") + url;
+        eventDispatcher->dispatchCustomEvent( eventName );
+        
         return cocos2d::experimental::ui::WebViewImpl::shouldStartLoading(index, url);
     }
 
@@ -98,6 +104,8 @@ extern "C" {
         std::string url = charUrl;
         env->ReleaseStringUTFChars(jurl, charUrl);
         cocos2d::experimental::ui::WebViewImpl::didFinishLoading(index, url);
+        auto eventDispatcher = cocos2d::Director::getInstance()->getEventDispatcher();
+        eventDispatcher->dispatchCustomEvent( "webViewDidFinishLoad" );
     }
 
     /*
@@ -111,6 +119,8 @@ extern "C" {
         std::string url = charUrl;
         env->ReleaseStringUTFChars(jurl, charUrl);
         cocos2d::experimental::ui::WebViewImpl::didFailLoading(index, url);
+        auto eventDispatcher = cocos2d::Director::getInstance()->getEventDispatcher();
+        eventDispatcher->dispatchCustomEvent( "webViewDidFailLoad" );
     }
 
     /*

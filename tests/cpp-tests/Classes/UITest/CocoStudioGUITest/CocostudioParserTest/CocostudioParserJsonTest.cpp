@@ -63,23 +63,39 @@ void CocostudioParserJsonLayer::onEnter()
 
 
 // CocostudioParserJsonScene
-
-CocostudioParserJsonScene* CocostudioParserJsonScene::create(const std::string& jsonFile)
+CocostudioParserJsonScene::CocostudioParserJsonScene(std::string jsonFile)
 {
-    auto scene = new (std::nothrow) CocostudioParserJsonScene;
-    if (scene && scene->init())
-    {
-        auto layer = new (std::nothrow) CocostudioParserJsonLayer(jsonFile);
-        scene->addChild(layer);
-        layer->release();
+    _jsonFile = jsonFile;
+}
 
-        scene->autorelease();
-    }
-    else
-    {
-        delete scene;
-        scene = nullptr;
-    }
+void CocostudioParserJsonScene::onEnter()
+{
+    CCScene::onEnter();
     
-    return scene;
+    auto label = Label::createWithTTF("Back", "fonts/arial.ttf", 20);
+    //#endif
+    MenuItemLabel* pMenuItem = MenuItemLabel::create(label, CC_CALLBACK_1(CocostudioParserJsonScene::BackCallback, this));
+    
+    Menu* pMenu = Menu::create(pMenuItem, nullptr);
+    
+    pMenu->setPosition( Vec2::ZERO );
+    pMenuItem->setPosition(VisibleRect::right().x - 50, VisibleRect::bottom().y + 25);
+    
+    addChild(pMenu, 1);
+}
+
+void CocostudioParserJsonScene::runThisTest()
+{
+    Layer* pLayer = new (std::nothrow) CocostudioParserJsonLayer(_jsonFile);
+    addChild(pLayer);
+    pLayer->release();
+    
+    CCDirector::getInstance()->replaceScene(this);
+}
+
+void CocostudioParserJsonScene::BackCallback(Ref* pSender)
+{
+    CocostudioParserTestScene* pScene = new (std::nothrow) CocostudioParserTestScene();
+    pScene->runThisTest();
+    pScene->release();
 }

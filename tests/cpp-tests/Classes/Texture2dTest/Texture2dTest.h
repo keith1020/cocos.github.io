@@ -26,15 +26,21 @@
 #ifndef __TEXTURE2D_TEST_H__
 #define __TEXTURE2D_TEST_H__
 
+#include "../testBasic.h"
 #include "../BaseTest.h"
 
-DEFINE_TEST_SUITE(Texture2DTests);
 
-class TextureDemo : public TestCase
+class TextureDemo : public BaseTest
 {
 public:
     virtual ~TextureDemo();
+    virtual std::string title() const override;
+    virtual std::string subtitle() const override;
     virtual void onEnter() override;
+
+    void restartCallback(Ref* sender);
+    void nextCallback(Ref* sender);
+    void backCallback(Ref* sender);
 };
 
 class TextureTIFF : public TextureDemo
@@ -405,8 +411,6 @@ class TextureAsync : public TextureDemo
 public:
     CREATE_FUNC(TextureAsync);
     virtual ~TextureAsync();
-
-    virtual float getDuration() const override { return 5.0f; }
     void loadImages(float dt);
     void imageLoaded(cocos2d::Texture2D* texture);
     virtual std::string title() const override;
@@ -462,12 +466,12 @@ public:
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
-    virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
+    virtual void draw(Renderer *renderer, const Mat4 &transform, uint32_t flags) override;
 protected:
-    void onDraw(const cocos2d::Mat4& transform, uint32_t flags);
+    void onDraw(const Mat4 &transform, uint32_t flags);
 
-    cocos2d::CustomCommand _renderCmd;
-    cocos2d::Texture2D* _tex1, *_Tex2F;
+    CustomCommand _renderCmd;
+    Texture2D* _tex1, *_Tex2F;
 };
 
 class TextureDrawInRect : public TextureDemo
@@ -478,12 +482,19 @@ public:
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
-    virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
+    virtual void draw(Renderer *renderer, const Mat4 &transform, uint32_t flags) override;
 protected:
-    void onDraw(const cocos2d::Mat4& transform, uint32_t flags);
+    void onDraw(const Mat4 &transform, uint32_t flags);
 
-    cocos2d::CustomCommand _renderCmd;
-    cocos2d::Texture2D* _tex1, *_Tex2F;
+    CustomCommand _renderCmd;
+    Texture2D* _tex1, *_Tex2F;
+};
+
+class TextureTestScene : public TestScene
+{
+public:
+    CREATE_FUNC(TextureTestScene);
+    virtual void runThisTest();
 };
 
 class TextureMemoryAlloc : public TextureDemo
@@ -493,10 +504,10 @@ public:
     virtual void onEnter() override;
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    void updateImage(cocos2d::Ref* sender);
-    void changeBackgroundVisible(cocos2d::Ref* sender);
+    void updateImage(Ref *sender);
+    void changeBackgroundVisible(Ref *sender);
 private:
-    cocos2d::Sprite* _background;
+    Sprite *_background;
 };
 
 class TexturePVRv3Premult : public TextureDemo

@@ -2,16 +2,18 @@
 #define _CURRENT_LANGUAGE_TEST_H_
 
 #include "cocos2d.h"
-#include "../BaseTest.h"
+#include "../testBasic.h"
 
-DEFINE_TEST_SUITE(CurrentLanguageTests);
-
-class CurrentLanguageTest : public TestCase
+class CurrentLanguageTest : public Layer
 {
 public:
-    CREATE_FUNC(CurrentLanguageTest);
-
     CurrentLanguageTest();
+};
+
+class CurrentLanguageTestScene : public TestScene
+{
+public:
+    virtual void runThisTest();
 };
 
 #endif // _CURRENT_LANGUAGE_TEST_H_

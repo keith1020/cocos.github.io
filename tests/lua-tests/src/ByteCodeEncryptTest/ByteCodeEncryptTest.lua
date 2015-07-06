@@ -1,14 +1,8 @@
 local targetPlatform = cc.Application:getInstance():getTargetPlatform()
-local is64BitIOSDevice     = cc.Application:getInstance():is64BitIOSDevice()
-
-if cc.PLATFORM_OS_LINUX ~= targetPlatform and is64BitIOSDevice ~= true then
+local isIOS64bit     = cc.Application:getInstance():isIOS64bit()
+if cc.PLATFORM_OS_LINUX ~= targetPlatform and isIOS64bit ~= true then
 require("ByteCodeEncryptTest/ByteCodeTest")
 require("ByteCodeEncryptTest/ByteCodeAndEncryptTest")
-end
-
-if (cc.PLATFORM_OS_IPHONE == targetPlatform or cc.PLATFORM_OS_IPAD == targetPlatform) and is64BitIOSDevice == true then
-require("ByteCodeEncryptTest/ByteCodeAndEncryptTest-arm64")
-require("ByteCodeEncryptTest/ByteCodeTest-arm64")
 end
 
 local LINE_SPACE = 40
@@ -61,12 +55,8 @@ local function byteCodeEncryptMainLayer()
         item:registerScriptTapHandler(menuCallback)
         item:setPosition(size.width / 2, size.height - i * LINE_SPACE)
         menu:addChild(item, ItemTagBasic + i)
-        if cc.PLATFORM_OS_LINUX == targetPlatform or is64BitIOSDevice == true then -- isIOS64bit
+        if cc.PLATFORM_OS_LINUX == targetPlatform or isIOS64bit == true then
             item:setEnabled(false)
-        end
-
-        if (cc.PLATFORM_OS_IPHONE == targetPlatform or cc.PLATFORM_OS_IPAD == targetPlatform) and is64BitIOSDevice == true then
-            item:setEnabled(true)
         end
     end
 

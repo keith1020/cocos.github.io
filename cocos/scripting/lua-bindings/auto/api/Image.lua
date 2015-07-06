@@ -85,12 +85,10 @@
 -- @function [parent=#Image] setPVRImagesHavePremultipliedAlpha 
 -- @param self
 -- @param #bool haveAlphaPremultiplied
--- @return Image#Image self (return value: cc.Image)
         
 --------------------------------
 -- js ctor
 -- @function [parent=#Image] Image 
 -- @param self
--- @return Image#Image self (return value: cc.Image)
         
 return nil

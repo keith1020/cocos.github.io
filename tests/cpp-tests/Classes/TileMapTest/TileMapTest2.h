@@ -1,36 +1,38 @@
 #ifndef _TILEMAP_TEST_NEW_H_
 #define _TILEMAP_TEST_NEW_H_
 
+#include "../testBasic.h"
 #include "../BaseTest.h"
 
-DEFINE_TEST_SUITE(FastTileMapTests);
-
-class TileDemoNew : public TestCase
+class TileDemoNew : public BaseTest
 {
 public:
-    TileDemoNew();
-    virtual ~TileDemoNew();
+    TileDemoNew(void);
+    virtual ~TileDemoNew(void);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    virtual void onExit() override;
+    virtual void onEnter() override;
+    virtual void onExit()override;
 
-    void onTouchesMoved(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event);
+    void restartCallback(Ref* sender);
+    void nextCallback(Ref* sender);
+    void backCallback(Ref* sender);
+
+    void onTouchesMoved(const std::vector<Touch*>& touches, Event  *event);
 };
 
 class TileMapTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TileMapTestNew);
-    TileMapTestNew();
+    TileMapTestNew(void);
     virtual std::string title() const override;
 };
 
 class TileMapEditTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TileMapEditTestNew);
-    TileMapEditTestNew ();
+    TileMapEditTestNew (void);
     virtual std::string title() const override;
 
     void updateMap(float dt);
@@ -39,8 +41,7 @@ public:
 class TMXOrthoTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXOrthoTestNew);
-    TMXOrthoTestNew();
+    TMXOrthoTestNew(void);
     virtual std::string title() const override;
 
     virtual void onEnter() override;
@@ -50,24 +51,21 @@ public:
 class TMXOrthoTest2New : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXOrthoTest2New);
-    TMXOrthoTest2New();
+    TMXOrthoTest2New(void);
     virtual std::string title() const override;
 };
 
 class TMXOrthoTest3New : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXOrthoTest3New);
-    TMXOrthoTest3New();
+    TMXOrthoTest3New(void);
     virtual std::string title() const override;
 };
 
 class TMXOrthoTest4New : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXOrthoTest4New);
-    TMXOrthoTest4New();
+    TMXOrthoTest4New(void);
     void removeSprite(float dt);
     virtual std::string title() const override;
 };
@@ -77,8 +75,7 @@ class TMXReadWriteTestNew : public TileDemoNew
     unsigned int _gid;
     unsigned int _gid2;
 public:
-    CREATE_FUNC(TMXReadWriteTestNew);
-    TMXReadWriteTestNew();
+    TMXReadWriteTestNew(void);
     virtual std::string title() const override;
 
     void removeSprite(Node* sender);
@@ -90,56 +87,51 @@ public:
 class TMXHexTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXHexTestNew);
-    TMXHexTestNew();
+    TMXHexTestNew(void);
     virtual std::string title() const override;
 };
 
 class TMXIsoTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXIsoTestNew);
-    TMXIsoTestNew();
+    TMXIsoTestNew(void);
     virtual std::string title() const override;
 };
 
 class TMXIsoTest1New : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXIsoTest1New);
-    TMXIsoTest1New();
+    TMXIsoTest1New(void);
     virtual std::string title() const override;
 };
 
 class TMXIsoTest2New : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXIsoTest2New);
-    TMXIsoTest2New();
+    TMXIsoTest2New(void);
     virtual std::string title() const override;
 };
 
 class TMXUncompressedTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXUncompressedTestNew);
-    TMXUncompressedTestNew();
+    TMXUncompressedTestNew(void);
     virtual std::string title() const override;
 };
 
 class TMXTilesetTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXTilesetTestNew);
-    TMXTilesetTestNew();
+    TMXTilesetTestNew(void);
     virtual std::string title() const override;
 };
+
+
 
 class TMXOrthoObjectsTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXOrthoObjectsTestNew);
-    TMXOrthoObjectsTestNew();
+    TMXOrthoObjectsTestNew(void);
     virtual std::string title() const override;
 
     virtual std::string subtitle() const override;
@@ -148,8 +140,7 @@ public:
 class TMXIsoObjectsTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXIsoObjectsTestNew);
-    TMXIsoObjectsTestNew();
+    TMXIsoObjectsTestNew(void);
     virtual std::string title() const override;
 
     virtual std::string subtitle() const override;
@@ -158,8 +149,7 @@ public:
 class TMXResizeTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXResizeTestNew);
-    TMXResizeTestNew();
+    TMXResizeTestNew(void);
     virtual std::string title() const override;
 
     virtual std::string subtitle() const override;
@@ -167,13 +157,12 @@ public:
 
 class TMXIsoZorderNew : public TileDemoNew
 {
-    cocos2d::Sprite*    _tamara;
+    Sprite*    _tamara;
 public:
-    CREATE_FUNC(TMXIsoZorderNew);
-    TMXIsoZorderNew();
+    TMXIsoZorderNew(void);
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    virtual void onExit();
+    virtual void onExit(void);
 
     ~TMXIsoZorderNew();
     void repositionSprite(float dt);
@@ -181,10 +170,9 @@ public:
 
 class TMXOrthoZorderNew : public TileDemoNew
 {
-    cocos2d::Sprite*    _tamara;
+    Sprite*    _tamara;
 public:
-    CREATE_FUNC(TMXOrthoZorderNew);
-    TMXOrthoZorderNew();
+    TMXOrthoZorderNew(void);
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
 
@@ -194,10 +182,9 @@ public:
 
 class TMXIsoVertexZNew : public TileDemoNew
 {
-    cocos2d::Sprite*    _tamara;
+    Sprite*    _tamara;
 public:
-    CREATE_FUNC(TMXIsoVertexZNew);
-    TMXIsoVertexZNew();
+    TMXIsoVertexZNew(void);
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
 
@@ -209,10 +196,9 @@ public:
 
 class TMXOrthoVertexZNew : public TileDemoNew
 {
-    cocos2d::Sprite*    _tamara;
+    Sprite*    _tamara;
 public:
-    CREATE_FUNC(TMXOrthoVertexZNew);
-    TMXOrthoVertexZNew();
+    TMXOrthoVertexZNew(void);
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
 
@@ -225,8 +211,7 @@ public:
 class TMXIsoMoveLayerNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXIsoMoveLayerNew);
-    TMXIsoMoveLayerNew();
+    TMXIsoMoveLayerNew(void);
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
 };
@@ -234,8 +219,7 @@ public:
 class TMXOrthoMoveLayerNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXOrthoMoveLayerNew);
-    TMXOrthoMoveLayerNew();
+    TMXOrthoMoveLayerNew(void);
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
 };
@@ -243,7 +227,6 @@ public:
 class TMXTilePropertyTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXTilePropertyTestNew);
     TMXTilePropertyTestNew();
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -252,7 +235,6 @@ public:
 class TMXOrthoFlipTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXOrthoFlipTestNew);
     TMXOrthoFlipTestNew();
     virtual std::string title() const override;
 };
@@ -260,7 +242,6 @@ public:
 class TMXOrthoFlipRunTimeTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXOrthoFlipRunTimeTestNew);
     TMXOrthoFlipRunTimeTestNew();
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -270,7 +251,6 @@ public:
 class TMXOrthoFromXMLTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXOrthoFromXMLTestNew);
     TMXOrthoFromXMLTestNew();
     virtual std::string title() const override;
 };
@@ -278,7 +258,6 @@ public:
 class TMXOrthoXMLFormatTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXOrthoXMLFormatTestNew);
     TMXOrthoXMLFormatTestNew();
     virtual std::string title() const override;
 };
@@ -286,7 +265,6 @@ public:
 class TMXBug987New : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXBug987New);
     TMXBug987New();
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -295,7 +273,6 @@ public:
 class TMXBug787New : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXBug787New);
     TMXBug787New();
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -304,10 +281,15 @@ public:
 class TMXGIDObjectsTestNew : public TileDemoNew
 {
 public:
-    CREATE_FUNC(TMXGIDObjectsTestNew);
     TMXGIDObjectsTestNew();
     virtual std::string title() const override;
     virtual std::string subtitle() const override;   
+};
+
+class TileMapTestSceneNew : public TestScene
+{
+public:
+    virtual void runThisTest();
 };
 
 #endif

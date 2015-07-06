@@ -26,25 +26,21 @@
 #define __TestCpp__UIButtonTest_Editor__
 
 #include "../UIScene_Editor.h"
-#include "BaseTest.h"
-
-DEFINE_TEST_SUITE(UIButtonEditorTests);
 
 class UIButtonTest_Editor : public UIScene_Editor
 {
 public:
-    CREATE_FUNC(UIButtonTest_Editor);
-
     UIButtonTest_Editor();
     ~UIButtonTest_Editor();
     
-    virtual bool init() override;
-
-    void touchEvent(cocos2d::Ref* sender, cocos2d::ui::Widget::TouchEventType type);
-    virtual void configureGUIScene() override;
+    bool init();
+    void touchEvent(Ref* pSender, Widget::TouchEventType type);
+    virtual void switchLoadMethod(Ref* pSender);
+    void configureGUIScene();
 
 protected:
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_EDITOR_CREATE_FUNC(UIButtonTest_Editor);
+    Text* _displayValueLabel;
 };
 
 #endif /* defined(__TestCpp__UIButtonTest_Editor__) */

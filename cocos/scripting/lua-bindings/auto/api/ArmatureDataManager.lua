@@ -5,18 +5,11 @@
 -- @parent_module ccs
 
 --------------------------------
--- 
--- @function [parent=#ArmatureDataManager] getAnimationDatas 
--- @param self
--- @return map_table#map_table ret (return value: map_table)
-        
---------------------------------
--- brief    remove animation data<br>
--- param     id the id of the animation data
+-- brief	remove animation data<br>
+-- param 	id the id of the animation data
 -- @function [parent=#ArmatureDataManager] removeAnimationData 
 -- @param self
 -- @param #string id
--- @return ArmatureDataManager#ArmatureDataManager self (return value: ccs.ArmatureDataManager)
         
 --------------------------------
 -- Add armature data<br>
@@ -27,7 +20,6 @@
 -- @param #string id
 -- @param #ccs.ArmatureData armatureData
 -- @param #string configFilePath
--- @return ArmatureDataManager#ArmatureDataManager self (return value: ccs.ArmatureDataManager)
         
 --------------------------------
 -- @overload self, string, string, string         
@@ -37,14 +29,12 @@
 -- @param #string imagePath
 -- @param #string plistPath
 -- @param #string configFilePath
--- @return ArmatureDataManager#ArmatureDataManager self (return value: ccs.ArmatureDataManager)
 
 --------------------------------
 -- 
 -- @function [parent=#ArmatureDataManager] removeArmatureFileInfo 
 -- @param self
 -- @param #string configFilePath
--- @return ArmatureDataManager#ArmatureDataManager self (return value: ccs.ArmatureDataManager)
         
 --------------------------------
 -- 
@@ -53,8 +43,8 @@
 -- @return map_table#map_table ret (return value: map_table)
         
 --------------------------------
--- brief    get texture data<br>
--- param     id the id of the texture data you want to get<br>
+-- brief	get texture data<br>
+-- param 	id the id of the texture data you want to get<br>
 -- return TextureData *
 -- @function [parent=#ArmatureDataManager] getTextureData 
 -- @param self
@@ -62,17 +52,17 @@
 -- @return TextureData#TextureData ret (return value: ccs.TextureData)
         
 --------------------------------
--- brief    get armature data<br>
--- param    id the id of the armature data you want to get<br>
--- return    ArmatureData *
+-- brief	get armature data<br>
+-- param	id the id of the armature data you want to get<br>
+-- return	ArmatureData *
 -- @function [parent=#ArmatureDataManager] getArmatureData 
 -- @param self
 -- @param #string id
 -- @return ArmatureData#ArmatureData ret (return value: ccs.ArmatureData)
         
 --------------------------------
--- brief    get animation data from _animationDatas(Dictionary)<br>
--- param     id the id of the animation data you want to get<br>
+-- brief	get animation data from _animationDatas(Dictionary)<br>
+-- param 	id the id of the animation data you want to get<br>
 -- return AnimationData *
 -- @function [parent=#ArmatureDataManager] getAnimationData 
 -- @param self
@@ -80,15 +70,19 @@
 -- @return AnimationData#AnimationData ret (return value: ccs.AnimationData)
         
 --------------------------------
--- brief    add animation data<br>
--- param     id the id of the animation data<br>
+-- 
+-- @function [parent=#ArmatureDataManager] removeAllArmatureFileInfo 
+-- @param self
+        
+--------------------------------
+-- brief	add animation data<br>
+-- param 	id the id of the animation data<br>
 -- return AnimationData *
 -- @function [parent=#ArmatureDataManager] addAnimationData 
 -- @param self
 -- @param #string id
 -- @param #ccs.AnimationData animationData
 -- @param #string configFilePath
--- @return ArmatureDataManager#ArmatureDataManager self (return value: ccs.ArmatureDataManager)
         
 --------------------------------
 -- Init ArmatureDataManager
@@ -97,12 +91,11 @@
 -- @return bool#bool ret (return value: bool)
         
 --------------------------------
--- brief    remove armature data<br>
--- param    id the id of the armature data you want to get
+-- brief	remove armature data<br>
+-- param	id the id of the armature data you want to get
 -- @function [parent=#ArmatureDataManager] removeArmatureData 
 -- @param self
 -- @param #string id
--- @return ArmatureDataManager#ArmatureDataManager self (return value: ccs.ArmatureDataManager)
         
 --------------------------------
 -- 
@@ -111,44 +104,46 @@
 -- @return map_table#map_table ret (return value: map_table)
         
 --------------------------------
--- brief    remove texture data<br>
--- param     id the id of the texture data you want to get
+-- brief	remove texture data<br>
+-- param 	id the id of the texture data you want to get
 -- @function [parent=#ArmatureDataManager] removeTextureData 
 -- @param self
 -- @param #string id
--- @return ArmatureDataManager#ArmatureDataManager self (return value: ccs.ArmatureDataManager)
         
 --------------------------------
--- brief    add texture data<br>
--- param     id the id of the texture data<br>
+-- brief	add texture data<br>
+-- param 	id the id of the texture data<br>
 -- return TextureData *
 -- @function [parent=#ArmatureDataManager] addTextureData 
 -- @param self
 -- @param #string id
 -- @param #ccs.TextureData textureData
 -- @param #string configFilePath
--- @return ArmatureDataManager#ArmatureDataManager self (return value: ccs.ArmatureDataManager)
         
 --------------------------------
--- brief    Juge whether or not need auto load sprite file
+-- 
+-- @function [parent=#ArmatureDataManager] getAnimationDatas 
+-- @param self
+-- @return map_table#map_table ret (return value: map_table)
+        
+--------------------------------
+-- brief	Juge whether or not need auto load sprite file
 -- @function [parent=#ArmatureDataManager] isAutoLoadSpriteFile 
 -- @param self
 -- @return bool#bool ret (return value: bool)
         
 --------------------------------
--- brief    Add sprite frame to CCSpriteFrameCache, it will save display name and it's relative image name
+-- brief	Add sprite frame to CCSpriteFrameCache, it will save display name and it's relative image name
 -- @function [parent=#ArmatureDataManager] addSpriteFrameFromFile 
 -- @param self
 -- @param #string plistPath
 -- @param #string imagePath
 -- @param #string configFilePath
--- @return ArmatureDataManager#ArmatureDataManager self (return value: ccs.ArmatureDataManager)
         
 --------------------------------
 -- 
 -- @function [parent=#ArmatureDataManager] destroyInstance 
 -- @param self
--- @return ArmatureDataManager#ArmatureDataManager self (return value: ccs.ArmatureDataManager)
         
 --------------------------------
 -- 

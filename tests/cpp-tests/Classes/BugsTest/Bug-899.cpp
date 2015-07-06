@@ -7,12 +7,10 @@
 
 #include "Bug-899.h"
 
-USING_NS_CC;
-
 bool Bug899Layer::init()
 {
 //    Director::getInstance()->enableRetinaDisplay(true);
-    if (BugsTestBase::init())
+    if (BugsTestBaseLayer::init())
     {
         auto bg = Sprite::create("Images/bugs/RetinaDisplay.jpg");
         addChild(bg, 0);

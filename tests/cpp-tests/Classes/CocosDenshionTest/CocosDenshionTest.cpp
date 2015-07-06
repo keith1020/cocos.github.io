@@ -1,7 +1,6 @@
 #include "CocosDenshionTest.h"
 #include "cocos2d.h"
 #include "extensions/GUI/CCControlExtension/CCControlSlider.h"
-#include "audio/include/SimpleAudioEngine.h"
 
 // android effect only support ogg
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
@@ -14,7 +13,7 @@
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
     #define MUSIC_FILE        "music.mid"
-#elif (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#elif (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
     #define MUSIC_FILE        "background.wav"
 #elif (CC_TARGET_PLATFORM == CC_PLATFORM_BLACKBERRY || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX )
     #define MUSIC_FILE        "background.ogg"
@@ -249,7 +248,7 @@ CocosDenshionTest::~CocosDenshionTest()
 
 void CocosDenshionTest::onExit()
 {
-    TestCase::onExit();
+    Layer::onExit();
 
     SimpleAudioEngine::end();
 }
@@ -417,7 +416,11 @@ void CocosDenshionTest::updateVolumes(float)
     }
 }
 
-CocosDenshionTests::CocosDenshionTests()
+void CocosDenshionTestScene::runThisTest()
 {
-    ADD_TEST_CASE(CocosDenshionTest);
+    auto layer = new (std::nothrow) CocosDenshionTest();
+    addChild(layer);
+    layer->autorelease();
+
+    Director::getInstance()->replaceScene(this);
 }

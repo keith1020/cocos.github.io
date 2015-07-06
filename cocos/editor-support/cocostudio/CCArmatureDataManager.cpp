@@ -119,6 +119,40 @@ void ArmatureDataManager::removeArmatureFileInfo(const std::string& configFilePa
     }
 }
 
+void ArmatureDataManager::removeAllArmatureFileInfo()
+{
+	//for (auto itor : _relativeDatas)
+	//{
+	//	RelativeData& data = itor.second;
+	//	for (std::string str : data.armatures)
+	//	{
+	//		removeArmatureData(str.c_str());
+	//	}
+
+	//	for (std::string str : data.animations)
+	//	{
+	//		removeAnimationData(str.c_str());
+	//	}
+
+	//	for (std::string str : data.textures)
+	//	{
+	//		removeTextureData(str.c_str());
+	//	}
+
+	//	for (std::string str : data.plistFiles)
+	//	{
+	//		SpriteFrameCacheHelper::getInstance()->removeSpriteFrameFromFile(str);
+	//	}
+
+	//	DataReaderHelper::getInstance()->removeConfigFile(itor.first);
+	//}
+	_armarureDatas.clear();
+	_animationDatas.clear();
+	_textureDatas.clear();
+	SpriteFrameCacheHelper::getInstance()->removeAllSpriteFrames();
+	DataReaderHelper::getInstance()->purge();
+	_relativeDatas.clear();
+}
 
 void ArmatureDataManager::addArmatureData(const std::string& id, ArmatureData *armatureData, const std::string& configFilePath)
 {

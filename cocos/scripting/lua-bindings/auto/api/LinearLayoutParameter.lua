@@ -7,11 +7,10 @@
 --------------------------------
 -- Sets LinearGravity parameter for LayoutParameter.<br>
 -- see LinearGravity<br>
--- param gravity Gravity in LinearGravity.
+-- param LinearGravity
 -- @function [parent=#LinearLayoutParameter] setGravity 
 -- @param self
 -- @param #int gravity
--- @return LinearLayoutParameter#LinearLayoutParameter self (return value: ccui.LinearLayoutParameter)
         
 --------------------------------
 -- Gets LinearGravity parameter for LayoutParameter.<br>
@@ -22,7 +21,7 @@
 -- @return int#int ret (return value: int)
         
 --------------------------------
--- Create a empty LinearLayoutParameter instance.<br>
+-- Allocates and initializes.<br>
 -- return A initialized LayoutParameter which is marked as "autorelease".
 -- @function [parent=#LinearLayoutParameter] create 
 -- @param self
@@ -39,13 +38,10 @@
 -- @function [parent=#LinearLayoutParameter] copyProperties 
 -- @param self
 -- @param #ccui.LayoutParameter model
--- @return LinearLayoutParameter#LinearLayoutParameter self (return value: ccui.LinearLayoutParameter)
         
 --------------------------------
--- Default constructor.<br>
--- lua new
+-- Default constructor
 -- @function [parent=#LinearLayoutParameter] LinearLayoutParameter 
 -- @param self
--- @return LinearLayoutParameter#LinearLayoutParameter self (return value: ccui.LinearLayoutParameter)
         
 return nil

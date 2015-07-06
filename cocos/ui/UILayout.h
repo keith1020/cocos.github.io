@@ -30,10 +30,6 @@ THE SOFTWARE.
 #include "renderer/CCCustomCommand.h"
 #include "renderer/CCGroupCommand.h"
 
-/**
- * @addtogroup ui
- * @{
- */
 NS_CC_BEGIN
 
 class DrawNode;
@@ -46,79 +42,34 @@ namespace ui {
 class LayoutManager;
 class Scale9Sprite;
 
-/**
- *@brief Layout interface for creating LayoutManger and do actual layout.
- * @js NA
- */
 class CC_GUI_DLL LayoutProtocol
 {
 public:
-    /**
-     *@brief Default constructor.
-     */
     LayoutProtocol(){}
-    /**
-     *@brief Default destructor.
-     */
     virtual ~LayoutProtocol(){}
-
     
-    /**
-     * @brief Create a custom layout manager.
-     *
-     * @return A LayoutManager descendants instance.
-     */
     virtual LayoutManager* createLayoutManager() = 0;
-    
-    /**
-     * @brief Return the content size of layout.
-     *
-     * @return A content size in Size.
-     */
     virtual Size getLayoutContentSize()const = 0;
-    
-    /**
-     * @brief Get all elements of the layout.
-     *
-     * @return A vector of Node pointers.
-     */
     virtual const Vector<Node*>& getLayoutElements()const = 0;
-    
-    /**
-     * @brief The main function to do the layout job.
-     *  Different layout manager should implement its own layout algorithm.
-     *
-     */
     virtual void doLayout() = 0;
 };
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+/**
+ *  @js NA
+ *  @lua NA
+ */
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
 #ifdef RELATIVE
 #undef RELATIVE
 #endif
 #endif
 
-/**
- *@brief A container for holding a few child widgets. 
- *
- * The child widgets could be rearranged according to the layout type and it also enables clipping, set background image and color.
- *
- * There are mainly four types of layout:
- * - Absolute layout: This the default layout type, child elements are arranged by their absolute position.
- * - Horizontal layout: child elements are arranged horizontally.
- * - Vertical layout: child elements are arranged vertically.
- * - Relative layout: child elements are arranged relative to certain rules.
- *
- */
 class CC_GUI_DLL Layout : public Widget, public LayoutProtocol
 {
     
     DECLARE_CLASS_GUI_INFO
     
 public:
-    /**
-     * Layout type, default is ABSOLUTE.
-     */
     enum class Type
     {
         ABSOLUTE,
@@ -127,18 +78,12 @@ public:
         RELATIVE
     };
     
-    /**
-     * Clipping Type, default is STENCIL.
-     */
     enum class ClippingType
     {
         STENCIL,
         SCISSOR
     };
     
-    /**
-     * Background color type, default is NONE.
-     */
     enum class BackGroundColorType
     {
         NONE,
@@ -148,155 +93,103 @@ public:
     
     /**
      * Default constructor
-     * @js ctor
-     * @lua new
      */
     Layout();
     
     /**
      * Default destructor
-     * @js NA
-     * @lua NA
      */
     virtual ~Layout();
     
     /**
-     * Create a empty layout.
+     * Allocates and initializes a layout.
      */
     static Layout* create();
     
+    //background
     /**
-     * Sets a background image for layout.
+     * Sets a background image for layout
      *
      * @param fileName image file path.
-     * @param texType @see TextureResType. 
+     *
+     * @param texType @see TextureResType. TextureResType::LOCAL means local file, TextureResType::PLIST means sprite frame.
      */
     void setBackGroundImage(const std::string& fileName,TextureResType texType = TextureResType::LOCAL);
     
     /**
-     * Sets a background image capinsets for layout, it only affects the scale9 enabled background image
+     * Sets a background image capinsets for layout, if the background image is a scale9 render.
      *
-     * @param capInsets  The capInsets in Rect.
+     * @param capinsets of background image.
      *
      */
     void setBackGroundImageCapInsets(const Rect& capInsets);
     
-    /**
-     * Query background image's capInsets size.
-     *@return The background image capInsets.
-     */
     const Rect& getBackGroundImageCapInsets()const;
     
     /**
-     * Sets Color Type for layout's background
+     * Sets Color Type for layout.
      *
-     * @param type   @see `BackGroundColorType`
+     * @param type   @see LayoutBackGroundColorType.
      */
     void setBackGroundColorType(BackGroundColorType type);
     
-    /**
-     * Query the layout's background color type.
-     *@return The layout's background color type.
-     */
     BackGroundColorType getBackGroundColorType()const;
     
     /**
-     * Enable background image scale9 rendering.
+     * Sets background iamge use scale9 renderer.
      *
-     * @param enabled  True means enable scale9 rendering for background image, false otherwise.
+     * @param enabled   true that use scale9 renderer, false otherwise.
      */
     void setBackGroundImageScale9Enabled(bool enabled);
     
-    /**
-     * Query background image scale9 enable status.
-     *@return Whehter background image is scale9 enabled or not.
-     */
     bool isBackGroundImageScale9Enabled()const;
     
     /**
-     * Set background color for layout
-     * The color only applies to layout when it's color type is BackGroundColorType::SOLIDE
+     * Sets background color for layout, if color type is BackGroundColorType::SOLIDE
      *
-     * @param color Color in Color3B.
+     * @param color
      */
     void setBackGroundColor(const Color3B &color);
     
-    /**
-     * Query the layout's background color.
-     *@return Background color in Color3B.
-     */
     const Color3B& getBackGroundColor()const;
     
     /**
-     * Set start and end background color for layout.
-     * This setting only take effect when the layout's  color type is BackGroundColorType::GRADIENT
+     * Sets background color for layout, if color type is BackGroundColorType::GRADIENT
      *
-     * @param startColor Color value in Color3B.
-     * @param endColor Color value in Color3B.
+     * @param start color
+     *
+     * @param end color
      */
     void setBackGroundColor(const Color3B &startColor, const Color3B &endColor);
     
-    /**
-     * Get the gradient background start color.
-     *@return  Gradient background start color value.
-     */
     const Color3B& getBackGroundStartColor()const;
     
-    /**
-     * Get the gradient background end color.
-     * @return Gradient background end color value.
-     */
     const Color3B& getBackGroundEndColor()const;
     
     /**
-     * Sets background color opacity of layout.
+     * Sets background opacity layout.
      *
-     * @param opacity The opacity in `GLubyte`.
+     * @param opacity
      */
     void setBackGroundColorOpacity(GLubyte opacity);
     
-    /**
-     * Get the layout's background color opacity.
-     *@return Background color opacity value.
-     */
     GLubyte getBackGroundColorOpacity()const;
     
     /**
-     * Sets background color vector for layout.
-     * This setting only take effect when layout's color type is BackGroundColorType::GRADIENT
+     * Sets background color vector for layout, if color type is BackGroundColorType::GRADIENT
      *
-     * @param vector The color vector in `Vec2`.
+     * @param vector
      */
     void setBackGroundColorVector(const Vec2 &vector);
     
-    /**
-     * Get the layout's background color vector.
-     *@return Background color vector.
-     */
     const Vec2& getBackGroundColorVector()const;
     
-    /**
-     * Set layout's background image color.
-     *@param color Background color value in `Color3B`.
-     */
     void setBackGroundImageColor(const Color3B& color);
     
-    /**
-     * Set opacity of background image.
-     *@param opacity Background image opacity in GLubyte.
-     */
     void setBackGroundImageOpacity(GLubyte opacity);
     
-    /**
-     * Get color of layout's background image.
-     *@return Layout's background image color.
-     */
     const Color3B& getBackGroundImageColor()const;
     
-    /**
-     * Get the opacity of layout's background image.
-     * @return The opacity of layout's background image.
-     */
     GLubyte getBackGroundImageOpacity()const;
     
     /**
@@ -312,27 +205,16 @@ public:
     const Size& getBackGroundImageTextureSize() const;
     
     /**
-     * Toggle layout clipping.
+     * Changes if layout can clip it's content and child.
      *
-     * If you do need clipping, you pass true to this function.
+     * If you really need this, please enable it. But it would reduce the rendering efficiency. 
      *
-     * @param enabled Pass true to enable clipping, false otherwise.
+     * @param clipping enabled.
      */
     virtual void setClippingEnabled(bool enabled);
     
-    
-    /**
-     * Change the clipping type of layout.
-     * On default, the clipping type is `ClippingType::STENCIL`.
-     * @see `ClippingType`
-     *@param type The clipping type of layout.
-     */
     void setClippingType(ClippingType type);
-
-    /**
-     *
-     * @see `setClippingType(ClippingType)`
-     */
+    
     ClippingType getClippingType()const;
     
     /**
@@ -347,32 +229,24 @@ public:
      */
     virtual std::string getDescription() const override;
     
-    /**
-     * Change the layout type.
-     *@param type Layout type.
-     */
+
     virtual void setLayoutType(Type type);
     
-    /**
-     * Query layout type.
-     *@return Get the layout type.
-     */
     virtual  Type getLayoutType() const;
 
-    
-    virtual void addChild(Node* child)override;
-    virtual void addChild(Node * child, int localZOrder)override;
     /**
      * Adds a child to the container with z order and tag
      *
      * If the child is added to a 'running' node, then 'onEnter' and 'onEnterTransitionDidFinish' will be called immediately.
      *
      * @param child     A child node
-     * @param localZOrder    Z order for drawing priority. Please refer to setLocalZOrder(int)
+     * @param zOrder    Z order for drawing priority. Please refer to setLocalZOrder(int)
      * @param tag       A interger to identify the node easily. Please refer to setTag(int)
      */
-    virtual void addChild(Node* child, int localZOrder, int tag) override;
-    virtual void addChild(Node* child, int localZOrder, const std::string &name) override;
+    virtual void addChild(Node* child)override;
+    virtual void addChild(Node * child, int localZOrder)override;
+    virtual void addChild(Node* child, int zOrder, int tag) override;
+    virtual void addChild(Node* child, int zOrder, const std::string &name) override;
     
     virtual void visit(Renderer *renderer, const Mat4 &parentTransform, uint32_t parentFlags) override;
 
@@ -403,14 +277,7 @@ public:
      */
     void requestDoLayout();
     
-    /**
-     * @lua NA
-     */
     virtual void onEnter() override;
-    
-    /**
-     * @lua NA
-     */
     virtual void onExit() override;
     
     /**
@@ -437,7 +304,7 @@ public:
     /**
      *  When a widget is in a layout, you could call this method to get the next focused widget within a specified direction.
      *  If the widget is not in a layout, it will return itself
-     *@param direction the direction to look for the next focused widget in a layout
+     *@param dir the direction to look for the next focused widget in a layout
      *@param current  the current focused widget
      *@return the next focused widget in a layout
      */
@@ -450,13 +317,6 @@ public:
      * @return return the index of widget in the layout
      */
     std::function<int(FocusDirection, Widget*)> onPassFocusToChild;
-    
-    /** 
-     * Override function. Set camera mask, the node is visible by the camera whose camera flag & node's camera mask is true. 
-     * @param mask Mask being set
-     * @param applyChildren If true call this function recursively from this node to its children.
-     */
-    virtual void setCameraMask(unsigned short mask, bool applyChildren = true) override;
 
 CC_CONSTRUCTOR_ACCESS:
     //override "init" method of widget.
@@ -671,6 +531,4 @@ protected:
     
 }
 NS_CC_END
-// end of ui group
-/// @}
 #endif /* defined(__Layout__) */

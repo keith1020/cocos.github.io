@@ -31,64 +31,30 @@
 #include <string>   // for ssize_t on linux
 #include "platform/CCStdC.h" // for ssize_t on window
 
-/**
- * @addtogroup base
- * @js NA
- * @lua NA
- */
 NS_CC_BEGIN
 
 class CC_DLL Data
 {
-    friend class Properties;
-    
 public:
-    /**
-     * This parameter is defined for convenient reference if a null Data object is needed.
-     */
     static const Data Null;
     
-    /**
-     * Constructor of Data.
-     */
     Data();
-    
-    /**
-     * Copy constructor of Data.
-     */
     Data(const Data& other);
-    
-    /**
-     * Copy constructor of Data.
-     */
     Data(Data&& other);
-    
-    /**
-     * Destructor of Data.
-     */
     ~Data();
     
-    /**
-     * Overroads of operator=.
-     */
+    // Assignment operator
     Data& operator= (const Data& other);
-    
-    /**
-     * Overroads of operator=.
-     */
     Data& operator= (Data&& other);
     
     /**
-     * Gets internal bytes of Data. It will retrun the pointer directly used in Data, so don't delete it.
-     *
-     * @return Pointer of bytes used internal in Data.
+     * @js NA
+     * @lua NA
      */
     unsigned char* getBytes() const;
-    
     /**
-     * Gets the size of the bytes.
-     *
-     * @return The size of bytes of Data.
+     * @js NA
+     * @lua NA
      */
     ssize_t getSize() const;
     
@@ -108,28 +74,25 @@ public:
      */
     void fastSet(unsigned char* bytes, const ssize_t size);
     
-    /** 
-     * Clears data, free buffer and reset data size.
-     */
+    /** Clears data, free buffer and reset data size */
     void clear();
     
-    /** 
-     * Check whether the data is null.
-     *
-     * @return True if the the Data is null, false if not.
-     */
+    /** Check whether the data is null. */
     bool isNull() const;
-    
+
+	/** 检查是否加密*/
+	bool isEncryed() const;
+	/** 解密*/
+	void decryptData();
 private:
     void move(Data& other);
     
 private:
     unsigned char* _bytes;
     ssize_t _size;
+    unsigned char* m_pOld;
 };
-
 
 NS_CC_END
 
-/** @} */
 #endif // __CCDATA_H__

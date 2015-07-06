@@ -22,12 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
 #include "CocosPlayClient.h"
-#include <map>
-#include<unordered_map>
+#include "cocos2d.h"
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include <map>
 #include "jni/JniHelper.h"
 #include "platform/CCCommon.h"
-#include "platform/CCFileUtils.h"
 
 using namespace cocos2d;
 

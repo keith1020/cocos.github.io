@@ -32,12 +32,12 @@
 #include "extensions/ExtensionMacros.h"
 #include "extensions/ExtensionExport.h"
 
-/**
- * @addtogroup ui
- * @{
- */
 NS_CC_EXT_BEGIN
 
+/**
+ * @addtogroup GUI
+ * @{
+ */
 
 class ScrollView;
 
@@ -93,7 +93,6 @@ public:
     static ScrollView* create();
     /**
      * @js ctor
-     * @lua new
      */
     ScrollView();
     /**
@@ -102,7 +101,7 @@ public:
      */
     virtual ~ScrollView();
 
-    bool init() override;
+    bool init();
     /**
      * Returns a scroll view object
      *
@@ -235,10 +234,10 @@ public:
     bool isClippingToBounds() { return _clippingToBounds; }
     void setClippingToBounds(bool bClippingToBounds) { _clippingToBounds = bClippingToBounds; }
 
-    virtual bool onTouchBegan(Touch *touch, Event *event) override;
-    virtual void onTouchMoved(Touch *touch, Event *event) override;
-    virtual void onTouchEnded(Touch *touch, Event *event) override;
-    virtual void onTouchCancelled(Touch *touch, Event *event) override;
+    virtual bool onTouchBegan(Touch *touch, Event *event);
+    virtual void onTouchMoved(Touch *touch, Event *event);
+    virtual void onTouchEnded(Touch *touch, Event *event);
+    virtual void onTouchCancelled(Touch *touch, Event *event);
     
     // Overrides
     virtual void setContentSize(const Size & size) override;
@@ -256,7 +255,7 @@ public:
     /**
      * CCActionTweenDelegate
      */
-    void updateTweenAction(float value, const std::string& key) override;
+    void updateTweenAction(float value, const std::string& key);
 
     bool hasVisibleParents() const;
 protected:
@@ -377,9 +376,9 @@ protected:
     CustomCommand _afterDrawCommand;
 };
 
+// end of GUI group
+/// @}
 
 NS_CC_EXT_END
-// end of ui group
-/// @}
 
 #endif /* __CCSCROLLVIEW_H__ */

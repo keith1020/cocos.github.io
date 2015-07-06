@@ -158,14 +158,15 @@ void TMXLayer::draw(Renderer *renderer, const Mat4& transform, uint32_t flags)
     {
         _renderCommands.resize(_primitives.size());
     }
-    
+	_texture->prepareDraw();
     int index = 0;
     for(const auto& iter : _primitives)
     {
         if(iter.second->getCount() > 0)
         {
             auto& cmd = _renderCommands[index++];
-            cmd.init(iter.first, _texture->getName(), getGLProgramState(), BlendFunc::ALPHA_NON_PREMULTIPLIED, iter.second, _modelViewTransform, flags);
+			//修改混合模式，满足美术需求和PS一样 added by tokentong 20150327
+            cmd.init(iter.first, _texture->getName(), getGLProgramState(), BlendFunc::ALPHA_PREMULTIPLIED, iter.second, _modelViewTransform, flags);
             renderer->addCommand(&cmd);
         }
     }
@@ -173,6 +174,7 @@ void TMXLayer::draw(Renderer *renderer, const Mat4& transform, uint32_t flags)
 
 void TMXLayer::onDraw(Primitive *primitive)
 {
+	_texture->prepareDraw();
     GL::bindTexture2D(_texture->getName());
     getGLProgramState()->apply(_modelViewTransform);
     
@@ -255,12 +257,12 @@ void TMXLayer::updateTiles(const Rect& culledRect)
             
             int quadIndex = _tileToQuadIndex[tileIndex];
             CC_ASSERT(-1 != quadIndex);
-            _indices[6 * offset + 0] = quadIndex * 4 + 0;
-            _indices[6 * offset + 1] = quadIndex * 4 + 1;
-            _indices[6 * offset + 2] = quadIndex * 4 + 2;
-            _indices[6 * offset + 3] = quadIndex * 4 + 3;
-            _indices[6 * offset + 4] = quadIndex * 4 + 2;
-            _indices[6 * offset + 5] = quadIndex * 4 + 1;
+            (*_indices)[6 * offset + 0] = quadIndex * 4 + 0; //[CY MOD]
+            (*_indices)[6 * offset + 1] = quadIndex * 4 + 1; //[CY MOD]
+            (*_indices)[6 * offset + 2] = quadIndex * 4 + 2; //[CY MOD]
+            (*_indices)[6 * offset + 3] = quadIndex * 4 + 3; //[CY MOD]
+            (*_indices)[6 * offset + 4] = quadIndex * 4 + 2; //[CY MOD]
+            (*_indices)[6 * offset + 5] = quadIndex * 4 + 1; //[CY MOD]
             
         } // for x
     } // for y
@@ -281,7 +283,7 @@ void TMXLayer::updateVertexBuffer()
     GL::bindVAO(0);
     if(nullptr == _vData)
     {
-        _vertexBuffer = VertexBuffer::create(sizeof(V3F_C4B_T2F), (int)_totalQuads.size() * 4);
+        _vertexBuffer = VertexBuffer::create(sizeof(V3F_C4B_T2F), (int)(*_totalQuads).size() * 4);  //[CY MOD]
         _vData = VertexData::create();
         _vData->setStream(_vertexBuffer, VertexStreamAttribute(0, GLProgram::VERTEX_ATTRIB_POSITION, GL_FLOAT, 3));
         _vData->setStream(_vertexBuffer, VertexStreamAttribute(offsetof(V3F_C4B_T2F, colors), GLProgram::VERTEX_ATTRIB_COLOR, GL_UNSIGNED_BYTE, 4, true));
@@ -291,7 +293,7 @@ void TMXLayer::updateVertexBuffer()
     }
     if(_vertexBuffer)
     {
-        _vertexBuffer->updateVertices((void*)&_totalQuads[0], (int)_totalQuads.size() * 4, 0);
+        _vertexBuffer->updateVertices((void*)&(*_totalQuads)[0], (int)(*_totalQuads).size() * 4, 0);  //[CY MOD]
     }
     
 }
@@ -300,10 +302,10 @@ void TMXLayer::updateIndexBuffer()
 {
     if(nullptr == _indexBuffer)
     {
-        _indexBuffer = IndexBuffer::create(IndexBuffer::IndexType::INDEX_TYPE_SHORT_16, (int)_indices.size());
+        _indexBuffer = IndexBuffer::create(IndexBuffer::IndexType::INDEX_TYPE_SHORT_16, (int)(*_indices).size()); //[CY MOD]
         CC_SAFE_RETAIN(_indexBuffer);
     }
-    _indexBuffer->updateIndices(&_indices[0], (int)_indices.size(), 0);
+    _indexBuffer->updateIndices(&(*_indices)[0], (int)(*_indices).size(), 0); //[CY MOD]
     
 }
 
@@ -430,8 +432,8 @@ void TMXLayer::updateTotalQuads()
         Size tileSize = CC_SIZE_PIXELS_TO_POINTS(_tileSet->_tileSize);
         Size texSize = _tileSet->_imageSize;
         _tileToQuadIndex.clear();
-        _totalQuads.resize(int(_layerSize.width * _layerSize.height));
-        _indices.resize(6 * int(_layerSize.width * _layerSize.height));
+        (*_totalQuads).resize(int(_layerSize.width * _layerSize.height)); //[CY MOD]
+        (*_indices).resize(6 * int(_layerSize.width * _layerSize.height));  //[CY MOD]
         _tileToQuadIndex.resize(int(_layerSize.width * _layerSize.height),-1);
         _indicesVertexZOffsets.clear();
         
@@ -447,7 +449,7 @@ void TMXLayer::updateTotalQuads()
                 
                 _tileToQuadIndex[tileIndex] = quadIndex;
                 
-                auto& quad = _totalQuads[quadIndex];
+                auto& quad = (*_totalQuads)[quadIndex]; //[CY MOD]
                 
                 Vec3 nodePos(float(x), float(y), 0);
                 _tileToNodeTransform.transformPoint(&nodePos);
@@ -516,13 +518,12 @@ void TMXLayer::updateTotalQuads()
                     quad.tr.vertices.y = top;
                     quad.tr.vertices.z = z;
                 }
-                
                 // texcoords
                 Rect tileTexture = _tileSet->getRectForGID(tileGID);
-                left   = (tileTexture.origin.x / texSize.width);
-                right  = left + (tileTexture.size.width / texSize.width);
-                bottom = (tileTexture.origin.y / texSize.height);
-                top    = bottom + (tileTexture.size.height / texSize.height);
+                left   = (tileTexture.origin.x) / texSize.width;
+                right  = (tileTexture.origin.x+tileTexture.size.width) / texSize.width;
+                bottom = (tileTexture.origin.y)/ texSize.height;
+                top = (tileTexture.origin.y+tileTexture.size.height) / texSize.height;
                 
                 quad.bl.texCoords.u = left;
                 quad.bl.texCoords.v = bottom;
@@ -740,19 +741,19 @@ void TMXLayer::parseInternalProperties()
 //CCTMXLayer2 - obtaining positions, offset
 Vec2 TMXLayer::calculateLayerOffset(const Vec2& pos)
 {
-    Vec2 ret;
+    Vec2 ret = Vec2::ZERO;
     switch (_layerOrientation) 
     {
     case FAST_TMX_ORIENTATION_ORTHO:
-        ret.set( pos.x * _mapTileSize.width, -pos.y *_mapTileSize.height);
+        ret = Vec2( pos.x * _mapTileSize.width, -pos.y *_mapTileSize.height);
         break;
     case FAST_TMX_ORIENTATION_ISO:
-        ret.set((_mapTileSize.width /2) * (pos.x - pos.y),
+        ret = Vec2((_mapTileSize.width /2) * (pos.x - pos.y),
                   (_mapTileSize.height /2 ) * (-pos.x - pos.y));
         break;
     case FAST_TMX_ORIENTATION_HEX:
     default:
-        CCASSERT(pos.isZero(), "offset for this map not implemented yet");
+        CCASSERT(pos.equals(Vec2::ZERO), "offset for this map not implemented yet");
         break;
     }
     return ret;    

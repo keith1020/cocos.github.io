@@ -32,14 +32,9 @@
 #include "renderer/CCCustomCommand.h"
 #include "renderer/CCGroupCommand.h"
 #include "renderer/CCPrimitiveCommand.h"
-#include "renderer/CCMeshCommand.h"
 #include "renderer/CCGLProgramCache.h"
-#include "renderer/CCMaterial.h"
-#include "renderer/CCTechnique.h"
-#include "renderer/CCPass.h"
-#include "renderer/CCRenderState.h"
 #include "renderer/ccGLStateCache.h"
-
+#include "renderer/CCMeshCommand.h"
 #include "base/CCConfiguration.h"
 #include "base/CCDirector.h"
 #include "base/CCEventDispatcher.h"
@@ -62,10 +57,6 @@ static bool compare3DCommand(RenderCommand* a, RenderCommand* b)
 }
 
 // queue
-RenderQueue::RenderQueue()
-{
-    
-}
 
 void RenderQueue::push_back(RenderCommand* command)
 {
@@ -137,25 +128,17 @@ RenderCommand* RenderQueue::operator[](ssize_t index) const
 
 void RenderQueue::clear()
 {
-    for(int i = 0; i < QUEUE_COUNT; ++i)
+    _commands.clear();
+    for(int index = 0; index < QUEUE_COUNT; ++index)
     {
-        _commands[i].clear();
-    }
-}
-
-void RenderQueue::realloc(size_t reserveSize)
-{
-    for(int i = 0; i < QUEUE_COUNT; ++i)
-    {
-        _commands[i] = std::vector<RenderCommand*>();
-        _commands[i].reserve(reserveSize);
+        _commands.push_back(std::vector<RenderCommand*>());
     }
 }
 
 void RenderQueue::saveRenderState()
 {
-    _isDepthEnabled = glIsEnabled(GL_DEPTH_TEST) != GL_FALSE;
-    _isCullEnabled = glIsEnabled(GL_CULL_FACE) != GL_FALSE;
+    _isDepthEnabled = glIsEnabled(GL_DEPTH_TEST);
+    _isCullEnabled = glIsEnabled(GL_CULL_FACE);
     glGetBooleanv(GL_DEPTH_WRITEMASK, &_isDepthWrite);
     
     CHECK_GL_ERROR_DEBUG();
@@ -166,29 +149,24 @@ void RenderQueue::restoreRenderState()
     if (_isCullEnabled)
     {
         glEnable(GL_CULL_FACE);
-        RenderState::StateBlock::_defaultState->setCullFace(true);
     }
     else
     {
         glDisable(GL_CULL_FACE);
-        RenderState::StateBlock::_defaultState->setCullFace(false);
     }
     
     
     if (_isDepthEnabled)
     {
         glEnable(GL_DEPTH_TEST);
-        RenderState::StateBlock::_defaultState->setDepthTest(true);
     }
     else
     {
         glDisable(GL_DEPTH_TEST);
-        RenderState::StateBlock::_defaultState->setDepthTest(false);
     }
     
     glDepthMask(_isDepthWrite);
-    RenderState::StateBlock::_defaultState->setDepthWrite(_isDepthEnabled);
-
+    
     CHECK_GL_ERROR_DEBUG();
 }
 
@@ -389,7 +367,7 @@ void Renderer::addCommand(RenderCommand* command, int renderQueue)
     CCASSERT(!_isRendering, "Cannot add command while rendering");
     CCASSERT(renderQueue >=0, "Invalid render queue");
     CCASSERT(command->getType() != RenderCommand::Type::UNKNOWN_COMMAND, "Invalid Command Type");
-
+    
     _renderGroups[renderQueue].push_back(command);
 }
 
@@ -482,9 +460,6 @@ void Renderer::processRenderCommand(RenderCommand* command)
             
             if(cmd->isSkipBatching())
             {
-                // XXX: execute() will call bind() and unbind()
-                // but unbind() shouldn't be call if the next command is a MESH_COMMAND with Material.
-                // Once most of cocos2d-x moves to Pass/StateBlock, only bind() should be used.
                 cmd->execute();
             }
             else
@@ -543,15 +518,11 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
         {
             glEnable(GL_DEPTH_TEST);
             glDepthMask(true);
-            RenderState::StateBlock::_defaultState->setDepthTest(true);
-            RenderState::StateBlock::_defaultState->setDepthWrite(true);
         }
         else
         {
             glDisable(GL_DEPTH_TEST);
             glDepthMask(false);
-            RenderState::StateBlock::_defaultState->setDepthTest(false);
-            RenderState::StateBlock::_defaultState->setDepthWrite(false);
         }
         for (auto it = zNegQueue.cbegin(); it != zNegQueue.cend(); ++it)
         {
@@ -567,12 +538,9 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
     if (opaqueQueue.size() > 0)
     {
         //Clear depth to achieve layered rendering
-        glEnable(GL_DEPTH_TEST);
         glDepthMask(true);
-        RenderState::StateBlock::_defaultState->setDepthTest(true);
-        RenderState::StateBlock::_defaultState->setDepthWrite(true);
-
-
+        glEnable(GL_DEPTH_TEST);
+        
         for (auto it = opaqueQueue.cbegin(); it != opaqueQueue.cend(); ++it)
         {
             processRenderCommand(*it);
@@ -588,11 +556,7 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
     {
         glEnable(GL_DEPTH_TEST);
         glDepthMask(false);
-
-        RenderState::StateBlock::_defaultState->setDepthTest(true);
-        RenderState::StateBlock::_defaultState->setDepthWrite(false);
-
-
+        
         for (auto it = transQueue.cbegin(); it != transQueue.cend(); ++it)
         {
             processRenderCommand(*it);
@@ -610,19 +574,11 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
         {
             glEnable(GL_DEPTH_TEST);
             glDepthMask(true);
-
-            RenderState::StateBlock::_defaultState->setDepthTest(true);
-            RenderState::StateBlock::_defaultState->setDepthWrite(true);
-
         }
         else
         {
             glDisable(GL_DEPTH_TEST);
             glDepthMask(false);
-
-            RenderState::StateBlock::_defaultState->setDepthTest(false);
-            RenderState::StateBlock::_defaultState->setDepthWrite(false);
-
         }
         for (auto it = zZeroQueue.cbegin(); it != zZeroQueue.cend(); ++it)
         {
@@ -696,11 +652,8 @@ void Renderer::clear()
 {
     //Enable Depth mask to make sure glClear clear the depth buffer correctly
     glDepthMask(true);
-    glClearColor(_clearColor.r, _clearColor.g, _clearColor.b, _clearColor.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDepthMask(false);
-
-    RenderState::StateBlock::_defaultState->setDepthWrite(false);
 }
 
 void Renderer::setDepthTest(bool enable)
@@ -710,19 +663,13 @@ void Renderer::setDepthTest(bool enable)
         glClearDepth(1.0f);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
-
-        RenderState::StateBlock::_defaultState->setDepthTest(true);
-        RenderState::StateBlock::_defaultState->setDepthFunction(RenderState::DEPTH_LEQUAL);
-
 //        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     }
     else
     {
         glDisable(GL_DEPTH_TEST);
-
-        RenderState::StateBlock::_defaultState->setDepthTest(false);
     }
-
+    
     _isDepthTestFor2D = enable;
     CHECK_GL_ERROR_DEBUG();
 }
@@ -875,7 +822,7 @@ void Renderer::drawBatchedQuads()
 {
     //TODO: we can improve the draw performance by insert material switching command before hand.
     
-    ssize_t indexToDraw = 0;
+    int indexToDraw = 0;
     int startIndex = 0;
     
     //Upload buffer to VBO
@@ -892,10 +839,10 @@ void Renderer::drawBatchedQuads()
         glBindBuffer(GL_ARRAY_BUFFER, _quadbuffersVBO[0]);
         
         // option 1: subdata
-        //  glBufferSubData(GL_ARRAY_BUFFER, sizeof(_quads[0])*start, sizeof(_quads[0]) * n , &_quads[start] );
+        //        glBufferSubData(GL_ARRAY_BUFFER, sizeof(_quads[0])*start, sizeof(_quads[0]) * n , &_quads[start] );
         
         // option 2: data
-        //  glBufferData(GL_ARRAY_BUFFER, sizeof(quads_[0]) * (n-start), &quads_[start], GL_DYNAMIC_DRAW);
+        //        glBufferData(GL_ARRAY_BUFFER, sizeof(quads_[0]) * (n-start), &quads_[start], GL_DYNAMIC_DRAW);
         
         // option 3: orphaning + glMapBuffer
         glBufferData(GL_ARRAY_BUFFER, sizeof(_quadVerts[0]) * _numberQuads * 4, nullptr, GL_DYNAMIC_DRAW);
@@ -927,19 +874,14 @@ void Renderer::drawBatchedQuads()
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _quadbuffersVBO[1]);
     }
-
-
-    // FIXME: The logic of this code is confusing, and error prone
-    // Needs refactoring
-
-    //Start drawing vertices in batch
+    
+    //Start drawing verties in batch
     for(const auto& cmd : _batchQuadCommands)
     {
-        bool commandQueued = true;
         auto newMaterialID = cmd->getMaterialID();
         if(_lastMaterialID != newMaterialID || newMaterialID == MATERIAL_ID_DO_NOT_BATCH)
         {
-            // flush buffer
+            //Draw quads
             if(indexToDraw > 0)
             {
                 glDrawElements(GL_TRIANGLES, (GLsizei) indexToDraw, GL_UNSIGNED_SHORT, (GLvoid*) (startIndex*sizeof(_indices[0])) );
@@ -951,15 +893,11 @@ void Renderer::drawBatchedQuads()
             }
             
             //Use new material
-            _lastMaterialID = newMaterialID;
-
             cmd->useMaterial();
+            _lastMaterialID = newMaterialID;
         }
-
-        if (commandQueued)
-        {
-            indexToDraw += cmd->getQuadCount() * 6;
-        }
+        
+        indexToDraw += cmd->getQuadCount() * 6;
     }
     
     //Draw any remaining quad
@@ -1031,27 +969,32 @@ bool Renderer::checkVisibility(const Mat4 &transform, const Size &size)
     // only cull the default camera. The culling algorithm is valid for default camera.
     if (scene && scene->_defaultCamera != Camera::getVisitingCamera())
         return true;
-
-    auto director = Director::getInstance();
-    Rect visiableRect(director->getVisibleOrigin(), director->getVisibleSize());
     
-    // transform center point to screen space
+    // half size of the screen
+    Size screen_half = Director::getInstance()->getWinSize();
+    screen_half.width /= 2;
+    screen_half.height /= 2;
+
     float hSizeX = size.width/2;
     float hSizeY = size.height/2;
-    Vec3 v3p(hSizeX, hSizeY, 0);
-    transform.transformPoint(&v3p);
-    Vec2 v2p = Camera::getVisitingCamera()->projectGL(v3p);
+
+    Vec4 v4world, v4local;
+    v4local.set(hSizeX, hSizeY, 0, 1);
+    transform.transformVector(v4local, &v4world);
+
+    // center of screen is (0,0)
+    v4world.x -= screen_half.width;
+    v4world.y -= screen_half.height;
 
     // convert content size to world coordinates
     float wshw = std::max(fabsf(hSizeX * transform.m[0] + hSizeY * transform.m[4]), fabsf(hSizeX * transform.m[0] - hSizeY * transform.m[4]));
     float wshh = std::max(fabsf(hSizeX * transform.m[1] + hSizeY * transform.m[5]), fabsf(hSizeX * transform.m[1] - hSizeY * transform.m[5]));
-    
-    // enlarge visable rect half size in screen coord
-    visiableRect.origin.x -= wshw;
-    visiableRect.origin.y -= wshh;
-    visiableRect.size.width += wshw * 2;
-    visiableRect.size.height += wshh * 2;
-    bool ret = visiableRect.containsPoint(v2p);
+
+    // compare if it in the positive quadrant of the screen
+    float tmpx = (fabsf(v4world.x)-wshw);
+    float tmpy = (fabsf(v4world.y)-wshh);
+    bool ret = (tmpx < screen_half.width && tmpy < screen_half.height);
+
     return ret;
 }
 
@@ -1059,6 +1002,7 @@ bool Renderer::checkVisibility(const Mat4 &transform, const Size &size)
 void Renderer::setClearColor(const Color4F &clearColor)
 {
     _clearColor = clearColor;
+    glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 }
 
 NS_CC_END

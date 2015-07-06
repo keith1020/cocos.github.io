@@ -28,10 +28,6 @@
 
 #include "base/CCEventListener.h"
 
-/**
- * @addtogroup base
- * @{
- */
 
 NS_CC_BEGIN
 
@@ -39,23 +35,12 @@ namespace ui {
     class Widget;
 }
 
-/** @class EventListenerFocus
- * @brief Focus event listener.
- */
 class CC_DLL EventListenerFocus : public EventListener
 {
 public:
     static const std::string LISTENER_ID;
-    
-    /** Create a focus event listener.
-     *
-     * @return An autoreleased EventListenerFocus object.
-     */
     static EventListenerFocus* create();
     
-    /** Destructor.
-     * @js NA
-     */
     virtual ~EventListenerFocus();
     
     /// Overrides
@@ -73,9 +58,8 @@ CC_CONSTRUCTOR_ACCESS:
     friend class EventDispatcher;
 };
 
-NS_CC_END
 
-// end of base group
-/// @}
+
+NS_CC_END
 
 #endif /* defined(__cocos2d_libs__CCEventListenerFocus__) */

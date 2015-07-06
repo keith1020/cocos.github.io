@@ -93,6 +93,7 @@ public class Cocos2dxMusic {
     }
 
     public void playBackgroundMusic(final String path, final boolean isLoop) {
+    	try{
         if (mCurrentPath == null) {
             // it is the first time to play background music or end() was called
             mBackgroundMediaPlayer = createMediaplayer(path);
@@ -131,6 +132,8 @@ public class Cocos2dxMusic {
             } catch (final Exception e) {
                 Log.e(Cocos2dxMusic.TAG, "playBackgroundMusic: error state");
             }
+        }}catch(Throwable e ){
+        	
         }
     }
 

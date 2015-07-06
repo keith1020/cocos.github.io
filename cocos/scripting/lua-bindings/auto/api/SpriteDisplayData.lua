@@ -9,7 +9,6 @@
 -- @function [parent=#SpriteDisplayData] copy 
 -- @param self
 -- @param #ccs.DisplayData displayData
--- @return SpriteDisplayData#SpriteDisplayData self (return value: ccs.SpriteDisplayData)
         
 --------------------------------
 -- 
@@ -21,6 +20,5 @@
 -- js ctor
 -- @function [parent=#SpriteDisplayData] SpriteDisplayData 
 -- @param self
--- @return SpriteDisplayData#SpriteDisplayData self (return value: ccs.SpriteDisplayData)
         
 return nil

@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "WidgetReader/ListViewReader/ListViewReader.h"
 #include "cocostudio/CocoLoader.h"
 #include "ui/CocosGUI.h"
+#include "../../external/xxhash/xxhash.h"
 #include "tinyxml2.h"
 
 using namespace cocos2d;
@@ -212,7 +213,7 @@ Widget* GUIReader::widgetFromJsonFile(const char *fileName)
 	jsonDict.Parse<0>(contentStr.c_str());
     if (jsonDict.HasParseError())
     {
-        CCLOG("GetParseError %d\n",jsonDict.GetParseError());
+        CCLOG("GetParseError %s\n",jsonDict.GetParseError());
     }
     Widget* widget = nullptr;
     const char* fileVersion = DICTOOL->getStringValue_json(jsonDict, "version");
@@ -238,6 +239,8 @@ Widget* GUIReader::widgetFromJsonFile(const char *fileName)
     }
     
     CC_SAFE_DELETE(pReader);
+	// Lynn root的tag用来保存fileName的hash值，用来查找不同的layout
+	widget->setTag( (int)XXH32( fileName, (int)strlen(fileName), 0 ) );
     return widget;
 }
     
@@ -420,7 +423,9 @@ Widget* GUIReader::widgetFromBinaryFile(const char *fileName)
             }
         }
     }
-    
+
+	// Lynn root的tag用来保存fileName的hash值，用来查找不同的layout
+	widget->setTag( (int)XXH32( fileName, (int)strlen(fileName), 0 ) );
     return widget;
    
 }
@@ -1373,7 +1378,7 @@ Widget* WidgetPropertiesReader0300::widgetFromBinary(CocoLoader* cocoLoader,  st
             customJsonDict.Parse<0>(customProperty);
             if (customJsonDict.HasParseError())
             {
-                CCLOG("GetParseError %d\n", customJsonDict.GetParseError());
+                CCLOG("GetParseError %s\n", customJsonDict.GetParseError());
             }
             setPropsForAllCustomWidgetFromJsonDictionary(classname, widget, customJsonDict);
         }else{
@@ -1412,7 +1417,7 @@ Widget* WidgetPropertiesReader0300::widgetFromBinary(CocoLoader* cocoLoader,  st
                             }
                             else
                             {
-                                if (nullptr == dynamic_cast<Layout*>(widget))
+                                if (!dynamic_cast<Layout*>(widget))
                                 {
                                     if (child->getPositionType() == ui::Widget::PositionType::PERCENT)
                                     {
@@ -1474,7 +1479,7 @@ Widget* WidgetPropertiesReader0300::widgetFromJsonDictionary(const rapidjson::Va
             customJsonDict.Parse<0>(customProperty);
             if (customJsonDict.HasParseError())
             {
-                CCLOG("GetParseError %d\n", customJsonDict.GetParseError());
+                CCLOG("GetParseError %s\n", customJsonDict.GetParseError());
             }
             setPropsForAllCustomWidgetFromJsonDictionary(classname, widget, customJsonDict);
         }else{
@@ -1504,7 +1509,7 @@ Widget* WidgetPropertiesReader0300::widgetFromJsonDictionary(const rapidjson::Va
                 }
                 else
                 {
-                    if (nullptr == dynamic_cast<Layout*>(widget))
+                    if (!dynamic_cast<Layout*>(widget))
                     {
                         if (child->getPositionType() == ui::Widget::PositionType::PERCENT)
                         {

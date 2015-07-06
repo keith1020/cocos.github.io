@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 Copyright (c) 2013-2014 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
@@ -75,7 +75,7 @@ public:
      */
     static ArmatureAnimation *create(Armature *armature);
 public:
-    /**
+	/**
      * @js ctor
      */
     ArmatureAnimation();
@@ -107,7 +107,7 @@ public:
     virtual float getSpeedScale() const;
 
     //! The animation update speed
-    CC_DEPRECATED_ATTRIBUTE virtual void setAnimationInternal(float animationInternal) {}
+    //!CC_DEPRECATED_ATTRIBUTE virtual void setAnimationInternal(float animationInternal) {}
 
     using ProcessBase::play;
     /**
@@ -157,15 +157,15 @@ public:
     /**
      * Pause the Process
      */
-    virtual void pause() override;
+    virtual void pause();
     /**
      * Resume the Process
      */
-    virtual void resume() override;
+    virtual void resume();
     /**
      * Stop the Process
      */
-    virtual void stop() override;
+    virtual void stop();
 
 
     /**
@@ -173,13 +173,14 @@ public:
      */
     ssize_t getMovementCount() const;
 
-    virtual void update(float dt) override;
+    void update(float dt);
 
     /**
      * Get current movementID
      * @return The name of current movement
      */
-    std::string getCurrentMovementID() const;
+    const std::string& getCurrentMovementID() const;
+	const std::string& GetLastMovementID() const;
 
     /**
      * Set armature's movement event callback function
@@ -242,7 +243,7 @@ protected:
      * @js NA
      * @lua NA
      */
-    void updateHandler() override;
+    void updateHandler();
 
     /**
      * Update current key frame, and process auto stop, pause
@@ -275,13 +276,13 @@ protected:
     //! Scale the animation speed
     float _speedScale;
 
-    MovementData *_movementData;                //! MovementData save all MovementFrameDatas this animation used.
+    MovementData *_movementData;				//! MovementData save all MovementFrameDatas this animation used.
 
-    Armature *_armature;                        //! A weak reference of armature
+    Armature *_armature;						//! A weak reference of armature
 
-    std::string _movementID;                //! Current movment's name
+    std::string _movementID;				//! Current movment's name
 
-    int _toIndex;                                //! The frame index in MovementData->m_pMovFrameDataArr, it's different from m_iFrameIndex.
+    int _toIndex;								//! The frame index in MovementData->m_pMovFrameDataArr, it's different from m_iFrameIndex.
 
     cocos2d::Vector<Tween*> _tweenList;
 

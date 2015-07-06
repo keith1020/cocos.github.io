@@ -32,28 +32,16 @@
 
 NS_CC_BEGIN
 
-/**
- * @addtogroup _3d
- * @{
- */
-
-/**
- * @brief Ray is a line with one end. usually use it to check intersects with some object,such as Plane, OBB, AABB
- * @js NA
- **/
 class CC_DLL Ray
 {
 public:
     /**
      * Constructor.
-     *
-     * @lua new
      */
     Ray();
 
     /**
      * Constructor.
-     * @lua NA
      */
     Ray(const Ray& ray);
     
@@ -62,13 +50,11 @@ public:
      *
      * @param origin The ray's origin.
      * @param direction The ray's direction.
-     * @lua new
      */
     Ray(const Vec3& origin, const Vec3& direction);
 
     /**
      * Destructor.
-     * @lua NA
      */
     ~Ray();
 
@@ -103,9 +89,6 @@ public:
     Vec3 _origin;        // The ray origin position.
     Vec3 _direction;     // The ray direction vector.
 };
-
-// end of 3d group
-/// @}
 
 NS_CC_END
 

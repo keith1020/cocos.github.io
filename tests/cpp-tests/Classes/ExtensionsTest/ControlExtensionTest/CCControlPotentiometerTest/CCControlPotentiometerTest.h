@@ -32,12 +32,12 @@ class ControlPotentiometerTest : public ControlScene
 public:
     ControlPotentiometerTest();
     virtual ~ControlPotentiometerTest();
-    virtual bool init() override;
-    CC_SYNTHESIZE_RETAIN(cocos2d::Label*, _displayValueLabel, DisplayValueLabel)
+    bool init();
+    CC_SYNTHESIZE_RETAIN(Label*, _displayValueLabel, DisplayValueLabel)
 
-    void valueChanged(cocos2d::Ref* sender, cocos2d::extension::Control::EventType controlEvent);
+    void valueChanged(Ref *sender, Control::EventType controlEvent);
 
-    CREATE_FUNC(ControlPotentiometerTest)
+    CONTROL_SCENE_CREATE_FUNC(ControlPotentiometerTest)
 };
 
 

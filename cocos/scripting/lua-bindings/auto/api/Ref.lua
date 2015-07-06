@@ -12,7 +12,6 @@
 -- js NA
 -- @function [parent=#Ref] release 
 -- @param self
--- @return Ref#Ref self (return value: cc.Ref)
         
 --------------------------------
 -- Retains the ownership.<br>
@@ -21,7 +20,6 @@
 -- js NA
 -- @function [parent=#Ref] retain 
 -- @param self
--- @return Ref#Ref self (return value: cc.Ref)
         
 --------------------------------
 -- Returns the Ref's current reference count.<br>

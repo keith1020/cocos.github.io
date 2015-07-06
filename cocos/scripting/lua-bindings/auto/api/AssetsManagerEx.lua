@@ -16,7 +16,6 @@
 -- he wants to update resources.
 -- @function [parent=#AssetsManagerEx] checkUpdate 
 -- @param self
--- @return AssetsManagerEx#AssetsManagerEx self (return value: cc.AssetsManagerEx)
         
 --------------------------------
 --  @brief Gets storage path.
@@ -28,7 +27,6 @@
 --  @brief Update with the current local manifest.
 -- @function [parent=#AssetsManagerEx] update 
 -- @param self
--- @return AssetsManagerEx#AssetsManagerEx self (return value: cc.AssetsManagerEx)
         
 --------------------------------
 --  @brief Function for retrieve the local manifest object
@@ -46,7 +44,6 @@
 --  @brief Reupdate all failed assets under the current AssetsManagerEx context
 -- @function [parent=#AssetsManagerEx] downloadFailedAssets 
 -- @param self
--- @return AssetsManagerEx#AssetsManagerEx self (return value: cc.AssetsManagerEx)
         
 --------------------------------
 --  @brief Create function for creating a new AssetsManagerEx<br>
@@ -59,13 +56,5 @@
 -- @param #string manifestUrl
 -- @param #string storagePath
 -- @return AssetsManagerEx#AssetsManagerEx ret (return value: cc.AssetsManagerEx)
-        
---------------------------------
--- 
--- @function [parent=#AssetsManagerEx] AssetsManagerEx 
--- @param self
--- @param #string manifestUrl
--- @param #string storagePath
--- @return AssetsManagerEx#AssetsManagerEx self (return value: cc.AssetsManagerEx)
         
 return nil

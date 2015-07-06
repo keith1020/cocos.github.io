@@ -1,14 +1,61 @@
+// #define COCOS2D_DEBUG   1
+
 #include "TextInputTest.h"
 
-USING_NS_CC;
+//////////////////////////////////////////////////////////////////////////
+// local function
+//////////////////////////////////////////////////////////////////////////
+
+enum 
+{
+    kTextFieldTTFDefaultTest = 0,
+    kTextFieldTTFActionTest,
+    kTextInputTestsCount,
+}; 
 
 #define FONT_NAME                       "fonts/Thonburi.ttf"
 #define FONT_SIZE                       36
 
-TextInputTests::TextInputTests()
+static int testIdx = -1; 
+
+KeyboardNotificationLayer* createTextInputTest(int nIndex)
 {
-    ADD_TEST_CASE(TextFieldTTFDefaultTest);
-    ADD_TEST_CASE(TextFieldTTFActionTest);
+    switch(nIndex)
+    {
+    case kTextFieldTTFDefaultTest: return new TextFieldTTFDefaultTest();
+    case kTextFieldTTFActionTest: return new TextFieldTTFActionTest();
+    default: return 0;
+    }
+}
+
+Layer* restartTextInputTest()
+{
+    TextInputTest* pContainerLayer = new (std::nothrow) TextInputTest;
+    pContainerLayer->autorelease();
+
+    auto pTestLayer = createTextInputTest(testIdx);
+    pTestLayer->autorelease();
+    pContainerLayer->addKeyboardNotificationLayer(pTestLayer);
+
+    return pContainerLayer;
+}
+
+Layer* nextTextInputTest()
+{
+    testIdx++;
+    testIdx = testIdx % kTextInputTestsCount;
+
+    return restartTextInputTest();
+}
+
+Layer* backTextInputTest()
+{
+    testIdx--;
+    int total = kTextInputTestsCount;
+    if( testIdx < 0 )
+        testIdx += total;    
+
+    return restartTextInputTest();
 }
 
 static Rect getRect(Node * node)
@@ -21,9 +68,55 @@ static Rect getRect(Node * node)
     return rc;
 }
 
-std::string KeyboardNotificationLayer::title() const
+//////////////////////////////////////////////////////////////////////////
+// implement TextInputTest
+//////////////////////////////////////////////////////////////////////////
+
+TextInputTest::TextInputTest()
+: _notificationLayer(0)
+{
+    
+}
+
+void TextInputTest::restartCallback(Ref* sender)
+{
+    auto s = new (std::nothrow) TextInputTestScene();
+    s->addChild(restartTextInputTest()); 
+
+    Director::getInstance()->replaceScene(s);
+    s->release();
+}
+
+void TextInputTest::nextCallback(Ref* sender)
+{
+    auto s = new (std::nothrow) TextInputTestScene();
+    s->addChild( nextTextInputTest() );
+    Director::getInstance()->replaceScene(s);
+    s->release();
+}
+
+void TextInputTest::backCallback(Ref* sender)
+{
+    auto s = new (std::nothrow) TextInputTestScene();
+    s->addChild( backTextInputTest() );
+    Director::getInstance()->replaceScene(s);
+    s->release();
+}
+
+void TextInputTest::addKeyboardNotificationLayer(KeyboardNotificationLayer * layer)
+{
+    _notificationLayer = layer;
+    addChild(layer);
+}
+
+std::string TextInputTest::title() const
 {
     return "text input test";
+}
+
+void TextInputTest::onEnter()
+{
+    BaseTest::onEnter();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -39,6 +132,12 @@ KeyboardNotificationLayer::KeyboardNotificationLayer()
     listener->onTouchEnded = CC_CALLBACK_2(KeyboardNotificationLayer::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
+
+//void KeyboardNotificationLayer::registerWithTouchDispatcher()
+//{
+//    auto director = Director::getInstance();
+//    director->getTouchDispatcher()->addTargetedDelegate(this, 0, false);
+//}
 
 void KeyboardNotificationLayer::keyboardWillShow(IMEKeyboardNotificationInfo& info)
 {
@@ -97,8 +196,8 @@ void KeyboardNotificationLayer::onTouchEnded(Touch  *touch, Event  *event)
     auto endPos = touch->getLocation();    
 
     float delta = 5.0f;
-    if (std::abs(endPos.x - _beginPos.x) > delta
-        || std::abs(endPos.y - _beginPos.y) > delta)
+    if (::abs(endPos.x - _beginPos.x) > delta
+        || ::abs(endPos.y - _beginPos.y) > delta)
     {
         // not click
         _beginPos.x = _beginPos.y = -1;
@@ -107,10 +206,10 @@ void KeyboardNotificationLayer::onTouchEnded(Touch  *touch, Event  *event)
 
     // decide the trackNode is clicked.
     Rect rect;
-    auto point = _trackNode->convertTouchToNodeSpace(touch);
+    auto point = convertTouchToNodeSpaceAR(touch);
     CCLOG("KeyboardNotificationLayer:clickedAt(%f,%f)", point.x, point.y);
 
-    rect.size = _trackNode->getContentSize();
+    rect = getRect(_trackNode);
     CCLOG("KeyboardNotificationLayer:TrackNode at(origin:%f,%f, size:%f,%f)",
         rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 
@@ -150,6 +249,14 @@ void TextFieldTTFDefaultTest::onEnter()
 
     // add TextFieldTTF
     auto s = Director::getInstance()->getWinSize();
+
+    std::string strSubtitle = subtitle();
+    TTFConfig ttfConfig;
+    ttfConfig.fontFilePath = FONT_NAME;
+    ttfConfig.fontSize = 16;
+    auto subTitle = Label::createWithTTF(ttfConfig, strSubtitle.c_str());
+    addChild(subTitle, 9999);
+    subTitle->setPosition(VisibleRect::center().x, VisibleRect::top().y - 60);
 
     auto pTextField = TextFieldTTF::textFieldWithPlaceHolder("<click here for input>",
         FONT_NAME,
@@ -210,6 +317,14 @@ void TextFieldTTFActionTest::onEnter()
 
     // add TextFieldTTF
     auto s = Director::getInstance()->getWinSize();
+
+    std::string strSubtitle = subtitle();
+    TTFConfig ttfConfig;
+    ttfConfig.fontFilePath = FONT_NAME;
+    ttfConfig.fontSize = 16;
+    auto subTitle = Label::createWithTTF(ttfConfig, strSubtitle.c_str());
+    addChild(subTitle, 9999);
+    subTitle->setPosition(VisibleRect::center().x, VisibleRect::top().y - 60);
 
     _textField = TextFieldTTF::textFieldWithPlaceHolder("<click here for input>",
         FONT_NAME,
@@ -344,4 +459,16 @@ bool TextFieldTTFActionTest::onDraw(TextFieldTTF * sender)
 void TextFieldTTFActionTest::callbackRemoveNodeWhenDidAction(Node * node)
 {
     this->removeChild(node, true);
+}
+
+//////////////////////////////////////////////////////////////////////////
+// implement TextInputTestScene
+//////////////////////////////////////////////////////////////////////////
+
+void TextInputTestScene::runThisTest()
+{
+    auto layer = nextTextInputTest();
+    addChild(layer);
+
+    Director::getInstance()->replaceScene(this);
 }

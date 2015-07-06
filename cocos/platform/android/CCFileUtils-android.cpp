@@ -303,6 +303,10 @@ Data FileUtilsAndroid::getData(const std::string& filename, bool forString)
     {
         ret.fastSet(data, size);
         cocosplay::notifyFileLoaded(fullPath);
+		if( ret.isEncryed() )
+		{
+			ret.decryptData();
+		}
     }
 
     return ret;

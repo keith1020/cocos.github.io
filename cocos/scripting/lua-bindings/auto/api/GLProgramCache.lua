@@ -10,7 +10,6 @@
 -- @param self
 -- @param #cc.GLProgram program
 -- @param #string key
--- @return GLProgramCache#GLProgramCache self (return value: cc.GLProgramCache)
         
 --------------------------------
 --  returns a GL program for a given key 
@@ -23,19 +22,16 @@
 --  reload the default shaders 
 -- @function [parent=#GLProgramCache] reloadDefaultGLPrograms 
 -- @param self
--- @return GLProgramCache#GLProgramCache self (return value: cc.GLProgramCache)
         
 --------------------------------
 --  loads the default shaders 
 -- @function [parent=#GLProgramCache] loadDefaultGLPrograms 
 -- @param self
--- @return GLProgramCache#GLProgramCache self (return value: cc.GLProgramCache)
         
 --------------------------------
 --  purges the cache. It releases the retained instance. 
 -- @function [parent=#GLProgramCache] destroyInstance 
 -- @param self
--- @return GLProgramCache#GLProgramCache self (return value: cc.GLProgramCache)
         
 --------------------------------
 --  returns the shared instance 
@@ -44,10 +40,8 @@
 -- @return GLProgramCache#GLProgramCache ret (return value: cc.GLProgramCache)
         
 --------------------------------
--- Constructor.<br>
 -- js ctor
 -- @function [parent=#GLProgramCache] GLProgramCache 
 -- @param self
--- @return GLProgramCache#GLProgramCache self (return value: cc.GLProgramCache)
         
 return nil

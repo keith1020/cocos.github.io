@@ -10,14 +10,24 @@
 #define __samples__NewEventDispatcherTest__
 
 #include "cocos2d.h"
+#include "../testBasic.h"
 #include "../BaseTest.h"
 
-DEFINE_TEST_SUITE(EventDispatcherTests);
-
-class EventDispatcherTestDemo : public TestCase
+class EventDispatcherTestScene : public TestScene
 {
 public:
+    virtual void runThisTest();
+};
+
+class EventDispatcherTestDemo : public BaseTest
+{
+public:
+    virtual void onEnter() override;
     virtual std::string title() const override;
+    virtual std::string subtitle() const override;
+    void backCallback(Ref* sender);
+    void nextCallback(Ref* sender);
+    void restartCallback(Ref* sender);
 };
 
 
@@ -57,8 +67,8 @@ public:
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
 private:
-    cocos2d::EventListenerCustom* _listener;
-    cocos2d::EventListenerCustom* _listener2;
+    EventListenerCustom* _listener;
+    EventListenerCustom* _listener2;
 };
 
 class LabelKeyboardEventTest : public EventDispatcherTestDemo
@@ -89,7 +99,7 @@ public:
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
 private:
-    cocos2d::Sprite* _sprite;
+    Sprite* _sprite;
     bool _spriteSaved;
 };
 
@@ -113,16 +123,16 @@ public:
 
     virtual void update(float dt) override;
 
-    void onEvent1(cocos2d::EventCustom* event);
-    void onEvent2(cocos2d::EventCustom* event);
+    void onEvent1(EventCustom *event);
+    void onEvent2(EventCustom *event);
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
 
 protected:
     int _count1, _count2, _count3, _count4;
-    cocos2d::Label* _label1, *_label2, *_label3, *_label4;
-    cocos2d::EventListenerCustom* _event1, *_event2, *_event3, *_event4;
+    Label *_label1, *_label2, *_label3, *_label4;
+    EventListenerCustom *_event1, *_event2, *_event3, *_event4;
 };
 
 class GlobalZTouchTest : public EventDispatcherTestDemo
@@ -137,7 +147,7 @@ public:
     virtual std::string subtitle() const override;
     
 protected:
-    cocos2d::Sprite* _sprite;
+    Sprite* _sprite;
     float _accum;
 };
 
@@ -151,8 +161,8 @@ public:
     virtual std::string subtitle() const override;
     
 protected:
-    bool isPointInNode(cocos2d::Vec2 pt, cocos2d::Node* node);
-    bool isPointInTopHalfAreaOfScreen(cocos2d::Vec2 pt);
+    bool isPointInNode(Vec2 pt, Node* node);
+    bool isPointInTopHalfAreaOfScreen(Vec2 pt);
 };
 
 class PauseResumeTargetTest : public EventDispatcherTestDemo
@@ -179,7 +189,7 @@ public:
     virtual std::string subtitle() const override;
     
 private:
-    cocos2d::EventListenerCustom* _customlistener;
+    EventListenerCustom* _customlistener;
     bool _bugFixed;
 };
 
@@ -227,7 +237,7 @@ public:
     virtual std::string subtitle() const override;
 
 private:
-    cocos2d::EventListenerCustom* _listener;
+    EventListenerCustom* _listener;
 };
 
 #endif /* defined(__samples__NewEventDispatcherTest__) */

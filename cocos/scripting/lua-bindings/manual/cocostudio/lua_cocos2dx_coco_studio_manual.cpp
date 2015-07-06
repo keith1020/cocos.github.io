@@ -221,6 +221,76 @@ static void extendArmatureAnimation(lua_State* L)
     lua_pop(L, 1);
 }
 
+int lua_cocos2dx_studio_Armature_setBlendMode(lua_State* tolua_S)
+{
+	int argc = 0;
+	cocostudio::Armature* cobj = nullptr;
+	bool ok  = true;
+
+#if COCOS2D_DEBUG >= 1
+	tolua_Error tolua_err;
+#endif
+
+
+#if COCOS2D_DEBUG >= 1
+	if (!tolua_isusertype(tolua_S,1,"ccs.Armature",0,&tolua_err)) goto tolua_lerror;
+#endif
+
+	cobj = (cocostudio::Armature*)tolua_tousertype(tolua_S,1,0);
+
+#if COCOS2D_DEBUG >= 1
+	if (!cobj) 
+	{
+		tolua_error(tolua_S,"invalid 'cobj' in function 'lua_cocos2dx_studio_Armature_setBlendFunc'", nullptr);
+		return 0;
+	}
+#endif
+
+	argc = lua_gettop(tolua_S)-1;
+	if (argc == 2) 
+	{
+		int src = 0;
+		ok &= luaval_to_int32(tolua_S, 2,(int *)&src, "lua_cocos2dx_studio_Armature_setBlendMode src");
+		if(!ok)
+		{
+			tolua_error(tolua_S,"invalid arguments in function 'lua_cocos2dx_studio_Armature_setBlendMode'", nullptr);
+			return 0;
+		}
+		int dst = 0;
+		ok &= luaval_to_int32(tolua_S, 3,(int *)&dst, "lua_cocos2dx_studio_Armature_setBlendMode dst");
+		if(!ok)
+		{
+			tolua_error(tolua_S,"invalid arguments in function 'lua_cocos2dx_studio_Armature_setBlendMode'", nullptr);
+			return 0;
+		}
+
+		cocos2d::BlendFunc bf;
+		bf.src = src;
+		bf.dst = dst;
+		cobj->setBlendFunc( bf );
+		return 0;
+	}
+	luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "ccs.Armature:setBlendFunc",argc, 1);
+	return 0;
+
+#if COCOS2D_DEBUG >= 1
+tolua_lerror:
+	tolua_error(tolua_S,"#ferror in function 'lua_cocos2dx_studio_Armature_setBlendFunc'.",&tolua_err);
+#endif
+
+	return 0;
+}
+static void extendArmature(lua_State* L)
+{
+	lua_pushstring(L, "ccs.Armature");
+	lua_rawget(L, LUA_REGISTRYINDEX);
+	if (lua_istable(L,-1))
+	{
+		tolua_function(L, "setBlendMode", lua_cocos2dx_studio_Armature_setBlendMode );
+	}
+	lua_pop(L, 1);
+}
+
 static int lua_cocos2dx_ArmatureDataManager_addArmatureFileInfoAsyncCallFunc(lua_State* L)
 {
     if (nullptr == L)
@@ -571,7 +641,7 @@ int register_all_cocos2dx_coco_studio_manual(lua_State* L)
     extendBone(L);
     extendActionTimelineCache(L);
     extendActionTimeline(L);
-    
+    extendArmature(L);
     return 0;
 }
 

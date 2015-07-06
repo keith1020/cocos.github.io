@@ -1,29 +1,28 @@
 #ifndef _TOUCHES_TEST__H_
 #define _TOUCHES_TEST__H_
 
-#include "../BaseTest.h"
+////----#include "cocos2d.h"
+#include "../testBasic.h"
 
+USING_NS_CC;
 
-DEFINE_TEST_SUITE(TouchesTests);
-
-class PongScene : public TestCase
+class PongScene : public TestScene
 {
 public:
-    CREATE_FUNC(PongScene);
-    
-    virtual bool init() override;
+    PongScene();
+
+    virtual void runThisTest();
 };
 
 class Ball;
 class Paddle;
-class PongLayer : public cocos2d::Layer
+class PongLayer : public Layer
 {
 private:
     Ball*       _ball;
-    cocos2d::Vector<Paddle*>    _paddles;
-    cocos2d::Vec2     _ballStartingVelocity; 
+    Vector<Paddle*>    _paddles;
+    Vec2     _ballStartingVelocity; 
 public:
-    CREATE_FUNC(PongLayer);
     PongLayer();
     ~PongLayer();
 

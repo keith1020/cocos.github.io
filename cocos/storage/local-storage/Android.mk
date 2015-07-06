@@ -12,7 +12,10 @@ LocalStorage-android.cpp
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/..
 
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/../..
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../.. \
+		    $(LOCAL_PATH)/../../../external/lua/tolua \
+                    $(LOCAL_PATH)/../../../external/lua/luajit/include \
+                    $(LOCAL_PATH)/../../../external/lua
 
 LOCAL_CFLAGS += -Wno-psabi
 LOCAL_EXPORT_CFLAGS += -Wno-psabi

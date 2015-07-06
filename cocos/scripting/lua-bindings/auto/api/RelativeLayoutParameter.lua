@@ -7,52 +7,49 @@
 --------------------------------
 -- Sets RelativeAlign parameter for LayoutParameter.<br>
 -- see RelativeAlign<br>
--- param align Relative align in  `RelativeAlign`.
+-- param RelativeAlign
 -- @function [parent=#RelativeLayoutParameter] setAlign 
 -- @param self
 -- @param #int align
--- @return RelativeLayoutParameter#RelativeLayoutParameter self (return value: ccui.RelativeLayoutParameter)
         
 --------------------------------
--- Set widget name your widget want to relative to.<br>
--- param name Relative widget name.
+-- Sets a key for LayoutParameter. Witch widget named this is relative to.<br>
+-- param name
 -- @function [parent=#RelativeLayoutParameter] setRelativeToWidgetName 
 -- @param self
 -- @param #string name
--- @return RelativeLayoutParameter#RelativeLayoutParameter self (return value: ccui.RelativeLayoutParameter)
         
 --------------------------------
--- Get a name of LayoutParameter in Relative Layout.<br>
--- return name Relative name in string.
+-- Gets a name in Relative Layout of LayoutParameter.<br>
+-- return name
 -- @function [parent=#RelativeLayoutParameter] getRelativeName 
 -- @param self
 -- @return string#string ret (return value: string)
         
 --------------------------------
--- Get the relative widget name.<br>
--- return name A relative widget name in string.
+-- Gets the key of LayoutParameter. Witch widget named this is relative to.<br>
+-- return name
 -- @function [parent=#RelativeLayoutParameter] getRelativeToWidgetName 
 -- @param self
 -- @return string#string ret (return value: string)
         
 --------------------------------
--- Set a name for LayoutParameter in Relative Layout.<br>
--- param name A string name.
+-- Sets a name in Relative Layout for LayoutParameter.<br>
+-- param name
 -- @function [parent=#RelativeLayoutParameter] setRelativeName 
 -- @param self
 -- @param #string name
--- @return RelativeLayoutParameter#RelativeLayoutParameter self (return value: ccui.RelativeLayoutParameter)
         
 --------------------------------
--- Get RelativeAlign parameter for LayoutParameter.<br>
+-- Gets RelativeAlign parameter for LayoutParameter.<br>
 -- see RelativeAlign<br>
--- return  A RelativeAlign variable.
+-- return RelativeAlign
 -- @function [parent=#RelativeLayoutParameter] getAlign 
 -- @param self
 -- @return int#int ret (return value: int)
         
 --------------------------------
--- Create a RelativeLayoutParameter instance.<br>
+-- Allocates and initializes.<br>
 -- return A initialized LayoutParameter which is marked as "autorelease".
 -- @function [parent=#RelativeLayoutParameter] create 
 -- @param self
@@ -69,13 +66,10 @@
 -- @function [parent=#RelativeLayoutParameter] copyProperties 
 -- @param self
 -- @param #ccui.LayoutParameter model
--- @return RelativeLayoutParameter#RelativeLayoutParameter self (return value: ccui.RelativeLayoutParameter)
         
 --------------------------------
--- Default constructor<br>
--- lua new
+-- Default constructor
 -- @function [parent=#RelativeLayoutParameter] RelativeLayoutParameter 
 -- @param self
--- @return RelativeLayoutParameter#RelativeLayoutParameter self (return value: ccui.RelativeLayoutParameter)
         
 return nil

@@ -348,6 +348,7 @@ void PageView::onTouchMoved(Touch *touch, Event *unusedEvent)
     {
         handleMoveLogic(touch);
     }
+    moveEvent();
 }
 
 void PageView::onTouchEnded(Touch *touch, Event *unusedEvent)

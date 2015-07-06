@@ -7,28 +7,24 @@
 --------------------------------
 -- Load texture for imageview.<br>
 -- param fileName   file name of texture.<br>
--- param texType    @see `Widget::TextureResType`
+-- param texType    @see TextureResType
 -- @function [parent=#ImageView] loadTexture 
 -- @param self
 -- @param #string fileName
 -- @param #int texType
--- @return ImageView#ImageView self (return value: ccui.ImageView)
         
 --------------------------------
--- 
--- @function [parent=#ImageView] init 
+-- Returns the "class name" of widget.
+-- @function [parent=#ImageView] getDescription 
 -- @param self
--- @param #string imageFileName
--- @param #int texType
--- @return bool#bool ret (return value: bool)
+-- @return string#string ret (return value: string)
         
 --------------------------------
--- Enable scale9 renderer.<br>
--- param enabled Set to true will use scale9 renderer, false otherwise.
+-- Sets if imageview is using scale9 renderer.<br>
+-- param able true that using scale9 renderer, false otherwise.
 -- @function [parent=#ImageView] setScale9Enabled 
 -- @param self
--- @param #bool enabled
--- @return ImageView#ImageView self (return value: ccui.ImageView)
+-- @param #bool able
         
 --------------------------------
 -- Updates the texture rect of the ImageView in points.<br>
@@ -36,31 +32,31 @@
 -- @function [parent=#ImageView] setTextureRect 
 -- @param self
 -- @param #rect_table rect
--- @return ImageView#ImageView self (return value: ccui.ImageView)
         
 --------------------------------
--- Sets capInsets for imageview.<br>
--- The capInsets affects the ImageView's renderer only if `setScale9Enabled(true)` is called.<br>
+-- Sets capinsets for imageview, if imageview is using scale9 renderer.<br>
 -- param capInsets    capinsets for imageview
 -- @function [parent=#ImageView] setCapInsets 
 -- @param self
 -- @param #rect_table capInsets
--- @return ImageView#ImageView self (return value: ccui.ImageView)
         
 --------------------------------
--- Get ImageView's capInsets size.<br>
--- return Query capInsets size in Rect<br>
--- see `setCapInsets(const Rect&)`
+-- 
 -- @function [parent=#ImageView] getCapInsets 
 -- @param self
 -- @return rect_table#rect_table ret (return value: rect_table)
         
 --------------------------------
--- Query whether button is using scale9 renderer or not.<br>
--- return whether button use scale9 renderer or not.
+-- 
 -- @function [parent=#ImageView] isScale9Enabled 
 -- @param self
 -- @return bool#bool ret (return value: bool)
+        
+--------------------------------
+-- 
+-- @function [parent=#ImageView] getTextureFile 
+-- @param self
+-- @return string#string ret (return value: string)
         
 --------------------------------
 -- @overload self, string, int         
@@ -85,18 +81,6 @@
         
 --------------------------------
 -- 
--- @function [parent=#ImageView] init 
--- @param self
--- @return bool#bool ret (return value: bool)
-        
---------------------------------
--- 
--- @function [parent=#ImageView] getDescription 
--- @param self
--- @return string#string ret (return value: string)
-        
---------------------------------
--- 
 -- @function [parent=#ImageView] getVirtualRendererSize 
 -- @param self
 -- @return size_table#size_table ret (return value: size_table)
@@ -106,14 +90,10 @@
 -- @function [parent=#ImageView] ignoreContentAdaptWithSize 
 -- @param self
 -- @param #bool ignore
--- @return ImageView#ImageView self (return value: ccui.ImageView)
         
 --------------------------------
--- Default constructor<br>
--- js ctor<br>
--- lua new
+-- Default constructor
 -- @function [parent=#ImageView] ImageView 
 -- @param self
--- @return ImageView#ImageView self (return value: ccui.ImageView)
         
 return nil

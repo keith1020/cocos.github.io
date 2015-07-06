@@ -40,6 +40,7 @@ _scale9Enabled(false),
 _prevIgnoreSize(true),
 _capInsets(Rect::ZERO),
 _imageRenderer(nullptr),
+_textureFile(""),
 _imageTexType(TextureResType::LOCAL),
 _imageTextureSize(_contentSize),
 _imageRendererAdaptDirty(true)
@@ -117,10 +118,11 @@ void ImageView::initRenderer()
 
 void ImageView::loadTexture(const std::string& fileName, TextureResType texType)
 {
-    if (fileName.empty())
+    if (fileName.empty() || (_textureFile == fileName && _imageTexType == texType && _imageRenderer->getSprite() != NULL ))
     {
         return;
     }
+    _textureFile = fileName;
     _imageTexType = texType;
     switch (_imageTexType)
     {
@@ -133,20 +135,9 @@ void ImageView::loadTexture(const std::string& fileName, TextureResType texType)
         default:
             break;
     }
-
-    this->setupTexture();
-}
-
-void ImageView::loadTexture(SpriteFrame* spriteframe)
-{
-    _imageRenderer->initWithSpriteFrame(spriteframe);
-    this->setupTexture();
-}
-
-void ImageView::setupTexture()
-{
+    
     _imageTextureSize = _imageRenderer->getContentSize();
-
+  
     this->updateChildrenDisplayedRGBA();
 
     updateContentSizeWithTextureSize(_imageTextureSize);
@@ -302,11 +293,7 @@ void ImageView::copySpecialProperties(Widget *widget)
     {
         _prevIgnoreSize = imageView->_prevIgnoreSize;
         setScale9Enabled(imageView->_scale9Enabled);
-        auto imageSprite = imageView->_imageRenderer->getSprite();
-        if(nullptr != imageSprite)
-        {
-            loadTexture(imageSprite->getSpriteFrame());
-        }
+        loadTexture(imageView->_textureFile, imageView->_imageTexType);
         setCapInsets(imageView->_capInsets);
     }
 }

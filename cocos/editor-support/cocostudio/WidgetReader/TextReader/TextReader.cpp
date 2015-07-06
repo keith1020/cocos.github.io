@@ -47,11 +47,6 @@ namespace cocostudio
         return instanceTextReader;
     }
     
-    void TextReader::destroyInstance()
-    {
-        CC_SAFE_DELETE(instanceTextReader);
-    }
-    
     void TextReader::setPropsFromBinary(cocos2d::ui::Widget *widget, CocoLoader *cocoLoader, stExpCocoNode *cocoNode)
     {
         this->beginSetBasicProperties(widget);
@@ -164,13 +159,6 @@ namespace cocostudio
         int areaHeight = 0;
         int h_alignment = 0;
         int v_alignment = 0;
-        bool outlineEnabled = false;
-        Color4B outlineColor = Color4B::BLACK;
-        int outlineSize = 1;
-        bool shadowEnabled = false;
-        Color4B shadowColor = Color4B::BLACK;
-        Size shadowOffset = Size(2, -2);
-        int shadowBlurRadius = 0;
         
         std::string path = "";
         std::string plistFile = "";
@@ -241,30 +229,6 @@ namespace cocostudio
             {
                 isCustomSize = (value == "True") ? true : false;
             }
-            else if (name == "OutlineEnabled")
-            {
-                outlineEnabled = (value == "True") ? true : false;
-            }
-            else if (name == "OutlineSize")
-            {
-                outlineSize = atoi(value.c_str());
-            }
-            else if (name == "ShadowEnabled")
-            {
-                shadowEnabled = (value == "True") ? true : false;
-            }
-            else if (name == "ShadowOffsetX")
-            {
-                shadowOffset.width = atof(value.c_str());
-            }
-            else if (name == "ShadowOffsetY")
-            {
-                shadowOffset.height = atof(value.c_str());
-            }
-            else if (name == "ShadowBlurRadius")
-            {
-                shadowBlurRadius = atoi(value.c_str());
-            }
             
             attribute = attribute->Next();
         }
@@ -300,70 +264,9 @@ namespace cocostudio
                     attribute = attribute->Next();
                 }
             }
-            else if (name == "OutlineColor")
-            {
-                attribute = child->FirstAttribute();
-                
-                while (attribute)
-                {
-                    name = attribute->Name();
-                    std::string value = attribute->Value();
-                    
-                    if (name == "A")
-                    {
-                        outlineColor.a = atoi(value.c_str());
-                    }
-                    else if (name == "R")
-                    {
-                        outlineColor.r = atoi(value.c_str());
-                    }
-                    else if (name == "G")
-                    {
-                        outlineColor.g = atoi(value.c_str());
-                    }
-                    else if (name == "B")
-                    {
-                        outlineColor.b = atoi(value.c_str());
-                    }
-                    
-                    attribute = attribute->Next();
-                }
-            }
-            else if (name == "ShadowColor")
-            {
-                attribute = child->FirstAttribute();
-                
-                while (attribute)
-                {
-                    name = attribute->Name();
-                    std::string value = attribute->Value();
-                    
-                    if (name == "A")
-                    {
-                        shadowColor.a = atoi(value.c_str());
-                    }
-                    else if (name == "R")
-                    {
-                        shadowColor.r = atoi(value.c_str());
-                    }
-                    else if (name == "G")
-                    {
-                        shadowColor.g = atoi(value.c_str());
-                    }
-                    else if (name == "B")
-                    {
-                        shadowColor.b = atoi(value.c_str());
-                    }
-                    
-                    attribute = attribute->Next();
-                }
-            }
             
             child = child->NextSiblingElement();
         }
-        
-        flatbuffers::Color f_outlineColor(outlineColor.a, outlineColor.r, outlineColor.g, outlineColor.b);
-        flatbuffers::Color f_shadowColor(shadowColor.a, shadowColor.r, shadowColor.g, shadowColor.b);
         
         auto options = CreateTextOptions(*builder,
                                          widgetOptions,
@@ -379,15 +282,7 @@ namespace cocostudio
                                          h_alignment,
                                          v_alignment,
                                          touchScaleEnabled,
-                                         isCustomSize,
-                                         outlineEnabled,
-                                         &f_outlineColor,
-                                         outlineSize,
-                                         shadowEnabled,
-                                         &f_shadowColor,
-                                         shadowOffset.width,
-                                         shadowOffset.height,
-                                         shadowBlurRadius);
+                                         isCustomSize);
         
         return *(Offset<Table>*)(&options);
     }
@@ -440,49 +335,17 @@ namespace cocostudio
             {
                 label->setFontName(path);
             }
-            //else
-            //{
-            //    auto alert = Label::create();
-            //    alert->setString(__String::createWithFormat("%s missed", errorFilePath.c_str())->getCString());
-            //    label->addChild(alert);
-            //}
-        }
-        
-        bool outlineEnabled = options->outlineEnabled();
-        if (outlineEnabled)
-        {
-            auto f_outlineColor = options->outlineColor();
-            if (f_outlineColor)
+            else
             {
-                Color4B outlineColor(f_outlineColor->r(), f_outlineColor->g(), f_outlineColor->b(), f_outlineColor->a());
-                label->enableOutline(outlineColor, options->outlineSize());
+                auto alert = Label::create();
+                alert->setString(__String::createWithFormat("%s missed", errorFilePath.c_str())->getCString());
+                label->addChild(alert);
             }
         }
         
-        bool shadowEnabled = options->shadowEnabled();
-        if (shadowEnabled)
-        {
-            auto f_shadowColor = options->shadowColor();
-            if (f_shadowColor)
-            {
-                Color4B shadowColor(f_shadowColor->r(), f_shadowColor->g(), f_shadowColor->b(), f_shadowColor->a());
-                label->enableShadow(shadowColor, Size(options->shadowOffsetX(), options->shadowOffsetY()), options->shadowBlurRadius());
-            }
-        }
-
-        // Save node color before set widget properties
-        auto oldColor = node->getColor();
-
         auto widgetReader = WidgetReader::getInstance();
         widgetReader->setPropsWithFlatBuffers(node, (Table*)options->widgetOptions());
-
-        // restore node color and set color to text to fix shadow & outline color won't show correct bug
-        node->setColor(oldColor);
-        auto optionsWidget = (WidgetOptions*)options->widgetOptions();
-        auto f_color = optionsWidget->color();
-        Color4B color(f_color->r(), f_color->g(), f_color->b(), f_color->a());
-        ((Text *)node)->setTextColor(color);
-
+        
         label->setUnifySizeEnabled(false);
         
         bool IsCustomSize = options->isCustomSize() != 0;

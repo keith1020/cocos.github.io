@@ -93,6 +93,8 @@ ParticleSystem::ParticleSystem()
 , _isActive(true)
 , _particleCount(0)
 , _duration(0)
+, _sourcePosition(Vec2::ZERO)
+, _posVar(Vec2::ZERO)
 , _life(0)
 , _lifeVar(0)
 , _angle(0)
@@ -114,7 +116,7 @@ ParticleSystem::ParticleSystem()
 , _yCoordFlipped(1)
 , _positionType(PositionType::FREE)
 {
-    modeA.gravity.setZero();
+    modeA.gravity = Vec2::ZERO;
     modeA.speed = 0;
     modeA.speedVar = 0;
     modeA.tangentialAccel = 0;
@@ -164,7 +166,7 @@ bool ParticleSystem::initWithFile(const std::string& plistFile)
 {
     bool ret = false;
     _plistFile = FileUtils::getInstance()->fullPathForFilename(plistFile);
-    ValueMap dict = FileUtils::getInstance()->getValueMapFromFile(_plistFile);
+    ValueMap dict = FileUtils::getInstance()->getValueMapFromFile(_plistFile.c_str());
 
     CCASSERT( !dict.empty(), "Particles: file not found");
     
@@ -367,7 +369,7 @@ bool ParticleSystem::initWithDictionary(ValueMap& dictionary, const std::string&
                 
                 Texture2D *tex = nullptr;
                 
-                if (!textureName.empty())
+                if (textureName.length() > 0)
                 {
                     // set not pop-up message box when load image failed
                     bool notify = FileUtils::getInstance()->isPopupNotify();
@@ -404,7 +406,7 @@ bool ParticleSystem::initWithDictionary(ValueMap& dictionary, const std::string&
                         CCASSERT(isOK, "CCParticleSystem: error init image with Data");
                         CC_BREAK_IF(!isOK);
                         
-                        setTexture(Director::getInstance()->getTextureCache()->addImage(image, _plistFile + textureName));
+                        setTexture(Director::getInstance()->getTextureCache()->addImage(image, textureName.c_str()));
 
                         image->release();
                     }
@@ -681,7 +683,7 @@ void ParticleSystem::update(float dt)
 
     _particleIdx = 0;
 
-    Vec2 currentPosition;
+    Vec2 currentPosition = Vec2::ZERO;
     if (_positionType == PositionType::FREE)
     {
         currentPosition = this->convertToWorldSpace(Vec2::ZERO);
@@ -708,6 +710,7 @@ void ParticleSystem::update(float dt)
                 {
                     Vec2 tmp, radial, tangential;
 
+                    radial = Vec2::ZERO;
                     // radial acceleration
                     if (p->pos.x || p->pos.y)
                     {

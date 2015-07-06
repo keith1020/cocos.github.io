@@ -28,23 +28,18 @@
 #include "../UIScene.h"
 #include "ui/UIScrollView.h"
 
-DEFINE_TEST_SUITE(UIListViewTests);
-
 class UIListViewTest_Vertical : public UIScene
 {
 public:
-    CREATE_FUNC(UIListViewTest_Vertical);
-
     UIListViewTest_Vertical();
     ~UIListViewTest_Vertical();
-
-    virtual bool init() override;
-    void selectedItemEvent(cocos2d::Ref* sender, cocos2d::ui::ListView::EventType type);
-    void selectedItemEventScrollView(cocos2d::Ref* sender, cocos2d::ui::ScrollView::EventType type);
+    bool init();
+    void selectedItemEvent(Ref* pSender, ListView::EventType type);
+    void selectedItemEventScrollView(Ref* pSender, ui::ScrollView::EventType type);
 
 protected:
-    
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UIListViewTest_Vertical)
+    Text* _displayValueLabel;
     
     std::vector<std::string> _array;
 };
@@ -52,18 +47,15 @@ protected:
 class UIListViewTest_Horizontal : public UIScene
 {
 public:
-    CREATE_FUNC(UIListViewTest_Horizontal);
-
     UIListViewTest_Horizontal();
     ~UIListViewTest_Horizontal();
-
-    virtual bool init() override;
-    void selectedItemEvent(cocos2d::Ref* sender, cocos2d::ui::ListView::EventType type);
+    bool init();
+    void selectedItemEvent(Ref* pSender, ListView::EventType type);
 
     
 protected:
-    
-    cocos2d::ui::Text* _displayValueLabel;
+    UI_SCENE_CREATE_FUNC(UIListViewTest_Horizontal)
+    Text* _displayValueLabel;
     
     std::vector<std::string> _array;
 };

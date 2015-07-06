@@ -15,14 +15,13 @@
 -- 
 -- @function [parent=#AnimationData] getMovementCount 
 -- @param self
--- @return long#long ret (return value: long)
+-- @return int#int ret (return value: int)
         
 --------------------------------
 -- 
 -- @function [parent=#AnimationData] addMovement 
 -- @param self
 -- @param #ccs.MovementData movData
--- @return AnimationData#AnimationData self (return value: ccs.AnimationData)
         
 --------------------------------
 -- 
@@ -34,6 +33,5 @@
 -- js ctor
 -- @function [parent=#AnimationData] AnimationData 
 -- @param self
--- @return AnimationData#AnimationData self (return value: ccs.AnimationData)
         
 return nil

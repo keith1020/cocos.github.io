@@ -26,11 +26,9 @@
 #if CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC
 
 #include "AudioEngine-inl.h"
+#include "audio/include/AudioEngine.h"
 
 #import <OpenAL/alc.h>
-#import <AVFoundation/AVFoundation.h>
-
-#include "audio/include/AudioEngine.h"
 #include "platform/CCFileUtils.h"
 #include "base/CCDirector.h"
 #include "base/CCScheduler.h"
@@ -129,102 +127,11 @@ namespace cocos2d {
     }
 }
 
-#if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
-@interface AudioEngineSessionHandler : NSObject
-{
-}
-
--(id) init;
--(void)handleInterruption:(NSNotification*)notification;
-
-@end
-
-@implementation AudioEngineSessionHandler
-
-void AudioEngineInterruptionListenerCallback(void* user_data, UInt32 interruption_state)
-{
-    if (kAudioSessionBeginInterruption == interruption_state)
-    {
-      alcMakeContextCurrent(nullptr);
-    }
-    else if (kAudioSessionEndInterruption == interruption_state)
-    {
-      OSStatus result = AudioSessionSetActive(true);
-      if (result) NSLog(@"Error setting audio session active! %d\n", result);
-
-      alcMakeContextCurrent(s_ALContext);
-    }
-}
-
--(id) init
-{
-    if (self = [super init])
-    {
-      if ([[[UIDevice currentDevice] systemVersion] intValue] > 5) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleInterruption:) name:AVAudioSessionInterruptionNotification object:[AVAudioSession sharedInstance]];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleInterruption:) name:UIApplicationDidBecomeActiveNotification object:[AVAudioSession sharedInstance]];
-      }
-      else {
-        AudioSessionInitialize(NULL, NULL, AudioEngineInterruptionListenerCallback, self);
-      }
-    }
-    return self;
-}
-
--(void)handleInterruption:(NSNotification*)notification
-{
-    static bool resumeOnBecomingActive = false;
-    
-    if ([notification.name isEqualToString:AVAudioSessionInterruptionNotification]) {
-        NSInteger reason = [[[notification userInfo] objectForKey:AVAudioSessionInterruptionTypeKey] integerValue];
-        if (reason == AVAudioSessionInterruptionTypeBegan) {
-            alcMakeContextCurrent(NULL);
-        }
-        
-        if (reason == AVAudioSessionInterruptionTypeEnded) {
-            if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-                NSError *error = nil;
-                [[AVAudioSession sharedInstance] setActive:YES error:&error];
-                alcMakeContextCurrent(s_ALContext);
-            } else {
-                resumeOnBecomingActive = true;
-            }
-        }
-    }
-    
-    if ([notification.name isEqualToString:UIApplicationDidBecomeActiveNotification] && resumeOnBecomingActive) {
-        resumeOnBecomingActive = false;
-        NSError *error = nil;
-        BOOL success = [[AVAudioSession sharedInstance]
-                        setCategory: AVAudioSessionCategoryAmbient
-                        error: &error];
-        if (!success) {
-            printf("Fail to set audio session.\n");
-            return;
-        }
-        [[AVAudioSession sharedInstance] setActive:YES error:&error];
-        alcMakeContextCurrent(s_ALContext);
-    }
-}
-
--(void) dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionInterruptionNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
-    
-    [super dealloc];
-}
-@end
-
-static id s_AudioEngineSessionHandler = nullptr;
-#endif
-
 AudioEngineImpl::AudioEngineImpl()
 : _threadPool(nullptr)
 , _lazyInitLoop(true)
 , _currentAudioID(0)
 {
-    
 }
 
 AudioEngineImpl::~AudioEngineImpl()
@@ -244,27 +151,21 @@ AudioEngineImpl::~AudioEngineImpl()
         _threadPool->destroy();
         delete _threadPool;
     }
-#if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
-    [s_AudioEngineSessionHandler release];
-#endif
 }
 
 bool AudioEngineImpl::init()
 {
     bool ret = false;
     do{
-#if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
-        s_AudioEngineSessionHandler = [[AudioEngineSessionHandler alloc] init];
-#endif
-        
         s_ALDevice = alcOpenDevice(nullptr);
         
         if (s_ALDevice) {
+            auto alError = alGetError();
             s_ALContext = alcCreateContext(s_ALDevice, nullptr);
             alcMakeContextCurrent(s_ALContext);
             
             alGenSources(MAX_AUDIOINSTANCES, _alSources);
-            auto alError = alGetError();
+            alError = alGetError();
             if(alError != AL_NO_ERROR)
             {
                 printf("%s:generating sources fail! error = %x\n", __PRETTY_FUNCTION__, alError);

@@ -27,14 +27,13 @@ package org.cocos2dx.lib;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 import java.lang.Runnable;
 
 import com.chukong.cocosplay.client.CocosPlayClient;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ComponentName;  //Enhance API modification
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,16 +41,14 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.IBinder;  //Enhance API modification
-import android.os.Vibrator;
 import android.preference.PreferenceManager.OnActivityResultListener;
+import android.provider.Settings.Secure;
+import android.telephony.TelephonyManager;
+import android.util.Base64;
 import android.util.DisplayMetrics;
-import android.util.Log;  //Enhance API modification
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
-import android.content.ServiceConnection;  //Enhance API modification	
-
-import com.enhance.gameservice.IGameTuningService;  //Enhance API modification
 
 public class Cocos2dxHelper {
     // ===========================================================
@@ -75,11 +72,8 @@ public class Cocos2dxHelper {
     private static Activity sActivity = null;
     private static Cocos2dxHelperListener sCocos2dxHelperListener;
     private static Set<OnActivityResultListener> onActivityResultListeners = new LinkedHashSet<OnActivityResultListener>();
-    private static Vibrator sVibrateService = null;
-    //Enhance API modification begin
-    private static IGameTuningService mGameServiceBinder = null;
-    private static final int BOOST_TIME = 7;
-    //Enhance API modification end
+
+    private static String sGpsAdid; 
 
     // ===========================================================
     // Constructors
@@ -115,30 +109,9 @@ public class Cocos2dxHelper {
             Cocos2dxBitmap.setContext(activity);
             sActivity = activity;
 
-            Cocos2dxHelper.sVibrateService = (Vibrator)activity.getSystemService(Context.VIBRATOR_SERVICE);
-
             sInited = true;
-            
-            //Enhance API modification begin
-            Intent serviceIntent = new Intent(IGameTuningService.class.getName());
-            serviceIntent.setPackage("com.enhance.gameservice");
-            boolean suc = activity.getApplicationContext().bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
-            //Enhance API modification end
         }
     }
-    
-    //Enhance API modification begin
-    private static ServiceConnection connection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mGameServiceBinder = IGameTuningService.Stub.asInterface(service);
-            fastLoading(BOOST_TIME);
-        }
-
-        public void onServiceDisconnected(ComponentName name) {
-            sActivity.getApplicationContext().unbindService(connection);
-        }
-    };
-    //Enhance API modification end
     
     public static Activity getActivity() {
         return sActivity;
@@ -208,15 +181,11 @@ public class Cocos2dxHelper {
         Cocos2dxHelper.sAccelerometerEnabled = false;
         Cocos2dxHelper.sCocos2dxAccelerometer.disable();
     }
-
+    
     public static void setKeepScreenOn(boolean value) {
         ((Cocos2dxActivity)sActivity).setKeepScreenOn(value);
     }
-
-    public static void vibrate(float duration) {
-        sVibrateService.vibrate((long)(duration * 1000));
-    }
-
+    
     public static boolean openURL(String url) { 
         boolean ret = false;
         try {
@@ -227,8 +196,54 @@ public class Cocos2dxHelper {
         } catch (Exception e) {
         }
         return ret;
+    } 
+	public final static String getMacAddress() {
+		return Cocos2dxActivity.getMacAddress();
+	}
+	
+	public final static String getUniqeID() {
+		return java.util.UUID.randomUUID().toString();
+	}
+	public final static String ReplaceStrangeString( String input )
+	{
+		input = input.replace(':', '#');
+		input = input.replace('\n', '#');
+		input = input.replace('"', '#');
+		return input;
+	}
+	public final static String getDeviceName() {
+		return Build.MANUFACTURER + "_" + Build.MODEL;
+	} 
+	private static String getDeviceManufacturer() {
+        return Build.MANUFACTURER;
     }
-
+	private static String getOsVersion() {
+        return "Android" + Build.VERSION.SDK_INT;
+    }
+	public final static String getAndroidID() {
+		String androidID = Secure.getString(sActivity.getContentResolver(), Secure.ANDROID_ID);
+		androidID = ReplaceStrangeString(androidID);
+		return androidID;
+	}
+	public final static String getTelephonyDeviceID(){
+		if( null == sActivity ){
+			return "";
+		}
+		return ((Cocos2dxActivity) sActivity).getTelephonyDeviceID();
+	}
+	public final static String getAdvertiseID() {
+		return MacAddressUtil.getGPSAdid( sActivity );
+	}
+	public final static String getDeviceExtraInformation() {
+		String s = "{";
+		s = s + "\"AndroidID\":";
+		s = s + "\"" + ReplaceStrangeString(getAndroidID()) + "\",";
+		s = s + "\"GpsAdid\":";
+		s = s + "\"" + ReplaceStrangeString(getAdvertiseID()) + "\"";
+		s = s + "}";
+		return s;
+	}
+	
     public static void preloadBackgroundMusic(final String pPath) {
         Cocos2dxHelper.sCocos2dMusic.preloadBackgroundMusic(pPath);
     }
@@ -390,104 +405,28 @@ public class Cocos2dxHelper {
     
     public static boolean getBoolForKey(String key, boolean defaultValue) {
         SharedPreferences settings = sActivity.getSharedPreferences(Cocos2dxHelper.PREFS_NAME, 0);
-        try {
-            return settings.getBoolean(key, defaultValue);
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-
-            Map allValues = settings.getAll();
-            Object value = allValues.get(key);
-            if ( value instanceof String)
-            {
-                return  Boolean.parseBoolean(value.toString());
-            }
-            else if (value instanceof Integer)
-            {
-                int intValue = ((Integer) value).intValue();
-                return (intValue !=  0) ;
-            }
-            else if (value instanceof Float)
-            {
-                float floatValue = ((Float) value).floatValue();
-                return (floatValue != 0.0f);
-            }
-        }
-
-        return false;
+        return settings.getBoolean(key, defaultValue);
     }
     
     public static int getIntegerForKey(String key, int defaultValue) {
         SharedPreferences settings = sActivity.getSharedPreferences(Cocos2dxHelper.PREFS_NAME, 0);
-        try {
-            return settings.getInt(key, defaultValue);
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-
-            Map allValues = settings.getAll();
-            Object value = allValues.get(key);
-            if ( value instanceof String) {
-                return  Integer.parseInt(value.toString());
-            }
-            else if (value instanceof Float)
-            {
-                return ((Float) value).intValue();
-            }
-            else if (value instanceof Boolean)
-            {
-                boolean booleanValue = ((Boolean) value).booleanValue();
-                if (booleanValue)
-                    return 1;
-            }
-        }
-
-        return 0;
+        return settings.getInt(key, defaultValue);
     }
     
     public static float getFloatForKey(String key, float defaultValue) {
         SharedPreferences settings = sActivity.getSharedPreferences(Cocos2dxHelper.PREFS_NAME, 0);
-        try {
-            return settings.getFloat(key, defaultValue);
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();;
-
-            Map allValues = settings.getAll();
-            Object value = allValues.get(key);
-            if ( value instanceof String) {
-                return  Float.parseFloat(value.toString());
-            }
-            else if (value instanceof Integer)
-            {
-                return ((Integer) value).floatValue();
-            }
-            else if (value instanceof Boolean)
-            {
-                boolean booleanValue = ((Boolean) value).booleanValue();
-                if (booleanValue)
-                    return 1.0f;
-            }
-        }
-
-        return 0.0f;
+        return settings.getFloat(key, defaultValue);
     }
     
     public static double getDoubleForKey(String key, double defaultValue) {
         // SharedPreferences doesn't support saving double value
-        return getFloatForKey(key, (float) defaultValue);
+        SharedPreferences settings = sActivity.getSharedPreferences(Cocos2dxHelper.PREFS_NAME, 0);
+        return settings.getFloat(key, (float)defaultValue);
     }
     
     public static String getStringForKey(String key, String defaultValue) {
         SharedPreferences settings = sActivity.getSharedPreferences(Cocos2dxHelper.PREFS_NAME, 0);
-        try {
-            return settings.getString(key, defaultValue);
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            
-            return settings.getAll().get(key).toString();
-        }
+        return settings.getString(key, defaultValue);
     }
     
     public static void setBoolForKey(String key, boolean value) {
@@ -536,66 +475,4 @@ public class Cocos2dxHelper {
 
         public void runOnGLThread(final Runnable pRunnable);
     }
-
-    //Enhance API modification begin
-    public static int setResolutionPercent(int per) {
-        try {
-            if (mGameServiceBinder != null) {
-                return mGameServiceBinder.setPreferredResolution(per);
-            }
-            return -1;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
-    public static int setFPS(int fps) {
-        try {
-            if (mGameServiceBinder != null) {
-                return mGameServiceBinder.setFramePerSecond(fps);
-            }
-            return -1;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
-    public static int fastLoading(int sec) {
-        try {
-            if (mGameServiceBinder != null) {
-                return mGameServiceBinder.boostUp(sec);
-            }
-            return -1;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
-    public static int getTemperature() {
-        try {
-            if (mGameServiceBinder != null) {
-                return mGameServiceBinder.getAbstractTemperature();
-            }
-            return -1;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
-    public static int setLowPowerMode(boolean enable) {
-        try {
-            if (mGameServiceBinder != null) {
-                return mGameServiceBinder.setGamePowerSaving(enable);
-            }
-            return -1;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-    //Enhance API modification end     
 }

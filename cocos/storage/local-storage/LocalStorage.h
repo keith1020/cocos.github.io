@@ -1,8 +1,6 @@
-/****************************************************************************
-Copyright (c) 2012 Zynga Inc.
-Copyright (c) 2013-2015 Chukong Technologies Inc.
+/*
 
-http://www.cocos2d-x.org
+Copyright (c) 2012 - Zynga Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +19,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-****************************************************************************/
+
+*/
+
+/*
+ Local Storage support for the JS Bindings for iOS.
+ Works on cocos2d-iphone and cocos2d-x.
+ */
 
 #ifndef __JSB_LOCALSTORAGE_H
 #define __JSB_LOCALSTORAGE_H
@@ -29,32 +33,19 @@ THE SOFTWARE.
 #include <string>
 #include "CCPlatformMacros.h"
 
-/**
- * @addtogroup storage
- * @{
- */
-
-/** Local Storage support for the JS Bindings.*/
-
-/** Initializes the database. If path is null, it will create an in-memory DB. */
+/** Initializes the database. If path is null, it will create an in-memory DB */
 void CC_DLL localStorageInit( const std::string& fullpath = "");
 
-/** Frees the allocated resources. */
+/** Frees the allocated resources */
 void CC_DLL localStorageFree();
 
-/** Sets an item in the JS. */
+/** sets an item in the LS */
 void CC_DLL localStorageSetItem( const std::string& key, const std::string& value);
 
-/** Gets an item from the JS. */
-bool CC_DLL localStorageGetItem( const std::string& key, std::string *outItem );
+/** gets an item from the LS */
+std::string CC_DLL localStorageGetItem( const std::string& key );
 
-/** Removes an item from the JS. */
+/** removes an item from the LS */
 void CC_DLL localStorageRemoveItem( const std::string& key );
-
-/** Removes all items from the JS. */
-void CC_DLL localStorageClear();
-
-// end group
-/// @}
 
 #endif // __JSB_LOCALSTORAGE_H

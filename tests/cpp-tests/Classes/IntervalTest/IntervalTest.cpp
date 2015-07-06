@@ -1,20 +1,13 @@
 #include "IntervalTest.h"
 #include "../testResource.h"
 
-USING_NS_CC;
-
 #define SID_STEP1    100
 #define SID_STEP2    101
 #define SID_STEP3    102
 
 #define IDC_PAUSE    200
 
-IntervalTests::IntervalTests()
-{
-    ADD_TEST_CASE(IntervalTest);
-}
-
-IntervalTest::IntervalTest()
+IntervalLayer::IntervalLayer()
 {
     _time0 = _time1 = _time2 = _time3 = _time4 = 0.0f;
 
@@ -101,7 +94,7 @@ IntervalTest::IntervalTest()
     addChild( menu );
 }
 
-IntervalTest::~IntervalTest()
+IntervalLayer::~IntervalLayer()
 {
     if(Director::getInstance()->isPaused())
     {
@@ -109,10 +102,19 @@ IntervalTest::~IntervalTest()
     }
 }
 
-void IntervalTest::update(float dt)
+void IntervalLayer::update(float dt)
 {
     _time0 +=dt;
     char time[10] = {0};
     sprintf(time, "%2.1f", _time0);
     _label0->setString(time);
+}
+
+void IntervalTestScene::runThisTest()
+{
+    auto layer = new (std::nothrow) IntervalLayer();
+    addChild(layer);
+    layer->release();
+
+    Director::getInstance()->replaceScene(this);
 }

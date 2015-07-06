@@ -27,14 +27,14 @@
 
 #include "../UIScene_Editor.h"
 
-DEFINE_TEST_SUITE(UITextAtlasEditorTests);
-
 class UITextAtlasTest_Editor : public UIScene_Editor
 {
 public:
-    CREATE_FUNC(UITextAtlasTest_Editor);
-
-    virtual bool init() override;
+    bool init();
+    virtual void switchLoadMethod(Ref* pSender);
+    void configureGUIScene();
+protected:
+    UI_SCENE_EDITOR_CREATE_FUNC(UITextAtlasTest_Editor)
 };
 
 #endif /* defined(__TestCpp__UITextAtlasTest_Editor__) */

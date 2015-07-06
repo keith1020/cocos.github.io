@@ -24,12 +24,6 @@
 
 #import "HttpAsynConnection.h"
 
-@interface HttpAsynConnection ()
-
-@property (readwrite) NSString *statusString;
-
-@end
-
 @implementation HttpAsynConnection
 
 @synthesize srcURL;
@@ -40,40 +34,23 @@
 @synthesize responseCode;
 @synthesize statusString;
 @synthesize responseError;
-@synthesize connError;
 @synthesize conn;
 @synthesize finish;
 @synthesize runLoop;
-
-- (void)dealloc
-{
-    [srcURL release];
-    [sslFile release];
-    [responseHeader release];
-    [responseData release];
-    [responseError release];
-    [conn release];
-    [runLoop release];
-    [connError release];
-    
-    [super dealloc];
-}
 
 - (void) startRequest:(NSURLRequest *)request
 {
     NSLog(@"Starting to load %@", srcURL);
     finish = false;
 
-    self.responseData = [NSMutableData data];
+    responseData = [NSMutableData new];
     getDataTime = 0;
-
-    self.responseError = nil;
-    self.connError = nil;
+    responseError = nil;
     
     // create the connection with the target request and this class as the delegate
-    self.conn = [[[NSURLConnection alloc] initWithRequest:request
-                                                 delegate:self
-                                         startImmediately:NO] autorelease];
+    self.conn = [[NSURLConnection alloc] initWithRequest:request
+                                                delegate:self
+                                        startImmediately:NO];
     
     [self.conn scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     
@@ -94,27 +71,28 @@
     
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
     //NSLog(@"All headers = %@", [httpResponse allHeaderFields]);
-    self.responseHeader = [httpResponse allHeaderFields];
+    responseHeader = [[httpResponse allHeaderFields] copy];
 
     responseCode = httpResponse.statusCode;
-    self.statusString = [NSHTTPURLResponse localizedStringForStatusCode:responseCode];
+    statusString = [[NSHTTPURLResponse localizedStringForStatusCode:responseCode] copy];
     if(responseCode == 200)
-        self.statusString = @"OK";
+        statusString = @"OK";
  
     /*The individual values of the numeric status codes defined for HTTP/1.1
-    | "200"  ; OK
-    | "201"  ; Created
-    | "202"  ; Accepted
-    | "203"  ; Non-Authoritative Information
-    | "204"  ; No Content
-    | "205"  ; Reset Content
-    | "206"  ; Partial Content
+    | “200”  ; OK
+    | “201”  ; Created
+    | “202”  ; Accepted
+    | “203”  ; Non-Authoritative Information
+    | “204”  ; No Content
+    | “205”  ; Reset Content
+    | “206”  ; Partial Content
     */
     if (responseCode < 200 || responseCode >= 300)
     {// something went wrong, abort the whole thing
-        self.responseError = [NSError errorWithDomain:@"CCBackendDomain"
-                                            code:responseCode
-                                        userInfo:@{NSLocalizedDescriptionKey: @"Bad HTTP Response Code"}];        
+        
+        [connection cancel];
+        finish = true;
+        return;
     }
     
     [responseData setLength:0];
@@ -140,7 +118,7 @@
   didFailWithError:(NSError *)error
 {
     //NSLog(@"Load failed with error %@", [error localizedDescription]);
-    self.connError = error;
+    responseError = [error copy];
     
     finish = true;
 }
@@ -178,12 +156,10 @@
     {
         CFDataRef errDataRef = SecTrustCopyExceptions(serverTrust);
         SecTrustSetExceptions(serverTrust, errDataRef);
+        
         SecTrustEvaluate(serverTrust, &trustResult);
-        [(id)errDataRef release];
     }
-    [certData release];
-    [(id)certArrayRef release];
-    [(id)certArrayRef release];
+    
     //Did our custom trust chain evaluate successfully?
     return trustResult = kSecTrustResultUnspecified || trustResult == kSecTrustResultProceed;    
 }

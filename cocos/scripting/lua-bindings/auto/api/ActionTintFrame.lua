@@ -26,12 +26,10 @@
 -- @function [parent=#ActionTintFrame] setColor 
 -- @param self
 -- @param #color3b_table ccolor
--- @return ActionTintFrame#ActionTintFrame self (return value: ccs.ActionTintFrame)
         
 --------------------------------
 -- Default constructor
 -- @function [parent=#ActionTintFrame] ActionTintFrame 
 -- @param self
--- @return ActionTintFrame#ActionTintFrame self (return value: ccs.ActionTintFrame)
         
 return nil

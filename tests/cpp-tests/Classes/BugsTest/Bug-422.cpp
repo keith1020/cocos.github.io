@@ -5,11 +5,9 @@
 
 #include "Bug-422.h"
 
-USING_NS_CC;
-
 bool Bug422Layer::init()
 {
-    if (BugsTestBase::init())
+    if (BugsTestBaseLayer::init())
     {
         reset();
         return true;

@@ -3,7 +3,8 @@
 
 #include "cocos2d.h"
 #include "extensions/cocos-ext.h"
-#include "../../BaseTest.h"
+#include "../../VisibleRect.h"
+#include "../../testBasic.h"
 #include "cocostudio/CocoStudio.h"
 
 #if ENABLE_PHYSICS_BOX2D_DETECT
@@ -13,78 +14,107 @@
 #include "chipmunk.h"
 #endif
 
-class CocoStudioArmatureTests : public TestSuite
+class ArmatureTestScene : public TestScene
 {
-public:
-    CocoStudioArmatureTests();
-    ~CocoStudioArmatureTests();
+public: 
+	ArmatureTestScene(bool bPortrait = false);
 
-private:
+	virtual void runThisTest();
 
+	// The CallBack for back to the main menu scene
+	virtual void MainMenuCallback(Ref* pSender);
 };
 
-class ArmatureBaseTest : public TestCase
+enum {
+	TEST_ASYNCHRONOUS_LOADING = 0,
+    TEST_DIRECT_LOADING,
+	TEST_COCOSTUDIO_WITH_SKELETON,
+	TEST_DRAGON_BONES_2_0,
+	TEST_PERFORMANCE,
+//    TEST_PERFORMANCE_BATCHNODE,
+	TEST_CHANGE_ZORDER,
+	TEST_ANIMATION_EVENT,
+    TEST_FRAME_EVENT,
+	TEST_PARTICLE_DISPLAY,
+	TEST_USE_DIFFERENT_PICTURE,
+	TEST_COLLIDER_DETECTOR,
+	TEST_BOUDINGBOX,
+	TEST_ANCHORPOINT,
+	TEST_ARMATURE_NESTING,
+    TEST_ARMATURE_NESTING_2,
+    TEST_PLAY_SEVERAL_MOVEMENT,
+    TEST_EASING,
+    TEST_CHANGE_ANIMATION_INTERNAL,
+	TEST_DIRECT_FROM_BINARY,
+    TEST_ARMATURE_NODE,
+    
+	TEST_LAYER_COUNT
+};
+
+class ArmatureTestLayer : public Layer
 {
 public:
 	virtual std::string title() const;
-    virtual bool init() override;
+	virtual std::string subtitle() const;
+
+    virtual void restartCallback(Ref* pSender);
+	virtual void nextCallback(Ref* pSender);
+	virtual void backCallback(Ref* pSender);
+
+    // overrides
+    virtual void onEnter() override;
+	virtual void onExit() override;
 
 protected:
+	MenuItemImage *restartItem;
+	MenuItemImage *nextItem;
+	MenuItemImage *backItem;
 };
 
-class TestAsynchronousLoading : public ArmatureBaseTest
+
+class TestAsynchronousLoading : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestAsynchronousLoading);
-
 	virtual void onEnter() override;
 	virtual std::string title() const override;
 	virtual std::string subtitle() const override;
-    virtual void restartTestCallback(cocos2d::Ref* pSender) override;
+    virtual void restartCallback(Ref* pSender);
 
 	void dataLoaded(float percent);
 };
 
-class TestDirectLoading : public ArmatureBaseTest
+class TestDirectLoading : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestDirectLoading);
     virtual void onEnter() override;
     virtual std::string title() const override;
 };
 
-class TestCSWithSkeleton : public ArmatureBaseTest
+class TestCSWithSkeleton : public ArmatureTestLayer
 {
-public:
-    CREATE_FUNC(TestCSWithSkeleton);
-
 	virtual void onEnter() override;
 	virtual std::string title() const override;
 };
 
 
-class TestDragonBones20 : public ArmatureBaseTest
+class TestDragonBones20 : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestDragonBones20);
-
 	virtual void onEnter() override;
 	virtual std::string title() const override;
 };
 
 
-class TestPerformance : public ArmatureBaseTest
+class TestPerformance : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestPerformance);
-
 	~TestPerformance();
 
 	virtual void onEnter() override;
 	virtual std::string title() const override;
 	virtual std::string subtitle() const override;
-    virtual void onIncrease(cocos2d::Ref* pSender);
-    virtual void onDecrease(cocos2d::Ref* pSender);
+    virtual void onIncrease(Ref* pSender);
+    virtual void onDecrease(Ref* pSender);
     virtual void addArmature(int number);
     virtual void addArmatureToParent(cocostudio::Armature *armature);
     virtual void removeArmatureFromParent(int tag);
@@ -100,9 +130,6 @@ public:
 
 class TestPerformanceBatchNode : public TestPerformance
 {
-public:
-    CREATE_FUNC(TestPerformanceBatchNode);
-
     virtual void onEnter() override;
     virtual std::string title() const override;
     virtual void addArmatureToParent(cocostudio::Armature *armature);
@@ -111,11 +138,8 @@ public:
     cocostudio::BatchNode *batchNode;
 };
 
-class TestChangeZorder : public ArmatureBaseTest
+class TestChangeZorder : public ArmatureTestLayer
 {
-public:
-    CREATE_FUNC(TestChangeZorder);
-
 	virtual void onEnter() override;
 	virtual std::string title() const override;
 	void changeZorder(float dt);
@@ -124,10 +148,9 @@ public:
 };
 
 
-class TestAnimationEvent : public ArmatureBaseTest
+class TestAnimationEvent : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestAnimationEvent);
 
 	virtual void onEnter() override;
 	virtual std::string title() const override;
@@ -139,66 +162,58 @@ public:
 };
 
 
-class TestFrameEvent : public ArmatureBaseTest
+class TestFrameEvent : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestFrameEvent);
-
     virtual void onEnter() override;
     virtual std::string title() const override;
     void onFrameEvent(cocostudio::Bone *bone, const std::string& evt, int originFrameIndex, int currentFrameIndex);
     void checkAction(float dt);
 protected:
-    cocos2d::NodeGrid* _gridNode;
+    NodeGrid* _gridNode;
 };
 
 
-class TestUseMutiplePicture : public ArmatureBaseTest
+class TestUseMutiplePicture : public ArmatureTestLayer
 {
-public:
-    CREATE_FUNC(TestUseMutiplePicture);
-
 	virtual void onEnter() override;
 	virtual void onExit() override;
 	virtual std::string title() const override;
 	virtual std::string subtitle() const override;
-	void onTouchesEnded(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event);
+	void onTouchesEnded(const std::vector<Touch*>& touches, Event* event);
 
 	int displayIndex;
 	cocostudio::Armature *armature;
 };
 
-class TestParticleDisplay : public ArmatureBaseTest
+class TestParticleDisplay : public ArmatureTestLayer
 {
-public:
-    CREATE_FUNC(TestParticleDisplay);
-
 	virtual void onEnter() override;
 	virtual void onExit() override;
 	virtual std::string title() const override;
 	virtual std::string subtitle() const override;
-	void onTouchesEnded(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event);
+	void onTouchesEnded(const std::vector<Touch*>& touches, Event* event);
 
 	int animationID;
 	cocostudio::Armature *armature;
 };
 
 
+
+
 #if ENABLE_PHYSICS_BOX2D_DETECT
 
 class ContactListener;
 
-class TestColliderDetector : public ArmatureBaseTest
+class TestColliderDetector : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestColliderDetector);
-
 	~TestColliderDetector();
 
 	virtual void onEnter() override;
 	virtual void onExit() override;
 	virtual std::string title() const override;
-	virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
+	virtual void draw(Renderer *renderer, const Mat4 &transform, uint32_t flags) override;
 	virtual void update(float delta);
 
 	void onFrameEvent(cocostudio::Bone *bone, const std::string& evt, int originFrameIndex, int currentFrameIndex);
@@ -220,11 +235,9 @@ public:
 #elif ENABLE_PHYSICS_CHIPMUNK_DETECT
 
 
-class TestColliderDetector : public ArmatureBaseTest
+class TestColliderDetector : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestColliderDetector);
-
 	~TestColliderDetector();
 
 	virtual void onEnter() override;
@@ -251,17 +264,15 @@ public:
 	void destroyCPBody(cpBody *body);
 };
 #elif ENABLE_PHYSICS_SAVE_CALCULATED_VERTEX
-class TestColliderDetector : public ArmatureBaseTest
+class TestColliderDetector : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestColliderDetector);
-
     ~TestColliderDetector();
     
     virtual void onEnter() override;
     virtual std::string title() const override;
     virtual void update(float delta);
-    virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
+    virtual void draw(Renderer *renderer, const Mat4 &transform, uint32_t flags) override;
     
     void onFrameEvent(cocostudio::Bone *bone, const std::string& evt, int originFrameIndex, int currentFrameIndex);
     
@@ -269,46 +280,43 @@ public:
     cocostudio::Armature *armature;
     cocostudio::Armature *armature2;
     
-    cocos2d::DrawNode* drawNode;
+    DrawNode *drawNode;
     cocos2d::Sprite *bullet;
 };
 #endif
 
 
-class TestBoundingBox : public ArmatureBaseTest
+
+
+
+class TestBoundingBox : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestBoundingBox);
-
 	virtual void onEnter() override;
 	virtual std::string title() const override;
-	virtual void draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
+	virtual void draw(Renderer *renderer, const Mat4 &transform, uint32_t flags) override;
 
 	cocostudio::Armature *armature;
-    cocos2d::Rect rect;
+	Rect rect;
     
 protected:
-    cocos2d::DrawNode* _drawNode;
+    DrawNode* _drawNode;
 };
 
-class TestAnchorPoint : public ArmatureBaseTest
+class TestAnchorPoint : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestAnchorPoint);
-
 	virtual void onEnter() override;
 	virtual std::string title() const override;
 };
 
-class TestArmatureNesting : public ArmatureBaseTest
+class TestArmatureNesting : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestArmatureNesting);
-
 	virtual void onEnter() override;
 	virtual void onExit() override;
 	virtual std::string title() const override;
-	void onTouchesEnded(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event);
+	void onTouchesEnded(const std::vector<Touch*>& touches, Event* event);
 
 	cocostudio::Armature *armature;
 	int weaponIndex;
@@ -324,22 +332,20 @@ public:
     virtual void playWithIndex(int index);
 
     CC_SYNTHESIZE(cocostudio::Armature*, m_pMount, Mount);
-    CC_SYNTHESIZE(cocos2d::Scene*, _scene, Scene);
+    CC_SYNTHESIZE(cocos2d::Layer*, m_pLayer, Layer);
 };
 
-class TestArmatureNesting2 : public ArmatureBaseTest
+class TestArmatureNesting2 : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestArmatureNesting2);
-
     virtual void onEnter() override;
     virtual void onExit() override;
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    void onTouchesEnded(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event);
+    void onTouchesEnded(const std::vector<Touch*>& touches, Event* event);
 
-    void changeMountCallback(cocos2d::Ref* pSender);
-    virtual cocostudio::Armature *createMount(const char *name, cocos2d::Vec2 position);
+    void changeMountCallback(Ref* pSender);
+    virtual cocostudio::Armature *createMount(const char *name, Vec2 position);
 
 private:
     Hero *hero;
@@ -352,58 +358,50 @@ private:
     bool touchedMenu;
 };
 
-class TestPlaySeveralMovement : public ArmatureBaseTest
+class TestPlaySeveralMovement : public ArmatureTestLayer
 {      
 public:
-    CREATE_FUNC(TestPlaySeveralMovement);
-
     virtual void onEnter() override;
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
 };
 
 
-class TestEasing : public ArmatureBaseTest
+class TestEasing : public ArmatureTestLayer
 {      
 public:
-    CREATE_FUNC(TestEasing);
-
     virtual void onEnter() override;
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
 
-    void onTouchesEnded(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event);
+    void onTouchesEnded(const std::vector<Touch*>& touches, Event* event);
     void updateSubTitle();
 
     int animationID;
     cocostudio::Armature *armature;
 };
 
-class TestChangeAnimationInternal : public ArmatureBaseTest
+class TestChangeAnimationInternal : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestChangeAnimationInternal);
-
     virtual void onEnter()override;
     virtual void onExit() override;
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
 
-    void onTouchesEnded(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event);
+    void onTouchesEnded(const std::vector<Touch*>& touches, Event* event);
 };
 
 
 #define BINARYFILECOUNT 6
-class TestLoadFromBinary : public ArmatureBaseTest
+class TestLoadFromBinary : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestLoadFromBinary);
-
-	virtual void onEnter() override;
+	virtual void onEnter();
     virtual std::string title() const override;
 	virtual std::string subtitle() const override;
     
-    void onTouchesEnded(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event);
+    void onTouchesEnded(const std::vector<Touch*>& touches, Event* event);
     
     
 	void dataLoaded(float percent);
@@ -415,12 +413,10 @@ private:
 	int m_armatureIndex;   // index of sync loaded armature, default -1 is none
 };
 
-class TestArmatureNode : public ArmatureBaseTest
+class TestArmatureNode : public ArmatureTestLayer
 {
 public:
-    CREATE_FUNC(TestArmatureNode);
-
-    virtual void onEnter() override;
+    virtual void onEnter();
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
 };

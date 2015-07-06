@@ -36,23 +36,13 @@
 
 NS_CC_BEGIN
 
-/**
- * @addtogroup _3d
- * @{
- */
-
 class Texture2D;
 class MeshSkin;
 class MeshIndexData;
 class GLProgramState;
 class GLProgram;
-class Material;
-class Renderer;
-class Scene;
-class Pass;
-
 /** 
- * @brief Mesh: contains ref to index buffer, GLProgramState, texture, skin, blend function, aabb and so on
+ * Mesh: contains ref to index buffer, GLProgramState, texture, skin, blend function, aabb and so on
  */
 class CC_DLL Mesh : public Ref
 {
@@ -64,28 +54,14 @@ public:
     /**create mesh with vertex attributes*/
     CC_DEPRECATED_ATTRIBUTE static Mesh* create(const std::vector<float>& vertices, int perVertexSizeInFloat, const IndexArray& indices, int numIndex, const std::vector<MeshVertexAttrib>& attribs, int attribCount){ return create(vertices, perVertexSizeInFloat, indices, attribs); }
     
-    /**
-     * @lua NA
-     */
     static Mesh* create(const std::vector<float>& vertices, int perVertexSizeInFloat, const IndexArray& indices, const std::vector<MeshVertexAttrib>& attribs);
     
-    /** 
-     * create mesh
-     * @lua NA
-     */
+    /** create mesh */
     static Mesh* create(const std::string& name, MeshIndexData* indexData, MeshSkin* skin = nullptr);
     
-    /**
-     * get vertex buffer
-     * 
-     * @lua NA
-     */
+    /**get vertex buffer*/
     GLuint getVertexBuffer() const;
-    /**
-     * has vertex attribute?
-     *
-     * @lua NA
-     */
+    /**has vertex attribute?*/
     bool hasVertexAttrib(int attrib) const;
     /**get mesh vertex attribute count*/
     ssize_t getMeshVertexAttribCount() const;
@@ -97,32 +73,20 @@ public:
     /**texture getter and setter*/
     void setTexture(const std::string& texPath);
     void setTexture(Texture2D* tex);
-    Texture2D* getTexture() const;
+    Texture2D* getTexture() const { return _texture; }
     
     /**visible getter and setter*/
     void setVisible(bool visible);
-    bool isVisible() const;
+    bool isVisible() const { return _visible; }
     
-    /**
-     * skin getter
-     *
-     * @lua NA
-     */
+    /**skin getter */
     MeshSkin* getSkin() const { return _skin; }
     
-    /**
-     * mesh index data getter
-     *
-     * @lua NA
-     */
+    /**mesh index data getter */
     MeshIndexData* getMeshIndexData() const { return _meshIndexData; }
     
-    /**
-     * get GLProgramState
-     * 
-     * @lua NA
-     */
-    GLProgramState* getGLProgramState() const;
+    /**get GLProgramState*/
+    GLProgramState* getGLProgramState() const { return _glProgramState; }
     
     /**name getter */
     const std::string& getName() const { return _name; }
@@ -130,50 +94,27 @@ public:
     void setBlendFunc(const BlendFunc &blendFunc);
     const BlendFunc &getBlendFunc() const;
     
-    /** 
-     * get primitive type
-     *
-     * @lua NA
-     */
+    /** get primitive type*/
     GLenum getPrimitiveType() const;
-    /**
-     * get index count
-     *
-     * @lua NA
-     */
+    /**get index count*/
     ssize_t getIndexCount() const;
-    /**
-     * get index format
-     *
-     * @lua NA
-     */
+    /**get index format*/
     GLenum getIndexFormat() const;
-    /**
-     * get index buffer
-     *
-     * @lua NA
-     */
+    /**get index buffer*/
     GLuint getIndexBuffer() const;
     
     /**get AABB*/
     const AABB& getAABB() const { return _aabb; }
 
-    /**  Sets a new GLProgramState for the Mesh
-     * A new Material will be created for it
-     */
+CC_CONSTRUCTOR_ACCESS:
+    
+    Mesh();
+    virtual ~Mesh();
+    
+    GLProgram* getDefaultGLProgram(bool textured);
+    
     void setGLProgramState(GLProgramState* glProgramState);
-
-    /** Sets a new Material to the Mesh */
-    void setMaterial(Material* material);
-
-    /** Returns the Material being used by the Mesh */
-    Material* getMaterial() const;
-
-    void draw(Renderer* renderer, float globalZ, const Mat4& transform, uint32_t flags, unsigned int lightMask, const Vec4& color, bool forceDepthWrite);
-
-    /** 
-     * Get the MeshCommand.
-     */
+    
     MeshCommand& getMeshCommand() { return _meshCommand; }
 
     /**skin setter*/
@@ -183,41 +124,23 @@ public:
     /**name setter*/
     void setName(const std::string& name) { _name = name; }
  
-    /** 
-     * calculate the AABB of the mesh
-     * @note the AABB is in the local space, not the world space
-     */
-    void calculateAABB();
+    void calcuateAABB();
     
-
-CC_CONSTRUCTOR_ACCESS:
-
-    Mesh();
-    virtual ~Mesh();
-
-protected:
-    void setLightUniforms(Pass* pass, Scene* scene, const Vec4& color, unsigned int lightmask);
     void bindMeshCommand();
-
-    Texture2D*          _texture;  //texture that submesh is using
-    MeshSkin*           _skin;     //skin
-    bool                _visible; // is the submesh visible
-    bool                _isTransparent; // is this mesh transparent, it is a property of material in fact
+protected:
+    Texture2D* _texture;  //texture that submesh is using
+    MeshSkin*  _skin;     //skin
+    bool       _visible; // is the submesh visible
+    bool       _isTransparent; // is this mesh transparent, it is a property of material in fact
     
-    std::string         _name;
-    MeshCommand         _meshCommand;
-    MeshIndexData*      _meshIndexData;
-    GLProgramState*     _glProgramState;
-    BlendFunc           _blend;
-    bool                _blendDirty;
-    Material*           _material;
-    AABB                _aabb;
+    std::string  _name;
+    MeshIndexData*     _meshIndexData;
+    GLProgramState* _glProgramState;
+    MeshCommand     _meshCommand;
+    BlendFunc       _blend;
+    AABB         _aabb;
     std::function<void()> _visibleChanged;
 };
-
-// end of 3d group
-/// @}
-
 
 NS_CC_END
 
